@@ -179,7 +179,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Setup do Projeto, Auth & Multi-Tenancy | 3/3 | Completed | 2026-10-19 |
 | 2. Gestão de Cursos, Módulos e Aulas | 2/2 | Completed | 2026-10-19 |
 | 3. Player de Aula e Experiência do Colaborador | 2/2 | Completed | 2026-10-19 |
-| 4. Quizzes, Certificados e Trilhas de Aprendizado | 0/3 | Ready to plan | - |
+| 4. Quizzes, Certificados e Trilhas de Aprendizado | 0/3 | Ready to execute | - |
 | 5. Faturamento e Assinaturas B2B com Mercado Pago | 0/2 | Not started | - |
 | 6. Alvora AI — Score de Evasão, Intervenção, Chat e Criação | 0/4 | Not started | - |
 | 7. Infraestrutura, Tempo Real e Observabilidade | 0/2 | Not started | - |
