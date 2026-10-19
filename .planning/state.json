@@ -11,7 +11,7 @@
     {
       "number": "2",
       "name": "Gestão de Cursos, Módulos e Aulas",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "number": "3",
@@ -41,8 +41,8 @@
   ],
   "next": {
     "command": "/gsd-progress --next",
-    "label": "Advance to Phase 2",
-    "reason": "Phase 1 completed · 14% total progress"
+    "label": "Advance to Phase 3",
+    "reason": "Phase 2 completed · 29% total progress"
   },
-  "updated_at": "2026-10-19T16:41:00.000Z"
+  "updated_at": "2026-10-19T17:18:00.000Z"
 }

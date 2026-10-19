@@ -7,7 +7,7 @@ A Alvora é construída em 7 fases verticais (Vertical MVP), partindo do alicerc
 ## Phases
 
 - [x] **Phase 1: Setup do Projeto, Auth & Multi-Tenancy** - Estrutura base Laravel 12, autenticação Sanctum, isolamento de organizações (`companies`), controle de 4 papéis e landing page B2B.
-- [ ] **Phase 2: Gestão de Cursos, Módulos e Aulas** - Painel do instrutor com CRUD estruturado de cursos, módulos, aulas e ordenação de conteúdo.
+- [x] **Phase 2: Gestão de Cursos, Módulos e Aulas** - Painel do instrutor com CRUD estruturado de cursos, módulos, aulas e ordenação de conteúdo.
 - [ ] **Phase 3: Player de Aula e Experiência do Colaborador** - Dashboard do aluno, player interativo reativo em Livewire 3 com progresso persistido e bloco de anotações.
 - [ ] **Phase 4: Quizzes, Certificados e Trilhas de Aprendizado** - Avaliações de fim de módulo com cálculo de nota, emissão de certificados PDF via DomPDF e trilhas corporativas obrigatórias.
 - [ ] **Phase 5: Faturamento e Assinaturas B2B com Mercado Pago** - Gestão de planos empresariais, processamento de pagamentos e tratamento de webhooks do Mercado Pago.
@@ -59,8 +59,8 @@ Plans:
 
 Plans:
 
-- [ ] 02-01: Modelagem e CRUD de cursos com status de publicação e validações.
-- [ ] 02-02: Interface do instrutor para gestão de módulos, aulas com anexo e ordenação de conteúdo.
+- [x] 02-01: Modelagem e CRUD de cursos com status de publicação e validações.
+- [x] 02-02: Interface do instrutor para gestão de módulos, aulas com anexo e ordenação de conteúdo.
 
 ### Phase 3: Player de Aula e Experiência do Colaborador
 
