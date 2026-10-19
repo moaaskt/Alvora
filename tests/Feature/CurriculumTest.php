@@ -10,13 +10,13 @@ use App\Models\Lesson;
 use App\Models\LessonAttachment;
 use App\Models\Module;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class CurriculumTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_instructor_can_access_curriculum_builder(): void
     {

@@ -4,6 +4,8 @@ use App\Livewire\Company\EmployeeManager;
 use App\Livewire\Instructor\CourseEditor;
 use App\Livewire\Instructor\CourseList;
 use App\Livewire\Instructor\CurriculumBuilder;
+use App\Livewire\Student\Dashboard as StudentDashboard;
+use App\Livewire\Student\LessonPlayer;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,8 +18,15 @@ Route::get('/planos', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
+        if (auth()->user()->isStudent()) {
+            return redirect()->route('student.dashboard');
+        }
         return view('dashboard');
     })->name('dashboard');
+
+    // Portal do Aluno / Colaborador
+    Route::get('/aluno/dashboard', StudentDashboard::class)->name('student.dashboard');
+    Route::get('/aluno/cursos/{course:slug}/aulas/{lesson?}', LessonPlayer::class)->name('student.player');
 
     Route::get('/empresa/colaboradores', EmployeeManager::class)
         ->middleware('role:company_admin')

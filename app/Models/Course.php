@@ -87,6 +87,14 @@ class Course extends Model
     }
 
     /**
+     * Enrollments of this course.
+     */
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    /**
      * Check if course is published.
      */
     public function isPublished(): bool

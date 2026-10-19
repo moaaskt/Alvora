@@ -8,13 +8,13 @@ use App\Livewire\Instructor\CourseList;
 use App\Models\Company;
 use App\Models\Course;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class CourseTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_instructor_and_company_admin_can_access_course_catalog(): void
     {

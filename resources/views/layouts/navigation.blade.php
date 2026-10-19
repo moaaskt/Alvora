@@ -72,16 +72,16 @@
                         </a>
                     @else
                         <!-- Aluno / Colaborador Links -->
-                        <a href="{{ route('dashboard') }}" class="text-white hover:text-indigo-400 transition-colors py-2 flex items-center gap-1.5">
+                        <a href="{{ route('student.dashboard') }}" class="text-white hover:text-indigo-400 transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('student.dashboard') ? 'text-indigo-400 font-semibold' : '' }}">
                             Meu Aprendizado
                         </a>
-                        <a href="{{ route('dashboard') }}" class="text-slate-300 hover:text-white transition-colors py-2">
+                        <a href="{{ route('student.dashboard') }}#catalogo" class="text-slate-300 hover:text-white transition-colors py-2">
                             Catálogo de Cursos
                         </a>
-                        <a href="{{ route('dashboard') }}" class="text-slate-300 hover:text-white transition-colors py-2">
+                        <a href="{{ route('student.dashboard') }}" class="text-slate-300 hover:text-white transition-colors py-2">
                             Minhas Trilhas
                         </a>
-                        <a href="{{ route('dashboard') }}" class="text-slate-300 hover:text-white transition-colors py-2">
+                        <a href="{{ route('student.dashboard') }}" class="text-slate-300 hover:text-white transition-colors py-2">
                             Meus Certificados
                         </a>
                     @endif

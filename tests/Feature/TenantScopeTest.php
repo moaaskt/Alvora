@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
@@ -26,12 +26,13 @@ class TestTenantDocument extends Model
 
 class TenantScopeTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {
         parent::setUp();
 
+        Schema::dropIfExists('test_tenant_documents');
         Schema::create('test_tenant_documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
@@ -147,5 +148,11 @@ class TenantScopeTest extends TestCase
         $response = $this->get('/test-company-admin-route');
         $response->assertStatus(200);
         $response->assertJson(['status' => 'authorized']);
+    }
+
+    protected function tearDown(): void
+    {
+        Schema::dropIfExists('test_tenant_documents');
+        parent::tearDown();
     }
 }

@@ -20,9 +20,9 @@
 
 ### Experiência do Aluno & Player
 
-- [ ] **PLAY-01**: Aluno visualiza seu dashboard com cursos matriculados, porcentagem de conclusão e trilhas ativas.
-- [ ] **PLAY-02**: Aluno assiste às aulas em um player interativo com suporte a anotações pessoais persistidas e download de materiais.
-- [ ] **PLAY-03**: O progresso da aula (`completed_at`) é computado e sincronizado de forma reativa via Livewire 3 conforme o aluno avança.
+- [x] **PLAY-01**: Aluno visualiza seu dashboard com cursos matriculados, porcentagem de conclusão e trilhas ativas.
+- [x] **PLAY-02**: Aluno assiste às aulas em um player interativo com suporte a anotações pessoais persistidas e download de materiais.
+- [x] **PLAY-03**: O progresso da aula (`completed_at`) é computado e sincronizado de forma reativa via Livewire 3 conforme o aluno avança.
 
 ### Avaliações, Trilhas & Certificados
 
@@ -84,16 +84,16 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| BILL-01 | Phase 1 | Pending |
-| CURS-01 | Phase 2 | Pending |
-| CURS-02 | Phase 2 | Pending |
-| PLAY-01 | Phase 3 | Pending |
-| PLAY-02 | Phase 3 | Pending |
-| PLAY-03 | Phase 3 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
+| BILL-01 | Phase 1 | Complete |
+| CURS-01 | Phase 2 | Complete |
+| CURS-02 | Phase 2 | Complete |
+| PLAY-01 | Phase 3 | Complete |
+| PLAY-02 | Phase 3 | Complete |
+| PLAY-03 | Phase 3 | Complete |
 | EVAL-01 | Phase 4 | Pending |
 | EVAL-02 | Phase 4 | Pending |
 | EVAL-03 | Phase 4 | Pending |

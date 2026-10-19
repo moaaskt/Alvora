@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -111,5 +112,29 @@ class User extends Authenticatable
         $userRoleValue = $this->role instanceof UserRole ? $this->role->value : $this->role;
 
         return $userRoleValue === $roleValue;
+    }
+
+    /**
+     * User course enrollments.
+     */
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    /**
+     * User lessons progress.
+     */
+    public function lessonProgress(): HasMany
+    {
+        return $this->hasMany(LessonProgress::class);
+    }
+
+    /**
+     * User lessons notes.
+     */
+    public function lessonNotes(): HasMany
+    {
+        return $this->hasMany(LessonNote::class);
     }
 }
