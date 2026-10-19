@@ -6,7 +6,7 @@ A Alvora é construída em 7 fases verticais (Vertical MVP), partindo do alicerc
 
 ## Phases
 
-- [ ] **Phase 1: Setup do Projeto, Auth & Multi-Tenancy** - Estrutura base Laravel 12, autenticação Sanctum, isolamento de organizações (`companies`), controle de 4 papéis e landing page B2B.
+- [x] **Phase 1: Setup do Projeto, Auth & Multi-Tenancy** - Estrutura base Laravel 12, autenticação Sanctum, isolamento de organizações (`companies`), controle de 4 papéis e landing page B2B.
 - [ ] **Phase 2: Gestão de Cursos, Módulos e Aulas** - Painel do instrutor com CRUD estruturado de cursos, módulos, aulas e ordenação de conteúdo.
 - [ ] **Phase 3: Player de Aula e Experiência do Colaborador** - Dashboard do aluno, player interativo reativo em Livewire 3 com progresso persistido e bloco de anotações.
 - [ ] **Phase 4: Quizzes, Certificados e Trilhas de Aprendizado** - Avaliações de fim de módulo com cálculo de nota, emissão de certificados PDF via DomPDF e trilhas corporativas obrigatórias.
@@ -35,12 +35,12 @@ A Alvora é construída em 7 fases verticais (Vertical MVP), partindo do alicerc
 Plans:
 **Wave 1**
 
-- [ ] 01-01: Bootstrap do Laravel 12, layout base Blade, Livewire 3 e landing page B2B pública.
-- [ ] 01-02: Migrations de `companies`, `company_users`, `users`, roles e configuração do Sanctum.
+- [x] 01-01: Bootstrap do Laravel 12, layout base Blade, Livewire 3 e landing page B2B pública.
+- [x] 01-02: Migrations de `companies`, `company_users`, `users`, roles e configuração do Sanctum.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-03: Telas de autenticação, proteção de rotas por tenant/role e gestão de convites de colaboradores.
+- [x] 01-03: Telas de autenticação, proteção de rotas por tenant/role e gestão de convites de colaboradores.
 
 ### Phase 2: Gestão de Cursos, Módulos e Aulas
 
