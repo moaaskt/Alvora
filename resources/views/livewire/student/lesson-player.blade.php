@@ -41,9 +41,14 @@
                 </div>
 
                 @if ($progressPercent >= 100)
-                    <span class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                        Curso Concluído ✓
-                    </span>
+                    <a
+                        href="{{ route('student.certificate', $course->slug) }}"
+                        target="_blank"
+                        class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 transition shadow-lg shadow-emerald-500/20"
+                    >
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        Baixar Certificado 🎓
+                    </a>
                 @endif
             </div>
         </div>

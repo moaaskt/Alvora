@@ -137,4 +137,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(LessonNote::class);
     }
+
+    /**
+     * Certificates earned by user.
+     */
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class);
+    }
 }

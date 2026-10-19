@@ -51,12 +51,13 @@ class TenantScopeTest extends TestCase
 
     public function test_tenant_scope_filters_queries_to_authenticated_user_company(): void
     {
-        $companyA = Company::create(['name' => 'Empresa Alfa', 'status' => 'active']);
-        $companyB = Company::create(['name' => 'Empresa Beta', 'status' => 'active']);
+        $unique = uniqid();
+        $companyA = Company::create(['name' => "Empresa Alfa {$unique}", 'status' => 'active']);
+        $companyB = Company::create(['name' => "Empresa Beta {$unique}", 'status' => 'active']);
 
         $userA = User::create([
             'name' => 'João Alfa',
-            'email' => 'joao@alfa.com',
+            'email' => "joao_{$unique}@alfa.com",
             'password' => bcrypt('password'),
             'company_id' => $companyA->id,
             'role' => UserRole::STUDENT,
@@ -76,11 +77,12 @@ class TenantScopeTest extends TestCase
 
     public function test_tenant_scope_automatically_injects_company_id_on_creation(): void
     {
-        $company = Company::create(['name' => 'Tech Corp', 'status' => 'active']);
+        $unique = uniqid();
+        $company = Company::create(['name' => "Tech Corp {$unique}", 'status' => 'active']);
 
         $user = User::create([
             'name' => 'Admin RH',
-            'email' => 'rh@techcorp.com',
+            'email' => "rh_{$unique}@techcorp.com",
             'password' => bcrypt('password'),
             'company_id' => $company->id,
             'role' => UserRole::COMPANY_ADMIN,
@@ -96,15 +98,16 @@ class TenantScopeTest extends TestCase
 
     public function test_admin_alvora_bypasses_tenant_isolation_completely(): void
     {
-        $companyA = Company::create(['name' => 'Empresa A', 'status' => 'active']);
-        $companyB = Company::create(['name' => 'Empresa B', 'status' => 'active']);
+        $unique = uniqid();
+        $companyA = Company::create(['name' => "Empresa A {$unique}", 'status' => 'active']);
+        $companyB = Company::create(['name' => "Empresa B {$unique}", 'status' => 'active']);
 
         TestTenantDocument::create(['title' => 'Doc 1', 'company_id' => $companyA->id]);
         TestTenantDocument::create(['title' => 'Doc 2', 'company_id' => $companyB->id]);
 
         $superAdmin = User::create([
             'name' => 'Admin Global',
-            'email' => 'admin@alvora.com',
+            'email' => "admin_{$unique}@alvora.com",
             'password' => bcrypt('password'),
             'company_id' => null,
             'role' => UserRole::ADMIN_ALVORA,
@@ -120,11 +123,12 @@ class TenantScopeTest extends TestCase
 
     public function test_ensure_user_has_role_middleware(): void
     {
-        $company = Company::create(['name' => 'Acme Inc', 'status' => 'active']);
+        $unique = uniqid();
+        $company = Company::create(['name' => "Acme Inc {$unique}", 'status' => 'active']);
 
         $rhUser = User::create([
             'name' => 'Gestor RH',
-            'email' => 'rh@acme.com',
+            'email' => "rh_{$unique}@acme.com",
             'password' => bcrypt('password'),
             'company_id' => $company->id,
             'role' => UserRole::COMPANY_ADMIN,
@@ -132,7 +136,7 @@ class TenantScopeTest extends TestCase
 
         $studentUser = User::create([
             'name' => 'Aluno Simples',
-            'email' => 'aluno@acme.com',
+            'email' => "aluno_{$unique}@acme.com",
             'password' => bcrypt('password'),
             'company_id' => $company->id,
             'role' => UserRole::STUDENT,

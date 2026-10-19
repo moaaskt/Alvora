@@ -48,4 +48,12 @@ class Module extends Model
     {
         return (int) $this->lessons()->sum('duration_minutes');
     }
+
+    /**
+     * Quizzes of this module.
+     */
+    public function quizzes(): HasMany
+    {
+        return $this->hasMany(Quiz::class);
+    }
 }

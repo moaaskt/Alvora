@@ -115,8 +115,18 @@ class Dashboard extends Component
             ->latest()
             ->get();
 
+        // Corporate Learning Tracks for this student
+        $trackEnrollments = \App\Models\TrackEnrollment::with(['track.courses'])
+            ->where('user_id', $user->id)
+            ->get();
+
+        foreach ($trackEnrollments as $te) {
+            $te->updateConsolidatedProgress();
+        }
+
         return view('livewire.student.dashboard', [
             'enrollments' => $enrollments,
+            'trackEnrollments' => $trackEnrollments,
             'totalEnrolled' => $totalEnrolled,
             'completedCount' => $completedCount,
             'inProgressCount' => $inProgressCount,

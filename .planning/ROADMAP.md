@@ -9,7 +9,7 @@ A Alvora é construída em 7 fases verticais (Vertical MVP), partindo do alicerc
 - [x] **Phase 1: Setup do Projeto, Auth & Multi-Tenancy** - Estrutura base Laravel 12, autenticação Sanctum, isolamento de organizações (`companies`), controle de 4 papéis e landing page B2B.
 - [x] **Phase 2: Gestão de Cursos, Módulos e Aulas** - Painel do instrutor com CRUD estruturado de cursos, módulos, aulas e ordenação de conteúdo.
 - [x] **Phase 3: Player de Aula e Experiência do Colaborador** - Dashboard do aluno, player interativo reativo em Livewire 3 com progresso persistido e bloco de anotações.
-- [ ] **Phase 4: Quizzes, Certificados e Trilhas de Aprendizado** - Avaliações de fim de módulo com cálculo de nota, emissão de certificados PDF via DomPDF e trilhas corporativas obrigatórias.
+- [x] **Phase 4: Quizzes, Certificados e Trilhas de Aprendizado** - Avaliações de fim de módulo com cálculo de nota, emissão de certificados PDF via DomPDF e trilhas corporativas obrigatórias.
 - [ ] **Phase 5: Faturamento e Assinaturas B2B com Mercado Pago** - Gestão de planos empresariais, processamento de pagamentos e tratamento de webhooks do Mercado Pago.
 - [ ] **Phase 6: Alvora AI — Score de Evasão, Intervenção, Chat e Criação** - Motor ponderado de risco, intervenções ativas para alunos em risco, sala de situação, assistente via Groq e geração de cursos com fallback OpenRouter.
 - [ ] **Phase 7: Infraestrutura, Tempo Real e Observabilidade** - Monitoramento de filas com Horizon, WebSockets nativos com Reverb, health checks, Telescope/Sentry e ambiente Docker com Octane.
@@ -100,9 +100,9 @@ Plans:
 
 Plans:
 
-- [ ] 04-01: Criação e execução de quizzes com feedback imediato e pontuação mínima.
-- [ ] 04-02: Template e motor de geração de certificados em PDF com validação de conclusão.
-- [ ] 04-03: Gestão de trilhas de aprendizado e associação a departamentos/cargos.
+- [x] 04-01: Criação e execução de quizzes com feedback imediato e pontuação mínima.
+- [x] 04-02: Template e motor de geração de certificados em PDF com validação de conclusão.
+- [x] 04-03: Gestão de trilhas de aprendizado e associação a departamentos/cargos.
 
 ### Phase 5: Faturamento e Assinaturas B2B com Mercado Pago
 
@@ -179,7 +179,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Setup do Projeto, Auth & Multi-Tenancy | 3/3 | Completed | 2026-10-19 |
 | 2. Gestão de Cursos, Módulos e Aulas | 2/2 | Completed | 2026-10-19 |
 | 3. Player de Aula e Experiência do Colaborador | 2/2 | Completed | 2026-10-19 |
-| 4. Quizzes, Certificados e Trilhas de Aprendizado | 0/3 | Ready to execute | - |
+| 4. Quizzes, Certificados e Trilhas de Aprendizado | 3/3 | Completed | 2026-10-19 |
 | 5. Faturamento e Assinaturas B2B com Mercado Pago | 0/2 | Not started | - |
 | 6. Alvora AI — Score de Evasão, Intervenção, Chat e Criação | 0/4 | Not started | - |
 | 7. Infraestrutura, Tempo Real e Observabilidade | 0/2 | Not started | - |

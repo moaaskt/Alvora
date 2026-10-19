@@ -108,6 +108,100 @@
         </div>
     </div>
 
+    {{-- Seção: Minhas Trilhas Corporativas (EVAL-04) --}}
+    @if ($trackEnrollments->isNotEmpty())
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    Minhas Trilhas Corporativas
+                </h2>
+                <span class="text-xs text-gray-400">{{ $trackEnrollments->count() }} trilha(s) atribuída(s)</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                @foreach ($trackEnrollments as $trackEnrollment)
+                    @php $track = $trackEnrollment->track; @endphp
+                    <div class="bg-gray-900/60 border border-white/5 rounded-2xl p-6 hover:border-white/10 transition flex flex-col justify-between space-y-4 shadow-xl relative overflow-hidden">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-2">
+                                    @if ($track->department)
+                                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+                                            {{ $track->department }}
+                                        </span>
+                                    @endif
+                                </div>
+
+                                @if ($track->is_mandatory)
+                                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20 flex items-center gap-1">
+                                        <svg class="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                        Obrigatória
+                                    </span>
+                                @else
+                                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-slate-800 text-slate-400">
+                                        Opcional
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div>
+                                <h3 class="text-lg font-bold text-white tracking-tight">{{ $track->title }}</h3>
+                                @if ($track->description)
+                                    <p class="text-xs text-gray-400 mt-1 line-clamp-2">{{ $track->description }}</p>
+                                @endif
+                            </div>
+
+                            {{-- Barra de Progresso Consolidado da Trilha --}}
+                            <div class="pt-1">
+                                <div class="flex justify-between text-xs text-gray-400 mb-1.5">
+                                    <span class="font-medium text-slate-300">Progresso Consolidado da Trilha</span>
+                                    <span class="font-bold {{ $trackEnrollment->progress_percent >= 100 ? 'text-emerald-400' : 'text-indigo-400' }}">
+                                        {{ $trackEnrollment->progress_percent }}%
+                                    </span>
+                                </div>
+                                <div class="w-full bg-gray-800 rounded-full h-2.5 overflow-hidden">
+                                    <div class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-2.5 rounded-full transition-all duration-500" style="width: {{ $trackEnrollment->progress_percent }}%"></div>
+                                </div>
+                            </div>
+
+                            {{-- Sequência de Cursos da Trilha --}}
+                            <div class="pt-2">
+                                <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cursos da Trilha ({{ $track->courses->count() }}):</span>
+                                <div class="mt-2 space-y-1.5">
+                                    @foreach ($track->courses as $course)
+                                        @php
+                                            $courseEnrollment = $enrollments->firstWhere('course_id', $course->id);
+                                            $coursePercent = $courseEnrollment?->progress_percent ?? 0;
+                                            $isCompleted = $courseEnrollment && $courseEnrollment->status === 'completed';
+                                        @endphp
+                                        <div class="flex items-center justify-between text-xs p-2 rounded-lg bg-gray-950/60 border border-white/5">
+                                            <div class="flex items-center gap-2 truncate">
+                                                <span class="w-4 h-4 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center text-[10px] font-bold">
+                                                    {{ $loop->iteration }}
+                                                </span>
+                                                <span class="truncate font-medium text-slate-200">{{ $course->title }}</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                @if ($isCompleted)
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                        Concluído ✓
+                                                    </span>
+                                                @else
+                                                    <span class="text-[11px] font-semibold text-slate-400">{{ $coursePercent }}%</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     {{-- Seção: Meus Cursos em Andamento --}}
     <div class="space-y-4">
         <div class="flex items-center justify-between">

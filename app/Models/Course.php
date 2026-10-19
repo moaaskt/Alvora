@@ -95,6 +95,22 @@ class Course extends Model
     }
 
     /**
+     * Quizzes of this course.
+     */
+    public function quizzes(): HasMany
+    {
+        return $this->hasMany(Quiz::class);
+    }
+
+    /**
+     * Certificates issued for this course.
+     */
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class);
+    }
+
+    /**
      * Check if course is published.
      */
     public function isPublished(): bool
