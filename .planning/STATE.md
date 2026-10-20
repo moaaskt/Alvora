@@ -1,16 +1,16 @@
 ---
 gsd_state_version: "1.0"
-current_phase: 4
-current_phase_name: Quizzes, Certificados e Trilhas de Aprendizado
-status: completed
-stopped_at: Phase 4 executed and verified with 100% test pass
-last_updated: "2026-10-19T18:20:00.000Z"
+current_phase: 5
+current_phase_name: Faturamento e Assinaturas B2B com Mercado Pago
+status: ready_to_plan
+stopped_at: Ready to plan Phase 5
+last_updated: "2026-10-19T18:23:00.000Z"
 last_activity: 2026-10-19
-last_activity_desc: Phase 4 (Quizzes, Certificados e Trilhas de Aprendizado) completed (3/3 plans verified)
+last_activity_desc: Ready to plan Phase 5 (Faturamento e Assinaturas B2B com Mercado Pago)
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 10
+  total_plans: 12
   completed_plans: 10
   percent: 57
 ---
@@ -22,14 +22,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-19)
 
 **Core value:** Combater a evasão no treinamento corporativo através do cálculo contínuo do Score de Risco de Evasão e intervenção preditiva automatizada via IA antes da desistência do colaborador.
-**Current focus:** Phase 4 completed. Ready for Phase 5 (Faturamento e Assinaturas B2B com Mercado Pago).
+**Current focus:** Phase 5: Faturamento e Assinaturas B2B com Mercado Pago
 
 ## Current Position
 
-Phase: 4 (Quizzes, Certificados e Trilhas de Aprendizado) — COMPLETED
-Plan: 3 of 3 in current phase completed
-Status: Phase completed & verified
-Last activity: 2026-10-19 — Phase 4 executed (Quizzes, Certificados via DomPDF e Trilhas Corporativas com TenantScope)
+Phase: 5 (Faturamento e Assinaturas B2B com Mercado Pago) — READY TO PLAN
+Plan: 0 of 2 in current phase
+Status: Ready to plan
+Last activity: 2026-10-19 — Transição para Fase 5 após conclusão integral da Fase 4
 
 Progress: [██████░░░░] 57%
 
@@ -89,5 +89,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-10-19
-Stopped at: Phase 4 execution completed and verified (50/50 tests passed)
-Resume file: .planning/phases/04-quizzes-certificados-e-trilhas-de-aprendizado/04-03-SUMMARY.md
+Stopped at: Phase 4 completed; ready to plan Phase 5
+Resume file: .planning/ROADMAP.md
