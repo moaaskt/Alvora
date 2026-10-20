@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'mercadopago' => [
+        'access_token' => env('MERCADO_PAGO_ACCESS_TOKEN', 'TEST-fake-access-token'),
+        'public_key' => env('MERCADO_PAGO_PUBLIC_KEY', 'TEST-fake-public-key'),
+        'webhook_secret' => env('MERCADO_PAGO_WEBHOOK_SECRET', 'fake-webhook-secret'),
+        'base_url' => env('MERCADO_PAGO_BASE_URL', 'https://api.mercadopago.com'),
+    ],
+
 ];

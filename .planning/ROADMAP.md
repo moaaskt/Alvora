@@ -10,7 +10,7 @@ A Alvora é construída em 7 fases verticais (Vertical MVP), partindo do alicerc
 - [x] **Phase 2: Gestão de Cursos, Módulos e Aulas** - Painel do instrutor com CRUD estruturado de cursos, módulos, aulas e ordenação de conteúdo.
 - [x] **Phase 3: Player de Aula e Experiência do Colaborador** - Dashboard do aluno, player interativo reativo em Livewire 3 com progresso persistido e bloco de anotações.
 - [x] **Phase 4: Quizzes, Certificados e Trilhas de Aprendizado** - Avaliações de fim de módulo com cálculo de nota, emissão de certificados PDF via DomPDF e trilhas corporativas obrigatórias.
-- [ ] **Phase 5: Faturamento e Assinaturas B2B com Mercado Pago** - Gestão de planos empresariais, processamento de pagamentos e tratamento de webhooks do Mercado Pago.
+- [x] **Phase 5: Faturamento e Assinaturas B2B com Mercado Pago** - Gestão de planos empresariais, processamento de pagamentos e tratamento de webhooks do Mercado Pago.
 - [ ] **Phase 6: Alvora AI — Score de Evasão, Intervenção, Chat e Criação** - Motor ponderado de risco, intervenções ativas para alunos em risco, sala de situação, assistente via Groq e geração de cursos com fallback OpenRouter.
 - [ ] **Phase 7: Infraestrutura, Tempo Real e Observabilidade** - Monitoramento de filas com Horizon, WebSockets nativos com Reverb, health checks, Telescope/Sentry e ambiente Docker com Octane.
 
@@ -121,8 +121,8 @@ Plans:
 
 Plans:
 
-- [ ] 05-01: Integração com SDK/API do Mercado Pago para checkout de assinaturas corporativas.
-- [ ] 05-02: Handler seguro de webhooks, atualização de status de tenant e telas de faturamento.
+- [x] 05-01: Integração com SDK/API do Mercado Pago para checkout de assinaturas corporativas.
+- [x] 05-02: Handler seguro de webhooks, atualização de status de tenant e telas de faturamento.
 
 ### Phase 6: Alvora AI — Score de Evasão, Intervenção, Chat e Criação
 
@@ -180,6 +180,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Gestão de Cursos, Módulos e Aulas | 2/2 | Completed | 2026-10-19 |
 | 3. Player de Aula e Experiência do Colaborador | 2/2 | Completed | 2026-10-19 |
 | 4. Quizzes, Certificados e Trilhas de Aprendizado | 3/3 | Completed | 2026-10-19 |
-| 5. Faturamento e Assinaturas B2B com Mercado Pago | 0/2 | Not started | - |
+| 5. Faturamento e Assinaturas B2B com Mercado Pago | 2/2 | Completed | 2026-10-20 |
 | 6. Alvora AI — Score de Evasão, Intervenção, Chat e Criação | 0/4 | Not started | - |
 | 7. Infraestrutura, Tempo Real e Observabilidade | 0/2 | Not started | - |

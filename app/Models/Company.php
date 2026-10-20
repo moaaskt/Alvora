@@ -43,11 +43,62 @@ class Company extends Model
     }
 
     /**
+     * Get all subscriptions for this company.
+     */
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    /**
+     * Get all invoices for this company.
+     */
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    /**
+     * Get the active or overdue subscription for this company.
+     */
+    public function activeSubscription(): ?Subscription
+    {
+        return $this->subscriptions()
+            ->whereIn('status', ['active', 'overdue'])
+            ->latest('id')
+            ->first();
+    }
+
+    /**
+     * Check if company has an active or in-grace subscription.
+     */
+    public function hasActiveSubscription(): bool
+    {
+        return $this->activeSubscription() !== null;
+    }
+
+    /**
      * Check if company status is active.
      */
     public function isActive(): bool
     {
         return $this->status === 'active';
+    }
+
+    /**
+     * Check if company is in overdue/grace period.
+     */
+    public function isOverdue(): bool
+    {
+        return $this->status === 'overdue';
+    }
+
+    /**
+     * Check if company is suspended.
+     */
+    public function isSuspended(): bool
+    {
+        return $this->status === 'suspended';
     }
 
     /**
