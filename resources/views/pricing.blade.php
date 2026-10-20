@@ -6,9 +6,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold">
+                <!-- <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold">
                     Planos Transparentes e Escaláveis
-                </div>
+                </div> -->
                 <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
                     Investimento sob medida para o crescimento do seu time
                 </h1>
