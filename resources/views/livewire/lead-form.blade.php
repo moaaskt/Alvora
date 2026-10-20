@@ -19,10 +19,6 @@
         </div>
     @else
         <div class="mb-8">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold mb-3">
-                <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
-                Demonstração Guiada Gratuita
-            </div>
             <h3 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Agende uma Apresentação Executiva</h3>
             <p class="text-slate-400 text-sm mt-2">
                 Descubra como nossa IA preditiva identifica padrões de desistência e aumenta a conclusão dos cursos do seu time.
