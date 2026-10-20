@@ -7,33 +7,33 @@
 
 ### Autenticação & Multi-tenancy
 
-- [ ] **AUTH-01**: Usuário pode se cadastrar e efetuar login com e-mail e senha via Laravel Sanctum com sessões e tokens de API.
-- [ ] **AUTH-02**: O sistema isola dados por organização (`companies`) garantindo que colaboradores vejam apenas dados da sua empresa.
-- [ ] **AUTH-03**: O sistema suporta 4 perfis de acesso com permissões granulares: `admin_alvora`, `company_admin`, `instructor` e `student`.
-- [ ] **AUTH-04**: O `company_admin` pode convidar colaboradores para sua empresa e gerenciar o status dos usuários.
+- [x] **AUTH-01**: Usuário pode se cadastrar e efetuar login com e-mail e senha via Laravel Sanctum com sessões e tokens de API.
+- [x] **AUTH-02**: O sistema isola dados por organização (`companies`) garantindo que colaboradores vejam apenas dados da sua empresa.
+- [x] **AUTH-03**: O sistema suporta 4 perfis de acesso com permissões granulares: `admin_alvora`, `company_admin`, `instructor` e `student`.
+- [x] **AUTH-04**: O `company_admin` pode convidar colaboradores para sua empresa e gerenciar o status dos usuários.
 
 ### Cursos & Conteúdo do Instrutor
 
-- [ ] **CURS-01**: Instrutor pode criar, editar e excluir cursos com título, slug, descrição e status de publicação.
-- [ ] **CURS-02**: Instrutor pode estruturar cursos em módulos e aulas ordenadas com suporte a URLs de vídeo, duração e materiais complementares.
+- [x] **CURS-01**: Instrutor pode criar, editar e excluir cursos com título, slug, descrição e status de publicação.
+- [x] **CURS-02**: Instrutor pode estruturar cursos em módulos e aulas ordenadas com suporte a URLs de vídeo, duração e materiais complementares.
 - [ ] **CURS-03**: Instrutor pode gerar a estrutura preliminar de um curso por comando em linguagem natural via IA (módulos, títulos e ementa) para revisão antes da publicação.
 
 ### Experiência do Aluno & Player
 
-- [ ] **PLAY-01**: Aluno visualiza seu dashboard com cursos matriculados, porcentagem de conclusão e trilhas ativas.
-- [ ] **PLAY-02**: Aluno assiste às aulas em um player interativo com suporte a anotações pessoais persistidas e download de materiais.
-- [ ] **PLAY-03**: O progresso da aula (`completed_at`) é computado e sincronizado de forma reativa via Livewire 3 conforme o aluno avança.
+- [x] **PLAY-01**: Aluno visualiza seu dashboard com cursos matriculados, porcentagem de conclusão e trilhas ativas.
+- [x] **PLAY-02**: Aluno assiste às aulas em um player interativo com suporte a anotações pessoais persistidas e download de materiais.
+- [x] **PLAY-03**: O progresso da aula (`completed_at`) é computado e sincronizado de forma reativa via Livewire 3 conforme o aluno avança.
 
 ### Avaliações, Trilhas & Certificados
 
-- [ ] **EVAL-01**: Instrutor pode cadastrar perguntas de quiz (múltipla escolha) vinculadas a aulas e módulos.
-- [ ] **EVAL-02**: Aluno realiza tentativas de quiz com correção imediata, armazenamento de histórico de notas e checagem de aproveitamento mínimo.
-- [ ] **EVAL-03**: Aluno gera e faz download de certificado em PDF via DomPDF automaticamente ao atingir 100% de conclusão de um curso.
-- [ ] **EVAL-04**: Gestor (`company_admin`) pode criar trilhas de aprendizado vinculando cursos com indicação de obrigatoriedade por departamento ou cargo.
+- [x] **EVAL-01**: Instrutor pode cadastrar perguntas de quiz (múltipla escolha) vinculadas a aulas e módulos.
+- [x] **EVAL-02**: Aluno realiza tentativas de quiz com correção imediata, armazenamento de histórico de notas e checagem de aproveitamento mínimo.
+- [x] **EVAL-03**: Aluno gera e faz download de certificado em PDF via DomPDF automaticamente ao atingir 100% de conclusão de um curso.
+- [x] **EVAL-04**: Gestor (`company_admin`) pode criar trilhas de aprendizado vinculando cursos com indicação de obrigatoriedade por departamento ou cargo.
 
 ### Faturamento & Assinaturas B2B
 
-- [ ] **BILL-01**: O sistema disponibiliza página pública institucional e página de planos de contratação B2B.
+- [x] **BILL-01**: O sistema disponibiliza página pública institucional e página de planos de contratação B2B.
 - [ ] **BILL-02**: Integração com Mercado Pago para cobrança de assinaturas de empresas com processamento de webhooks para ativação e bloqueio de acesso.
 - [ ] **BILL-03**: `admin_alvora` e `company_admin` podem visualizar status de contrato, faturamento e planos ativos.
 
@@ -84,20 +84,20 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| BILL-01 | Phase 1 | Pending |
-| CURS-01 | Phase 2 | Pending |
-| CURS-02 | Phase 2 | Pending |
-| PLAY-01 | Phase 3 | Pending |
-| PLAY-02 | Phase 3 | Pending |
-| PLAY-03 | Phase 3 | Pending |
-| EVAL-01 | Phase 4 | Pending |
-| EVAL-02 | Phase 4 | Pending |
-| EVAL-03 | Phase 4 | Pending |
-| EVAL-04 | Phase 4 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
+| BILL-01 | Phase 1 | Complete |
+| CURS-01 | Phase 2 | Complete |
+| CURS-02 | Phase 2 | Complete |
+| PLAY-01 | Phase 3 | Complete |
+| PLAY-02 | Phase 3 | Complete |
+| PLAY-03 | Phase 3 | Complete |
+| EVAL-01 | Phase 4 | Complete |
+| EVAL-02 | Phase 4 | Complete |
+| EVAL-03 | Phase 4 | Complete |
+| EVAL-04 | Phase 4 | Complete |
 | BILL-02 | Phase 5 | Pending |
 | BILL-03 | Phase 5 | Pending |
 | EVAS-01 | Phase 6 | Pending |

@@ -6,12 +6,12 @@
     {
       "number": "1",
       "name": "Setup do Projeto, Auth & Multi-Tenancy",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "number": "2",
       "name": "Gestão de Cursos, Módulos e Aulas",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "number": "3",
@@ -41,8 +41,8 @@
   ],
   "next": {
     "command": "/gsd-progress --next",
-    "label": "Advance to the next step",
-    "reason": "Phase 1 of 7 · 0% · executing"
+    "label": "Advance to Phase 3",
+    "reason": "Phase 2 completed · 29% total progress"
   },
-  "updated_at": "2026-10-19T09:07:59.093Z"
+  "updated_at": "2026-10-19T17:18:00.000Z"
 }
