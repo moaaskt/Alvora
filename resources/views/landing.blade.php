@@ -8,12 +8,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-4xl mx-auto space-y-6">
                 <!-- Badge de Destaque -->
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-700/80 shadow-inner">
+                <!-- <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-700/80 shadow-inner">
                     <span class="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
                     <span class="text-xs font-semibold text-emerald-400">Novo Paradigma em T&D Corporativo</span>
                     <span class="text-slate-600">•</span>
                     <span class="text-xs text-slate-300">Inteligência Preditiva Ativa</span>
-                </div>
+                </div> -->
 
                 <!-- Headline Principal -->
                 <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15]">
