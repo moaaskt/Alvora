@@ -68,6 +68,12 @@
         </template>
     </div>
 
+    @auth
+        @if(auth()->user()->isStudent())
+            @livewire('student.ai-tutor-drawer')
+        @endif
+    @endauth
+
     @livewireScripts
 </body>
 </html>

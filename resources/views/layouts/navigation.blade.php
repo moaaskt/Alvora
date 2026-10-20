@@ -57,6 +57,13 @@
                         <a href="{{ route('company.tracks.index') }}" class="text-slate-300 hover:text-white transition-colors py-2 {{ request()->routeIs('company.tracks.*') ? 'text-indigo-400 font-semibold' : '' }}">
                             Trilhas Corporativas
                         </a>
+                        <a href="{{ route('company.situation-room') }}" class="text-slate-300 hover:text-white transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('company.situation-room*') ? 'text-rose-400 font-semibold' : '' }}">
+                            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                            Sala de Situação
+                        </a>
+                        <a href="{{ route('company.ai-insights') }}" class="text-slate-300 hover:text-white transition-colors py-2 {{ request()->routeIs('company.ai-insights*') ? 'text-indigo-400 font-semibold' : '' }}">
+                            Insights de IA
+                        </a>
                         <a href="{{ route('company.billing') }}" class="text-slate-300 hover:text-white transition-colors py-2 {{ request()->routeIs('company.billing*') ? 'text-indigo-400 font-semibold' : '' }}">
                             Assinatura & Plano
                         </a>

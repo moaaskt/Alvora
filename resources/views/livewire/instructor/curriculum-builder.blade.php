@@ -30,6 +30,11 @@
         </button>
     </div>
 
+    <!-- Gerador de Grade com IA (OpenRouter Fallback) -->
+    <div class="mb-6">
+        @livewire('instructor.curriculum-ai-generator', ['courseId' => $course->id])
+    </div>
+
     <!-- Modal Novo Módulo -->
     @if($showNewModuleModal)
         <div class="p-6 rounded-2xl bg-slate-900 border border-indigo-500/40 shadow-2xl relative">

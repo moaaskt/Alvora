@@ -1,19 +1,19 @@
 ---
 gsd_state_version: "1.0"
-current_phase: 5
-current_phase_name: Faturamento e Assinaturas B2B com Mercado Pago
+current_phase: 6
+current_phase_name: Alvora AI — Score de Evasão, Intervenção, Chat e Criação
 status: completed
-stopped_at: Phase 05 completed (2/2 plans)
-last_updated: "2026-10-20T08:36:00.000Z"
+stopped_at: Phase 06 completed (4/4 plans)
+last_updated: "2026-10-20T15:22:00.000Z"
 last_activity: 2026-10-20
-last_activity_desc: Phase 5 completed (Faturamento e Assinaturas B2B com Mercado Pago)
+last_activity_desc: Phase 6 completed (Alvora AI - Score, Intervenção, Groq Chat e OpenRouter Fallback)
 state_head: developer
 progress:
   total_phases: 7
-  completed_phases: 5
-  total_plans: 12
-  completed_plans: 12
-  percent: 71
+  completed_phases: 6
+  total_plans: 16
+  completed_plans: 16
+  percent: 86
 ---
 
 # Project State
@@ -27,20 +27,20 @@ See: .planning/PROJECT.md (updated 2026-10-19)
 
 ## Current Position
 
-Phase: 5 (Faturamento e Assinaturas B2B com Mercado Pago) — COMPLETED
-Plan: 2 of 2 in current phase (12 of 12 total plans)
-Status: Phase 5 completed, ready for Phase 6
-Last activity: 2026-10-20 — Fase 5 concluída com sucesso (05-01 e 05-02)
+Phase: 6 (Alvora AI — Score de Evasão, Intervenção, Chat e Criação) — COMPLETED
+Plan: 4 of 4 in current phase (16 of 16 total plans)
+Status: Phase 6 completed, ready for Phase 7
+Last activity: 2026-10-20 — Fase 6 concluída com sucesso (06-01 a 06-04)
 
-Progress: [███████░░░] 71%
+Progress: [████████░░] 86%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 12
+- Total plans completed: 16
 - Average duration: ~10 min
-- Total execution time: ~2.1 hours
+- Total execution time: ~2.8 hours
 
 **By Phase:**
 
@@ -51,13 +51,13 @@ Progress: [███████░░░] 71%
 | 3. Player de Aula e Experiência do Colaborador | 2/2 | 24 min | ~12 min |
 | 4. Quizzes, Certificados e Trilhas de Aprendizado | 3/3 | 25 min | ~8 min |
 | 5. Faturamento e Assinaturas B2B com Mercado Pago | 2/2 | 22 min | ~11 min |
-| 6. Alvora AI — Score de Evasão, Intervenção, Chat e Criação | 0/4 | - | - |
+| 6. Alvora AI — Score de Evasão, Intervenção, Chat e Criação | 4/4 | 30 min | ~7.5 min |
 | 7. Infraestrutura, Tempo Real e Observabilidade | 0/2 | - | - |
 
 **Recent Trend:**
 
-- Last 5 plans: 04-02, 04-03, 05-01, 05-02 completed
-- Trend: Fast, Robust & Verified (60/60 tests passing with DatabaseTransactions)
+- Last 5 plans: 05-02, 06-01, 06-02, 06-03, 06-04 completed
+- Trend: Fast, Robust & Verified (74/74 tests passing with DatabaseTransactions)
 
 ## Accumulated Context
 
@@ -79,6 +79,11 @@ Progress: [███████░░░] 71%
 - [Phase 5]: Tolerância de carência de 5 dias em inadimplência (`status = overdue`) antes da suspensão total (`status = suspended`).
 - [Phase 5]: Middleware `CheckSubscriptionStatus` bloqueando colaboradores mas preservando acesso do RH estritamente para regularização em `/empresa/faturamento`.
 - [Phase 5]: Upgrades com cobrança integral e renovação instantânea do ciclo de 30 dias com cota expandida de vagas (`max_users`).
+- [Phase 6]: Motor de cálculo de risco ponderado com 4 pilares: inatividade (35%), estagnação em aulas (25%), notas em quizzes (20%) e desvio em relação à turma (20%).
+- [Phase 6]: Intervenção ativa proativa autônoma disparada para alunos em alto risco (score >= 70) com throttling de 48 horas contra fadiga de mensagens.
+- [Phase 6]: Sala de Situação interativa para gestores de RH com Heatmap cromático de engajamento em tempo real e recomputação sob demanda.
+- [Phase 6]: Chat Alvora AI integrado via Groq API com injeção automática de contexto de curso, módulo e aula em reprodução.
+- [Phase 6]: Roteador resiliente via OpenRouter com fallback automático em cascata (DeepSeek R1 -> Llama 3.3 70B -> Qwen 3) para geração de cursos e insights executivos.
 
 ### Pending Todos
 
@@ -94,6 +99,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-10-20T08:36:00.000Z
-Stopped at: Phase 05 completed (2/2 plans)
-Resume file: .planning/phases/06-alvora-ai-score-de-evasao-intervencao-chat-e-criacao/
+Last session: 2026-10-20T15:24:00.000Z
+Stopped at: Phase 06 completed (4/4 plans)
+Resume file: .planning/ROADMAP.md

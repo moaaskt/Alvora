@@ -143,10 +143,10 @@ Plans:
 
 Plans:
 
-- [ ] 06-01: Motor do Score de Risco de Evasão ponderado, jobs agendados e histórico em `risk_scores`.
-- [ ] 06-02: Sistema de intervenção ativa proativa e Sala de Situação (heatmap para RH).
-- [ ] 06-03: Componente de Chat Alvora AI com integração Groq API de baixa latência e histórico contextual.
-- [ ] 06-04: Roteador resiliente com OpenRouter (fallback entre modelos) para geração de cursos e insights executivos.
+- [x] 06-01: Motor do Score de Risco de Evasão ponderado, jobs agendados e histórico em `risk_scores`.
+- [x] 06-02: Sistema de intervenção ativa proativa e Sala de Situação (heatmap para RH).
+- [x] 06-03: Componente de Chat Alvora AI com integração Groq API de baixa latência e histórico contextual.
+- [x] 06-04: Roteador resiliente com OpenRouter (fallback entre modelos) para geração de cursos e insights executivos.
 
 ### Phase 7: Infraestrutura, Tempo Real e Observabilidade
 
@@ -181,5 +181,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Player de Aula e Experiência do Colaborador | 2/2 | Completed | 2026-10-19 |
 | 4. Quizzes, Certificados e Trilhas de Aprendizado | 3/3 | Completed | 2026-10-19 |
 | 5. Faturamento e Assinaturas B2B com Mercado Pago | 2/2 | Completed | 2026-10-20 |
-| 6. Alvora AI — Score de Evasão, Intervenção, Chat e Criação | 0/4 | Not started | - |
+| 6. Alvora AI — Score de Evasão, Intervenção, Chat e Criação | 4/4 | Completed | 2026-10-20 |
 | 7. Infraestrutura, Tempo Real e Observabilidade | 0/2 | Not started | - |
