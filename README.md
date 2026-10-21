@@ -1,8 +1,8 @@
 <div align="center">
 
-# Alvora
-
+# Alvora ![Desenvolvimento](https://img.shields.io/badge/Desenvolvimento-Cont%C3%ADnuo-FF9800?style=for-the-badge&logo=github&logoColor=white)
 **LMS B2B com IA anti-evasão: prevê quem vai abandonar o treinamento e intervém antes que aconteça.**
+
 
 ![Tests](https://img.shields.io/badge/tests-84%20passed%20%C2%B7%20329%20assertions-brightgreen?logo=phpunit&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)
