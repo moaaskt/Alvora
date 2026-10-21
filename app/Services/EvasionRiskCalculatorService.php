@@ -85,8 +85,14 @@ class EvasionRiskCalculatorService
             'calculated_at' => now(),
         ]);
 
-        // Auto trigger autonomous AI intervention if in high risk
+        // Auto trigger autonomous AI intervention and realtime broadcast alert if in high risk
         if ($finalScore >= 70) {
+            try {
+                event(new \App\Events\EvasionRiskAlertEvent($riskScore));
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Falha ao transmitir alerta de evasão em tempo real: " . $e->getMessage());
+            }
+
             try {
                 app(EvasionInterventionService::class)->triggerForRiskScore($riskScore);
             } catch (\Throwable $e) {

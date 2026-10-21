@@ -43,7 +43,7 @@ class EvasionInterventionService
         // Generate tailored empathetic message
         $message = $this->generateMessage($user, $riskScore, $recommendedLesson);
 
-        return AiIntervention::create([
+        $intervention = AiIntervention::create([
             'company_id' => $riskScore->company_id,
             'user_id' => $user->id,
             'risk_score_id' => $riskScore->id,
@@ -51,11 +51,19 @@ class EvasionInterventionService
             'message' => $message,
             'status' => 'sent',
         ]);
+
+        try {
+            event(new \App\Events\NewInterventionDispatchedEvent($intervention));
+        } catch (\Throwable $e) {
+            Log::warning("Falha ao transmitir evento NewInterventionDispatchedEvent: " . $e->getMessage());
+        }
+
+        return $intervention;
     }
 
     public function createManualIntervention(User $user, string $message, ?int $recommendedLessonId = null): AiIntervention
     {
-        return AiIntervention::create([
+        $intervention = AiIntervention::create([
             'company_id' => $user->company_id,
             'user_id' => $user->id,
             'risk_score_id' => $user->latestRiskScore?->id,
@@ -63,6 +71,14 @@ class EvasionInterventionService
             'message' => $message,
             'status' => 'sent',
         ]);
+
+        try {
+            event(new \App\Events\NewInterventionDispatchedEvent($intervention));
+        } catch (\Throwable $e) {
+            Log::warning("Falha ao transmitir evento NewInterventionDispatchedEvent manual: " . $e->getMessage());
+        }
+
+        return $intervention;
     }
 
     protected function findRecommendedLesson(User $user): ?Lesson

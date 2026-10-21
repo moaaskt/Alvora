@@ -1,0 +1,193 @@
+services:
+  # -------------------------------------------------------------
+  # 1. Banco de Dados Relacional MySQL 8.0
+  # -------------------------------------------------------------
+  mysql:
+    image: mysql:8.0
+    container_name: alvora_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-alvora}
+      MYSQL_USER: ${DB_USERNAME:-alvora}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_secret}
+    ports:
+      - "${FORWARD_DB_PORT:-3306}:3306"
+    volumes:
+      - alvora_mysql_data:/var/lib/mysql
+    networks:
+      - alvora_network
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  # -------------------------------------------------------------
+  # 2. Cache, Filas e Sessões Redis 7
+  # -------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: alvora_redis
+    restart: unless-stopped
+    ports:
+      - "${FORWARD_REDIS_PORT:-6379}:6379"
+    volumes:
+      - alvora_redis_data:/data
+    networks:
+      - alvora_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # -------------------------------------------------------------
+  # 3. Aplicação Laravel Octane (FrankenPHP)
+  # -------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: alvora_app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      APP_NAME: "${APP_NAME:-Alvora}"
+      APP_ENV: "${APP_ENV:-production}"
+      APP_KEY: "${APP_KEY}"
+      APP_DEBUG: "${APP_DEBUG:-false}"
+      APP_URL: "${APP_URL:-http://localhost:8000}"
+      RUN_MIGRATIONS: "true"
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-alvora}
+      DB_USERNAME: ${DB_USERNAME:-alvora}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+      SESSION_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      BROADCAST_CONNECTION: reverb
+      REVERB_APP_ID: "${REVERB_APP_ID:-alvora-app}"
+      REVERB_APP_KEY: "${REVERB_APP_KEY:-alvora-key}"
+      REVERB_APP_SECRET: "${REVERB_APP_SECRET:-alvora-secret}"
+      REVERB_HOST: "reverb"
+      REVERB_PORT: 8080
+      REVERB_SCHEME: "http"
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      - alvora_storage:/app/storage
+    networks:
+      - alvora_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # -------------------------------------------------------------
+  # 4. Supervisor de Filas Assíncronas (Laravel Horizon)
+  # -------------------------------------------------------------
+  horizon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: alvora_horizon
+    restart: unless-stopped
+    command: ["php", "artisan", "horizon"]
+    depends_on:
+      app:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      APP_ENV: "${APP_ENV:-production}"
+      APP_KEY: "${APP_KEY}"
+      RUN_MIGRATIONS: "false"
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-alvora}
+      DB_USERNAME: ${DB_USERNAME:-alvora}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      QUEUE_CONNECTION: redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    volumes:
+      - alvora_storage:/app/storage
+    networks:
+      - alvora_network
+    healthcheck:
+      test: ["CMD-SHELL", "php artisan horizon:status | grep -q 'running' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # -------------------------------------------------------------
+  # 5. Servidor WebSockets em Tempo Real (Laravel Reverb)
+  # -------------------------------------------------------------
+  reverb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: alvora_reverb
+    restart: unless-stopped
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080", "--hostname=0.0.0.0"]
+    depends_on:
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      APP_ENV: "${APP_ENV:-production}"
+      APP_KEY: "${APP_KEY}"
+      RUN_MIGRATIONS: "false"
+      CACHE_STORE: redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REVERB_APP_ID: "${REVERB_APP_ID:-alvora-app}"
+      REVERB_APP_KEY: "${REVERB_APP_KEY:-alvora-key}"
+      REVERB_APP_SECRET: "${REVERB_APP_SECRET:-alvora-secret}"
+      REVERB_HOST: "0.0.0.0"
+      REVERB_PORT: 8080
+      REVERB_SERVER_HOST: "0.0.0.0"
+      REVERB_SERVER_PORT: 8080
+    ports:
+      - "${REVERB_PORT:-8080}:8080"
+    networks:
+      - alvora_network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8080 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+# -------------------------------------------------------------
+# Redes e Volumes Compartilhados
+# -------------------------------------------------------------
+networks:
+  alvora_network:
+    driver: bridge
+
+volumes:
+  alvora_mysql_data:
+    driver: local
+  alvora_redis_data:
+    driver: local
+  alvora_storage:
+    driver: local
