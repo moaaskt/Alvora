@@ -63,6 +63,63 @@
                     </span>
                 </button>
             </form>
+
+            <!-- Acesso Rápido para Testes / Demonstração -->
+            <div class="mt-6 pt-5 border-t border-slate-800/80">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Acesso Rápido Demo (1 clique)
+                    </span>
+                    <span class="text-[10px] text-slate-500 font-mono">Senha: password123</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <!-- Super Admin -->
+                    <button type="button"
+                            wire:click="loginAs('admin@alvora.com.br')"
+                            class="p-2.5 rounded-xl bg-slate-950/60 hover:bg-indigo-950/40 border border-slate-800 hover:border-indigo-500/50 text-left transition-all group cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-white group-hover:text-indigo-300">Admin Alvora</span>
+                            <span class="text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">SaaS</span>
+                        </div>
+                        <span class="text-[11px] text-slate-400 block truncate mt-0.5">admin@alvora.com.br</span>
+                    </button>
+
+                    <!-- Gestor RH (Company Admin) -->
+                    <button type="button"
+                            wire:click="loginAs('rh@acme.com.br')"
+                            class="p-2.5 rounded-xl bg-slate-950/60 hover:bg-emerald-950/40 border border-slate-800 hover:border-emerald-500/50 text-left transition-all group cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-white group-hover:text-emerald-300">Gestor RH</span>
+                            <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Empresa</span>
+                        </div>
+                        <span class="text-[11px] text-slate-400 block truncate mt-0.5">rh@acme.com.br</span>
+                    </button>
+
+                    <!-- Instrutor / Professor -->
+                    <button type="button"
+                            wire:click="loginAs('professor@acme.com.br')"
+                            class="p-2.5 rounded-xl bg-slate-950/60 hover:bg-amber-950/40 border border-slate-800 hover:border-amber-500/50 text-left transition-all group cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-white group-hover:text-amber-300">Professor / Instrutor</span>
+                            <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">Cursos</span>
+                        </div>
+                        <span class="text-[11px] text-slate-400 block truncate mt-0.5">professor@acme.com.br</span>
+                    </button>
+
+                    <!-- Aluno / Colaborador -->
+                    <button type="button"
+                            wire:click="loginAs('aluno@acme.com.br')"
+                            class="p-2.5 rounded-xl bg-slate-950/60 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/50 text-left transition-all group cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-white group-hover:text-cyan-300">Aluno / Colaborador</span>
+                            <span class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Player</span>
+                        </div>
+                        <span class="text-[11px] text-slate-400 block truncate mt-0.5">aluno@acme.com.br</span>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Rodapé do Card -->
