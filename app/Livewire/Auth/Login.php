@@ -38,6 +38,14 @@ class Login extends Component
         return redirect()->intended(route('dashboard'));
     }
 
+    public function loginAs(string $email, string $password = 'password123')
+    {
+        $this->email = $email;
+        $this->password = $password;
+
+        return $this->login();
+    }
+
     public function render()
     {
         return view('livewire.auth.login')->layout('layouts.guest', ['title' => 'Entrar na Plataforma — ALVORA']);
