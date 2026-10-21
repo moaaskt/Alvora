@@ -23,6 +23,3 @@ Homestead.yaml
 # Logs
 npm-debug.log*
 yarn-error.log*
-
-# Agent
-.planning
