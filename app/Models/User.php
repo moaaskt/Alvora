@@ -145,4 +145,28 @@ class User extends Authenticatable
     {
         return $this->hasMany(Certificate::class);
     }
+
+    /**
+     * Risk scores history for user.
+     */
+    public function riskScores(): HasMany
+    {
+        return $this->hasMany(RiskScore::class);
+    }
+
+    /**
+     * Latest calculated risk score for user (relation).
+     */
+    public function latestRiskScore(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(RiskScore::class)->latestOfMany('calculated_at');
+    }
+
+    /**
+     * AI interventions sent to user.
+     */
+    public function interventions(): HasMany
+    {
+        return $this->hasMany(AiIntervention::class);
+    }
 }

@@ -16,7 +16,7 @@
 
 - [x] **CURS-01**: Instrutor pode criar, editar e excluir cursos com título, slug, descrição e status de publicação.
 - [x] **CURS-02**: Instrutor pode estruturar cursos em módulos e aulas ordenadas com suporte a URLs de vídeo, duração e materiais complementares.
-- [ ] **CURS-03**: Instrutor pode gerar a estrutura preliminar de um curso por comando em linguagem natural via IA (módulos, títulos e ementa) para revisão antes da publicação.
+- [x] **CURS-03**: Instrutor pode gerar a estrutura preliminar de um curso por comando em linguagem natural via IA (módulos, títulos e ementa) para revisão antes da publicação.
 
 ### Experiência do Aluno & Player
 
@@ -34,26 +34,26 @@
 ### Faturamento & Assinaturas B2B
 
 - [x] **BILL-01**: O sistema disponibiliza página pública institucional e página de planos de contratação B2B.
-- [ ] **BILL-02**: Integração com Mercado Pago para cobrança de assinaturas de empresas com processamento de webhooks para ativação e bloqueio de acesso.
-- [ ] **BILL-03**: `admin_alvora` e `company_admin` podem visualizar status de contrato, faturamento e planos ativos.
+- [x] **BILL-02**: Integração com Mercado Pago para cobrança de assinaturas de empresas com processamento de webhooks para ativação e bloqueio de acesso.
+- [x] **BILL-03**: `admin_alvora` e `company_admin` podem visualizar status de contrato, faturamento e planos ativos.
 
 ### Alvora AI - Score de Risco de Evasão & Intervenção
 
-- [ ] **EVAS-01**: Motor de cálculo calcula score de risco de 0 a 100 ponderando dias sem acesso, tempo parado na aula, notas em quizzes e ritmo em relação à turma.
-- [ ] **EVAS-02**: O sistema classifica colaboradores nos níveis baixo, médio e alto risco com registro de histórico em `risk_scores`.
-- [ ] **EVAS-03**: O sistema dispara intervenções ativas automáticas para alunos em risco alto (mensagem de incentivo gerada por IA e recomendação de reforço).
-- [ ] **EVAS-04**: O gestor da empresa (`company_admin`) recebe alertas em tempo real e visualiza uma Sala de Situação com heatmap de risco de evasão de seu time.
+- [x] **EVAS-01**: Motor de cálculo calcula score de risco de 0 a 100 ponderando dias sem acesso, tempo parado na aula, notas em quizzes e ritmo em relação à turma.
+- [x] **EVAS-02**: O sistema classifica colaboradores nos níveis baixo, médio e alto risco com registro de histórico em `risk_scores`.
+- [x] **EVAS-03**: O sistema dispara intervenções ativas automáticas para alunos em risco alto (mensagem de incentivo gerada por IA e recomendação de reforço).
+- [x] **EVAS-04**: O gestor da empresa (`company_admin`) recebe alertas em tempo real e visualiza uma Sala de Situação com heatmap de risco de evasão de seu time.
 
 ### Alvora AI - Chat & Suporte ao Colaborador
 
-- [ ] **CHAT-01**: Aluno acessa assistente Alvora AI em tempo real via Groq integrado ao contexto de seu progresso e dúvidas do curso.
-- [ ] **CHAT-02**: O sistema mantém histórico de conversas em `ai_conversations` isolado por colaborador e contexto.
+- [x] **CHAT-01**: Aluno acessa assistente Alvora AI em tempo real via Groq integrado ao contexto de seu progresso e dúvidas do curso.
+- [x] **CHAT-02**: O sistema mantém histórico de conversas em `ai_conversations` isolado por colaborador e contexto.
 
 ### Alvora AI - Monitoramento & Insights Executivos
 
-- [ ] **INST-01**: Dashboard executivo do `company_admin` apresenta métricas de ROI de treinamento e taxas de conclusão de trilhas obrigatórias.
-- [ ] **INST-02**: Alvora AI Monitor gera diagnósticos interpretados para o `admin_alvora` e `company_admin` identificando anomalias de engajamento da plataforma.
-- [ ] **INST-03**: Roteador de IA implementa array de fallback com modelos OpenRouter para garantir resiliência operacional sem paradas.
+- [x] **INST-01**: Dashboard executivo do `company_admin` apresenta métricas de ROI de treinamento e taxas de conclusão de trilhas obrigatórias.
+- [x] **INST-02**: Alvora AI Monitor gera diagnósticos interpretados para o `admin_alvora` e `company_admin` identificando anomalias de engajamento da plataforma.
+- [x] **INST-03**: Roteador de IA implementa array de fallback com modelos OpenRouter para garantir resiliência operacional sem paradas.
 
 ### Infraestrutura, Tempo Real & Observabilidade
 
@@ -98,18 +98,18 @@
 | EVAL-02 | Phase 4 | Complete |
 | EVAL-03 | Phase 4 | Complete |
 | EVAL-04 | Phase 4 | Complete |
-| BILL-02 | Phase 5 | Pending |
-| BILL-03 | Phase 5 | Pending |
-| EVAS-01 | Phase 6 | Pending |
-| EVAS-02 | Phase 6 | Pending |
-| EVAS-03 | Phase 6 | Pending |
-| EVAS-04 | Phase 6 | Pending |
-| CHAT-01 | Phase 6 | Pending |
-| CHAT-02 | Phase 6 | Pending |
-| CURS-03 | Phase 6 | Pending |
-| INST-01 | Phase 6 | Pending |
-| INST-02 | Phase 6 | Pending |
-| INST-03 | Phase 6 | Pending |
+| BILL-02 | Phase 5 | Complete |
+| BILL-03 | Phase 5 | Complete |
+| EVAS-01 | Phase 6 | Complete |
+| EVAS-02 | Phase 6 | Complete |
+| EVAS-03 | Phase 6 | Complete |
+| EVAS-04 | Phase 6 | Complete |
+| CHAT-01 | Phase 6 | Complete |
+| CHAT-02 | Phase 6 | Complete |
+| CURS-03 | Phase 6 | Complete |
+| INST-01 | Phase 6 | Complete |
+| INST-02 | Phase 6 | Complete |
+| INST-03 | Phase 6 | Complete |
 | INFR-01 | Phase 7 | Pending |
 | INFR-02 | Phase 7 | Pending |
 | INFR-03 | Phase 7 | Pending |

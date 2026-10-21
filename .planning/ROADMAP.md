@@ -11,8 +11,8 @@ A Alvora é construída em 7 fases verticais (Vertical MVP), partindo do alicerc
 - [x] **Phase 3: Player de Aula e Experiência do Colaborador** - Dashboard do aluno, player interativo reativo em Livewire 3 com progresso persistido e bloco de anotações.
 - [x] **Phase 4: Quizzes, Certificados e Trilhas de Aprendizado** - Avaliações de fim de módulo com cálculo de nota, emissão de certificados PDF via DomPDF e trilhas corporativas obrigatórias.
 - [x] **Phase 5: Faturamento e Assinaturas B2B com Mercado Pago** - Gestão de planos empresariais, processamento de pagamentos e tratamento de webhooks do Mercado Pago.
-- [ ] **Phase 6: Alvora AI — Score de Evasão, Intervenção, Chat e Criação** - Motor ponderado de risco, intervenções ativas para alunos em risco, sala de situação, assistente via Groq e geração de cursos com fallback OpenRouter.
-- [ ] **Phase 7: Infraestrutura, Tempo Real e Observabilidade** - Monitoramento de filas com Horizon, WebSockets nativos com Reverb, health checks, Telescope/Sentry e ambiente Docker com Octane.
+- [x] **Phase 6: Alvora AI — Score de Evasão, Intervenção, Chat e Criação** - Motor ponderado de risco, intervenções ativas para alunos em risco, sala de situação, assistente via Groq e geração de cursos com fallback OpenRouter.
+- [x] **Phase 7: Infraestrutura, Tempo Real e Observabilidade** - Monitoramento de filas com Horizon, WebSockets nativos com Reverb, health checks, Telescope/Sentry e ambiente Docker com Octane.
 
 ## Phase Details
 
@@ -143,10 +143,10 @@ Plans:
 
 Plans:
 
-- [ ] 06-01: Motor do Score de Risco de Evasão ponderado, jobs agendados e histórico em `risk_scores`.
-- [ ] 06-02: Sistema de intervenção ativa proativa e Sala de Situação (heatmap para RH).
-- [ ] 06-03: Componente de Chat Alvora AI com integração Groq API de baixa latência e histórico contextual.
-- [ ] 06-04: Roteador resiliente com OpenRouter (fallback entre modelos) para geração de cursos e insights executivos.
+- [x] 06-01: Motor do Score de Risco de Evasão ponderado, jobs agendados e histórico em `risk_scores`.
+- [x] 06-02: Sistema de intervenção ativa proativa e Sala de Situação (heatmap para RH).
+- [x] 06-03: Componente de Chat Alvora AI com integração Groq API de baixa latência e histórico contextual.
+- [x] 06-04: Roteador resiliente com OpenRouter (fallback entre modelos) para geração de cursos e insights executivos.
 
 ### Phase 7: Infraestrutura, Tempo Real e Observabilidade
 
@@ -166,8 +166,8 @@ Plans:
 
 Plans:
 
-- [ ] 07-01: Configuração do Laravel Horizon para filas Redis e Laravel Reverb para broadcasting WebSocket em tempo real.
-- [ ] 07-02: Endpoint de health check, instrumentação de Telescope/Sentry e orquestração Docker com Octane.
+- [x] 07-01: Configuração do Laravel Horizon para filas Redis e Laravel Reverb para broadcasting WebSocket em tempo real.
+- [x] 07-02: Endpoint de health check, instrumentação de Telescope/Sentry e orquestração Docker com Octane.
 
 ## Progress
 
@@ -181,5 +181,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Player de Aula e Experiência do Colaborador | 2/2 | Completed | 2026-10-19 |
 | 4. Quizzes, Certificados e Trilhas de Aprendizado | 3/3 | Completed | 2026-10-19 |
 | 5. Faturamento e Assinaturas B2B com Mercado Pago | 2/2 | Completed | 2026-10-20 |
-| 6. Alvora AI — Score de Evasão, Intervenção, Chat e Criação | 0/4 | Not started | - |
-| 7. Infraestrutura, Tempo Real e Observabilidade | 0/2 | Not started | - |
+| 6. Alvora AI — Score de Evasão, Intervenção, Chat e Criação | 4/4 | Completed | 2026-10-21 |
+| 7. Infraestrutura, Tempo Real e Observabilidade | 2/2 | Completed | 2026-10-21 |

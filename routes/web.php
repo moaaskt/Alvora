@@ -53,6 +53,14 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
         ->middleware('role:company_admin')
         ->name('company.billing');
 
+    Route::get('/empresa/sala-de-situacao', \App\Livewire\Company\SituationRoom::class)
+        ->middleware('role:company_admin')
+        ->name('company.situation-room');
+
+    Route::get('/empresa/insights-executivos', \App\Livewire\Company\AiExecutiveInsights::class)
+        ->middleware('role:company_admin,admin_alvora')
+        ->name('company.ai-insights');
+
     // Retorno do Checkout Mercado Pago
     Route::prefix('empresa/faturamento')->name('company.billing.')->group(function () {
         Route::get('/sucesso', [BillingReturnController::class, 'success'])->name('success');

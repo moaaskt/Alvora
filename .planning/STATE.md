@@ -1,19 +1,19 @@
 ---
 gsd_state_version: "1.0"
-current_phase: 5
-current_phase_name: Faturamento e Assinaturas B2B com Mercado Pago
+current_phase: 7
+current_phase_name: Infraestrutura, Tempo Real e Observabilidade
 status: completed
-stopped_at: Phase 05 completed (2/2 plans)
-last_updated: "2026-10-20T08:36:00.000Z"
-last_activity: 2026-10-20
-last_activity_desc: Phase 5 completed (Faturamento e Assinaturas B2B com Mercado Pago)
+stopped_at: Milestone v1.0 complete (7/7 phases, 18/18 plans executed)
+last_updated: "2026-10-21T04:35:00.000Z"
+last_activity: 2026-10-21
+last_activity_desc: Phase 7 completed (18 of 18 total plans executed, 84/84 tests passing)
 state_head: developer
 progress:
   total_phases: 7
-  completed_phases: 5
-  total_plans: 12
-  completed_plans: 12
-  percent: 71
+  completed_phases: 7
+  total_plans: 18
+  completed_plans: 18
+  percent: 100
 ---
 
 # Project State
@@ -23,24 +23,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-19)
 
 **Core value:** Combater a evasão no treinamento corporativo através do cálculo contínuo do Score de Risco de Evasão e intervenção preditiva automatizada via IA antes da desistência do colaborador.
-**Current focus:** Phase 6: Alvora AI — Score de Evasão, Intervenção, Chat e Criação
+**Current focus:** Milestone v1.0 Concluído com 100% dos requisitos entregues e verificados.
 
 ## Current Position
 
-Phase: 5 (Faturamento e Assinaturas B2B com Mercado Pago) — COMPLETED
-Plan: 2 of 2 in current phase (12 of 12 total plans)
-Status: Phase 5 completed, ready for Phase 6
-Last activity: 2026-10-20 — Fase 5 concluída com sucesso (05-01 e 05-02)
+Phase: 7 (Infraestrutura, Tempo Real e Observabilidade) — COMPLETED
+Plan: 2 of 2 in current phase (18 of 18 total plans)
+Status: Milestone v1.0 concluído com sucesso
+Last activity: 2026-10-21 — Fase 7 executada com 100% de sucesso (84/84 testes passando)
 
-Progress: [███████░░░] 71%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 12
+- Total plans completed: 18
 - Average duration: ~10 min
-- Total execution time: ~2.1 hours
+- Total execution time: ~3.1 hours
 
 **By Phase:**
 
@@ -51,13 +51,13 @@ Progress: [███████░░░] 71%
 | 3. Player de Aula e Experiência do Colaborador | 2/2 | 24 min | ~12 min |
 | 4. Quizzes, Certificados e Trilhas de Aprendizado | 3/3 | 25 min | ~8 min |
 | 5. Faturamento e Assinaturas B2B com Mercado Pago | 2/2 | 22 min | ~11 min |
-| 6. Alvora AI — Score de Evasão, Intervenção, Chat e Criação | 0/4 | - | - |
-| 7. Infraestrutura, Tempo Real e Observabilidade | 0/2 | - | - |
+| 6. Alvora AI — Score de Evasão, Intervenção, Chat e Criação | 4/4 | 30 min | ~7.5 min |
+| 7. Infraestrutura, Tempo Real e Observabilidade | 2/2 | 18 min | ~9 min |
 
 **Recent Trend:**
 
-- Last 5 plans: 04-02, 04-03, 05-01, 05-02 completed
-- Trend: Fast, Robust & Verified (60/60 tests passing with DatabaseTransactions)
+- Last 5 plans: 06-03, 06-04, 07-01, 07-02 completed
+- Trend: Fast, Robust & Verified (84/84 tests passing with DatabaseTransactions and Mocking)
 
 ## Accumulated Context
 
@@ -79,10 +79,21 @@ Progress: [███████░░░] 71%
 - [Phase 5]: Tolerância de carência de 5 dias em inadimplência (`status = overdue`) antes da suspensão total (`status = suspended`).
 - [Phase 5]: Middleware `CheckSubscriptionStatus` bloqueando colaboradores mas preservando acesso do RH estritamente para regularização em `/empresa/faturamento`.
 - [Phase 5]: Upgrades com cobrança integral e renovação instantânea do ciclo de 30 dias com cota expandida de vagas (`max_users`).
+- [Phase 6]: Motor de cálculo de risco ponderado com 4 pilares: inatividade (35%), estagnação em aulas (25%), notas em quizzes (20%) e desvio em relação à turma (20%).
+- [Phase 6]: Intervenção ativa proativa autônoma disparada para alunos em alto risco (score >= 70) com throttling de 48 horas contra fadiga de mensagens.
+- [Phase 6]: Sala de Situação interativa para gestores de RH com Heatmap cromático de engajamento em tempo real e recomputação sob demanda.
+- [Phase 6]: Chat Alvora AI integrado via Groq API com injeção automática de contexto de curso, módulo e aula em reprodução.
+- [Phase 6]: Roteador resiliente via OpenRouter com fallback automático em cascata (DeepSeek R1 -> Llama 3.3 70B -> Qwen 3) para geração de cursos e insights executivos.
+- [Phase 7]: Laravel Horizon configurado para supervisão de filas Redis balanceadas (`high`, `default`, `notifications`, `ai`) protegido por gate `viewHorizon` exclusivo para `admin_alvora`.
+- [Phase 7]: Laravel Reverb para WebSockets com autorização multi-tenant em `routes/channels.php` e eventos `EvasionRiskAlertEvent` e `NewInterventionDispatchedEvent`.
+- [Phase 7]: Endpoint público `/api/health` para sondas de orquestração com testes de latência de MySQL, Redis e Storage local.
+- [Phase 7]: Dockerfile multi-stage com FrankenPHP para Laravel Octane e compilação de assets via Node 20.
+- [Phase 7]: `docker-compose.yml` orquestrando os 5 serviços (`app`, `mysql`, `redis`, `horizon`, `reverb`) com healthchecks explícitos e o `app` dependente de `mysql: condition: service_healthy` e `redis: condition: service_healthy`.
+- [Phase 7]: Observabilidade configurada com Telescope para desenvolvimento e Sentry para monitoramento em produção com conformidade LGPD.
 
 ### Pending Todos
 
-None.
+None. All 7 phases completed.
 
 ### Blockers/Concerns
 
@@ -94,6 +105,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-10-20T08:36:00.000Z
-Stopped at: Phase 05 completed (2/2 plans)
-Resume file: .planning/phases/06-alvora-ai-score-de-evasao-intervencao-chat-e-criacao/
+Last session: 2026-10-21T04:35:00.000Z
+Stopped at: Milestone v1.0 Complete
+Resume file: .planning/ROADMAP.md
