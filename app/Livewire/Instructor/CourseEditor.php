@@ -17,12 +17,17 @@ class CourseEditor extends Component
     public string $thumbnail = '';
     public string $status = 'draft';
     public ?int $instructor_id = null;
+    public string $activeTab = 'basic'; // 'basic' | 'publish'
+
+    protected $queryString = [
+        'activeTab' => ['except' => 'basic', 'as' => 'tab'],
+    ];
 
     protected function rules(): array
     {
         return [
             'title' => 'required|string|min:3|max:255',
-            'slug' => 'required|string|min:3|max:255',
+            'slug' => 'nullable|string|min:3|max:255',
             'description' => 'nullable|string|max:3000',
             'thumbnail' => 'nullable|string|max:2048',
             'status' => 'required|in:draft,published,archived',
@@ -31,13 +36,16 @@ class CourseEditor extends Component
     }
 
     protected array $messages = [
-        'title.required' => 'O título do curso é obrigatório.',
-        'slug.required' => 'O slug é obrigatório.',
-        'instructor_id.required' => 'Selecione um instrutor responsável.',
+        'title.required' => 'O título do treinamento é obrigatório.',
+        'title.min' => 'O título deve ter no mínimo 3 caracteres.',
+        'instructor_id.required' => 'Selecione o professor/instrutor responsável.',
     ];
 
     public function mount(?Course $course = null): void
     {
+        $requestedTab = request()->query('tab', 'basic');
+        $this->activeTab = in_array($requestedTab, ['basic', 'publish']) ? $requestedTab : 'basic';
+
         if ($course && $course->exists) {
             $this->courseId = $course->id;
             $this->title = $course->title;
@@ -48,6 +56,13 @@ class CourseEditor extends Component
             $this->instructor_id = $course->instructor_id;
         } else {
             $this->instructor_id = Auth::id();
+        }
+    }
+
+    public function setTab(string $tab): void
+    {
+        if (in_array($tab, ['basic', 'publish'])) {
+            $this->activeTab = $tab;
         }
     }
 
@@ -64,6 +79,11 @@ class CourseEditor extends Component
 
         $user = Auth::user();
         $companyId = $user->company_id;
+
+        // Auto-generate slug if empty
+        if (empty($validated['slug'])) {
+            $validated['slug'] = Str::slug($validated['title']);
+        }
 
         // Ensure unique slug per tenant
         $slugExists = Course::withoutGlobalScopes()
@@ -88,6 +108,7 @@ class CourseEditor extends Component
             ]);
 
             $this->dispatch('toast', message: 'Informações do curso atualizadas com sucesso!', type: 'success');
+            return null;
         } else {
             $course = Course::create([
                 'company_id' => $companyId,
@@ -100,15 +121,13 @@ class CourseEditor extends Component
             ]);
 
             $this->dispatch('toast', message: 'Curso criado com sucesso! Agora adicione os módulos e aulas.', type: 'success');
+            return redirect()->route('instructor.courses.curriculum', $course);
         }
-
-        return redirect()->route('instructor.courses.curriculum', $course);
     }
 
     public function render()
     {
         $user = Auth::user();
-        // Instructors / admins available in this company
         $instructors = User::where(function ($q) {
             $q->where('role', 'instructor')
               ->orWhere('role', 'company_admin');
@@ -118,8 +137,13 @@ class CourseEditor extends Component
             $instructors = collect([$user]);
         }
 
+        $course = $this->courseId 
+            ? Course::withCount(['modules', 'lessons', 'quizzes'])->find($this->courseId) 
+            : null;
+
         return view('livewire.instructor.course-editor', [
             'instructors' => $instructors,
+            'course' => $course,
         ])->layout('layouts.app', ['title' => ($this->courseId ? 'Editar Curso' : 'Novo Curso') . ' — ALVORA']);
     }
 }
