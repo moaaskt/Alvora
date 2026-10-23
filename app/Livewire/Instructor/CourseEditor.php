@@ -159,6 +159,9 @@ class CourseEditor extends Component
         return view('livewire.instructor.course-editor', [
             'instructors' => $instructors,
             'course' => $course,
-        ])->layout('layouts.app', ['title' => ($this->courseId ? 'Editar Curso' : 'Novo Curso') . ' — ALVORA']);
+        ])->layout('layouts.instructor', [
+            'title' => ($this->courseId ? 'Atualizar: ' . $this->title : 'Criar Novo Treinamento') . ' — ALVORA',
+            'breadcrumb' => $this->courseId ? 'Atualizar Curso' : 'Novo Curso',
+        ]);
     }
 }
