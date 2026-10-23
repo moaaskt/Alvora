@@ -40,6 +40,12 @@ class Login extends Component
 
     public function loginAs(string $email, string $password = 'password123')
     {
+        if (app()->isProduction()) {
+            throw ValidationException::withMessages([
+                'email' => 'O acesso de demonstração em 1 clique está desabilitado em ambiente de produção por segurança.',
+            ]);
+        }
+
         $this->email = $email;
         $this->password = $password;
 
@@ -48,6 +54,10 @@ class Login extends Component
 
     public function render()
     {
-        return view('livewire.auth.login')->layout('layouts.guest', ['title' => 'Entrar na Plataforma — ALVORA']);
+        return view('livewire.auth.login')->layout('layouts.guest', [
+            'title' => 'Portal Corporativo — ALVORA',
+            'theme' => 'editorial',
+            'hideNav' => true,
+        ]);
     }
 }
