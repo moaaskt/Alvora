@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.instructor', ['title' => 'Gestão de Avaliações — ALVORA', 'breadcrumb' => 'Avaliação'])]
 class QuizEditor extends Component
 {
     public Course $course;

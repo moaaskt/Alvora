@@ -321,4 +321,34 @@ class CourseTest extends TestCase
         $response->assertSee('Publicado');
         $response->assertSee('Grade Curricular');
     }
+
+    public function test_instructor_can_view_course_curriculum_screen(): void
+    {
+        $company = Company::create(['name' => 'Empresa Alfa', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Carlos',
+            'email' => 'carlos@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Desenvolvimento de temas WordPress',
+            'slug' => 'desenvolvimento-de-temas-wordpress',
+            'description' => 'Curso completo corporativo de WordPress.',
+            'status' => 'published',
+        ]);
+
+        $this->actingAs($instructor);
+
+        $response = $this->get(route('instructor.courses.curriculum', $course));
+        $response->assertStatus(200);
+        $response->assertSee('Grade Curricular: Desenvolvimento de temas WordPress');
+        $response->assertSee('Adicionar Módulo');
+        $response->assertSee('Gerador Curricular Inteligente');
+    }
 }
