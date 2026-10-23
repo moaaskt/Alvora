@@ -189,13 +189,16 @@ class BillingWebhookAndDashboardTest extends TestCase
         $studentResponse->assertRedirect(route('student.dashboard'));
         $studentResponse->assertSessionHas('error');
 
-        // 2. Gestor de RH tentando acessar rotas internas operacionais é redirecionado para a tela de faturamento
-        $adminResponse = $this->actingAs($companyAdmin)->get('/empresa/colaboradores');
+        // 2. Instrutor / Gestor tentando acessar rotas internas operacionais é redirecionado para a tela de faturamento
+        $adminResponse = $this->actingAs($companyAdmin)->get('/instrutor/colaboradores');
         $adminResponse->assertRedirect(route('company.billing'));
         $adminResponse->assertSessionHas('warning');
 
-        // 3. Gestor de RH pode acessar a rota de faturamento para regularizar a assinatura
-        $billingResponse = $this->actingAs($companyAdmin)->get('/empresa/faturamento');
+        // Testar que acesso a /empresa/colaboradores quando suspenso redireciona para faturamento
+        $this->actingAs($companyAdmin)->get('/empresa/colaboradores')->assertRedirect(route('company.billing'));
+
+        // 3. Instrutor / Gestor pode acessar a rota de faturamento para regularizar a assinatura
+        $billingResponse = $this->actingAs($companyAdmin)->get('/instrutor/faturamento');
         $billingResponse->assertOk();
     }
 

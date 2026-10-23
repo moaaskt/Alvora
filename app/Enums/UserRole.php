@@ -16,9 +16,9 @@ enum UserRole: string
     {
         return match ($this) {
             self::ADMIN_ALVORA => 'Administrador Alvora',
-            self::COMPANY_ADMIN => 'Gestor da Empresa (RH)',
-            self::INSTRUCTOR => 'Instrutor Corporativo',
-            self::STUDENT => 'Colaborador / Aluno',
+            self::COMPANY_ADMIN => 'Instrutor',
+            self::INSTRUCTOR => 'Instrutor',
+            self::STUDENT => 'Aluno',
         };
     }
 

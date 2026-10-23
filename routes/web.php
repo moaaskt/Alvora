@@ -87,33 +87,43 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
     Route::get('/aluno/cursos/{course:slug}/certificado', [CertificateController::class, 'download'])->name('student.certificate');
     Route::get('/aluno/quizzes/{quiz}', QuizRunner::class)->name('student.quiz');
 
-    // Portal RH / Gestão de Empresa
-    Route::get('/empresa/colaboradores', EmployeeManager::class)
-        ->middleware('role:company_admin')
+    // Portal do Instrutor / Gestão Corporativa (o instrutor é a própria empresa)
+    Route::get('/instrutor/colaboradores', EmployeeManager::class)
+        ->middleware('role:instructor,company_admin')
         ->name('employees.index');
 
-    Route::get('/empresa/trilhas', TrackManager::class)
-        ->middleware('role:company_admin')
+    Route::get('/instrutor/trilhas', TrackManager::class)
+        ->middleware('role:instructor,company_admin')
         ->name('company.tracks.index');
 
-    Route::get('/empresa/faturamento', CompanyBilling::class)
-        ->middleware('role:company_admin')
+    Route::get('/instrutor/faturamento', CompanyBilling::class)
+        ->middleware('role:instructor,company_admin')
         ->name('company.billing');
 
-    Route::get('/empresa/sala-de-situacao', \App\Livewire\Company\SituationRoom::class)
-        ->middleware('role:company_admin')
+    Route::get('/instrutor/sala-de-situacao', \App\Livewire\Company\SituationRoom::class)
+        ->middleware('role:instructor,company_admin')
         ->name('company.situation-room');
 
-    Route::get('/empresa/insights-executivos', \App\Livewire\Company\AiExecutiveInsights::class)
-        ->middleware('role:company_admin,admin_alvora')
+    Route::get('/instrutor/insights-executivos', \App\Livewire\Company\AiExecutiveInsights::class)
+        ->middleware('role:instructor,company_admin,admin_alvora')
         ->name('company.ai-insights');
 
     // Retorno do Checkout Mercado Pago
-    Route::prefix('empresa/faturamento')->name('company.billing.')->group(function () {
+    Route::prefix('instrutor/faturamento')->name('company.billing.')->group(function () {
         Route::get('/sucesso', [BillingReturnController::class, 'success'])->name('success');
         Route::get('/pendente', [BillingReturnController::class, 'pending'])->name('pending');
         Route::get('/erro', [BillingReturnController::class, 'failure'])->name('failure');
     });
+
+    // Redirecionamentos de retrocompatibilidade de /empresa/* para /instrutor/*
+    Route::redirect('/empresa/colaboradores', '/instrutor/colaboradores');
+    Route::redirect('/empresa/trilhas', '/instrutor/trilhas');
+    Route::redirect('/empresa/faturamento', '/instrutor/faturamento');
+    Route::redirect('/empresa/faturamento/sucesso', '/instrutor/faturamento/sucesso');
+    Route::redirect('/empresa/faturamento/pendente', '/instrutor/faturamento/pendente');
+    Route::redirect('/empresa/faturamento/erro', '/instrutor/faturamento/erro');
+    Route::redirect('/empresa/sala-de-situacao', '/instrutor/sala-de-situacao');
+    Route::redirect('/empresa/insights-executivos', '/instrutor/insights-executivos');
 
     // Super Admin Alvora - Faturamento Global B2B
     Route::get('/admin/faturamento', AdminBilling::class)
@@ -127,6 +137,7 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
         Route::get('/cursos/{course}/editar', CourseEditor::class)->name('courses.edit');
         Route::get('/cursos/{course}/curriculo', CurriculumBuilder::class)->name('courses.curriculum');
         Route::get('/cursos/{course}/quizzes/novo', QuizEditor::class)->name('courses.quizzes.create');
+        Route::get('/cursos/{course}/quizzes/{quiz}/editar', QuizEditor::class)->name('courses.quizzes.edit');
         Route::get('/quizzes/{quiz}/editar', QuizEditor::class)->name('quizzes.edit');
     });
 });

@@ -126,10 +126,13 @@ class SituationRoomAndInterventionTest extends TestCase
         ]);
 
         // Aluno não pode acessar
-        $this->actingAs($student)->get('/empresa/sala-de-situacao')->assertForbidden();
+        $this->actingAs($student)->get('/instrutor/sala-de-situacao')->assertForbidden();
 
-        // Gestor de RH pode acessar com sucesso
-        $this->actingAs($admin)->get('/empresa/sala-de-situacao')
+        // Acesso legado a /empresa/sala-de-situacao redireciona para /instrutor/sala-de-situacao
+        $this->actingAs($admin)->get('/empresa/sala-de-situacao')->assertRedirect('/instrutor/sala-de-situacao');
+
+        // Instrutor / Gestor pode acessar com sucesso
+        $this->actingAs($admin)->get('/instrutor/sala-de-situacao')
             ->assertOk()
             ->assertSee('Sala de Situação')
             ->assertSee('Heatmap de Engajamento');

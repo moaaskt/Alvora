@@ -1,33 +1,79 @@
 <div class="space-y-8">
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-800">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <a href="{{ route('instructor.courses.index') }}" class="text-xs text-slate-400 hover:text-white transition-colors">
-                    &larr; Catálogo
-                </a>
-                <span class="text-slate-600">&bull;</span>
-                <a href="{{ route('instructor.courses.edit', $course) }}" class="text-xs text-slate-400 hover:text-white transition-colors">
-                    Configurações do Curso
-                </a>
+    <div class="space-y-4 pb-6 border-b border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <a href="{{ route('instructor.courses.index') }}" class="text-xs text-slate-400 hover:text-white transition-colors">
+                        &larr; Catálogo
+                    </a>
+                    <span class="text-slate-600">&bull;</span>
+                    <a href="{{ route('instructor.courses.edit', $course) }}" class="text-xs text-slate-400 hover:text-white transition-colors">
+                        Configurações do Curso
+                    </a>
+                </div>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                        {{ $course->title }}
+                    </h1>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold 
+                        @if($course->isPublished()) bg-emerald-500/20 text-emerald-300 border border-emerald-500/30
+                        @else bg-amber-500/20 text-amber-300 border border-amber-500/30 @endif">
+                        {{ $course->isPublished() ? 'Publicado' : 'Rascunho' }}
+                    </span>
+                </div>
             </div>
+
             <div class="flex items-center gap-3">
-                <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                    {{ $course->title }}
-                </h1>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold 
-                    @if($course->isPublished()) bg-emerald-500/20 text-emerald-300 border border-emerald-500/30
-                    @else bg-amber-500/20 text-amber-300 border border-amber-500/30 @endif">
-                    {{ $course->isPublished() ? 'Publicado' : 'Rascunho' }}
-                </span>
+                <a href="{{ route('instructor.courses.quizzes.create', $course) }}" 
+                   class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold text-xs text-indigo-300 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                    <span>Nova Avaliação</span>
+                </a>
+
+                <button wire:click="$toggle('showNewModuleModal')" type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 shadow-md shadow-indigo-600/30 transition-all hover:scale-[1.02]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    <span>Adicionar Módulo</span>
+                </button>
             </div>
         </div>
 
-        <button wire:click="$toggle('showNewModuleModal')" type="button"
-                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 shadow-md shadow-indigo-600/30 transition-all hover:scale-[1.02]">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-            <span>Adicionar Módulo</span>
-        </button>
+        <!-- Barra de 4 Abas (Academy LMS Pattern) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl text-xs font-semibold shadow-xl">
+            <!-- Aba 1: Informações Básicas -->
+            <a href="{{ route('instructor.courses.edit', $course) }}?tab=basic"
+               class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                <span class="truncate">1. Informações Básicas</span>
+            </a>
+
+            <!-- Aba 2: Grade Curricular (Ativa) -->
+            <span class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/30">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                <span class="truncate">2. Grade Curricular</span>
+                @if($course->lessons->count() > 0)
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white font-mono">{{ $course->lessons->count() }}</span>
+                @endif
+            </span>
+
+            <!-- Aba 3: Avaliações & Quizzes -->
+            <a href="{{ route('instructor.courses.edit', $course) }}?tab=quizzes"
+               class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                <span class="truncate">3. Quizzes & Avaliações</span>
+                @if($course->quizzes->count() > 0)
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-500/20 text-indigo-300 font-mono">{{ $course->quizzes->count() }}</span>
+                @endif
+            </a>
+
+            <!-- Aba 4: Mídia & Publicação -->
+            <a href="{{ route('instructor.courses.edit', $course) }}?tab=publish"
+               class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                <span class="truncate">4. Mídia & Publicação</span>
+            </a>
+        </div>
     </div>
 
     <!-- Gerador de Grade com IA (OpenRouter Fallback) -->
@@ -266,4 +312,20 @@
             @endforeach
         </div>
     @endif
+
+    <!-- Navegação de Rodapé da Grade Curricular -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-slate-800">
+        <a href="{{ route('instructor.courses.edit', $course) }}?tab=basic" 
+           class="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-800/80 transition-colors flex items-center gap-1.5 w-full sm:w-auto justify-center">
+            <span>&larr;</span>
+            <span>Voltar para Informações Básicas</span>
+        </a>
+
+        <a href="{{ route('instructor.courses.edit', $course) }}?tab=quizzes" 
+           class="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 shadow-md shadow-indigo-600/30 transition-all flex items-center justify-center gap-1.5 w-full sm:w-auto">
+            <span>Avançar para Quizzes & Avaliações</span>
+            <span>&rarr;</span>
+        </a>
+    </div>
+
 </div>

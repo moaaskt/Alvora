@@ -163,4 +163,111 @@ class CourseTest extends TestCase
         $this->assertEquals($courseA->id, $visibleCourses->first()->id);
         $this->assertFalse($visibleCourses->contains('id', $courseB->id));
     }
+
+    public function test_instructor_can_switch_tabs_and_update_media_and_publication(): void
+    {
+        $company = Company::create(['name' => 'Empresa Alfa', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Carlos',
+            'email' => 'carlos@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Curso de Microsserviços',
+            'slug' => 'curso-de-microsservicos',
+            'status' => 'draft',
+        ]);
+
+        $this->actingAs($instructor);
+
+        Livewire::test(CourseEditor::class, ['course' => $course])
+            ->assertSet('activeTab', 'basic')
+            ->call('setTab', 'publish')
+            ->assertSet('activeTab', 'publish')
+            ->set('thumbnail', 'https://exemplo.com/capa.jpg')
+            ->set('status', 'published')
+            ->call('save')
+            ->assertDispatched('toast');
+
+        $course->refresh();
+        $this->assertEquals('https://exemplo.com/capa.jpg', $course->thumbnail);
+        $this->assertEquals('published', $course->status);
+    }
+
+    public function test_instructor_creating_course_advances_to_curriculum(): void
+    {
+        $company = Company::create(['name' => 'Empresa Alfa', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Carlos',
+            'email' => 'carlos@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $this->actingAs($instructor);
+
+        Livewire::test(CourseEditor::class)
+            ->set('title', 'Inteligência Artificial Aplicada')
+            ->set('description', 'Aprenda IA do zero ao avançado.')
+            ->set('instructor_id', $instructor->id)
+            ->call('save')
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('courses', [
+            'company_id' => $company->id,
+            'title' => 'Inteligência Artificial Aplicada',
+            'slug' => 'inteligencia-artificial-aplicada',
+            'status' => 'draft',
+        ]);
+    }
+
+    public function test_instructor_can_manage_quizzes_in_dedicated_tab(): void
+    {
+        $company = Company::create(['name' => 'Empresa Alfa', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Carlos',
+            'email' => 'carlos@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Curso de Teste com Quizzes',
+            'slug' => 'curso-de-teste-com-quizzes',
+            'status' => 'draft',
+        ]);
+
+        $quiz = \App\Models\Quiz::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'title' => 'Quiz Inicial do Curso',
+            'passing_score' => 70,
+        ]);
+
+        $this->actingAs($instructor);
+
+        // Testa alternância para aba quizzes e exclusão
+        Livewire::test(CourseEditor::class, ['course' => $course])
+            ->set('activeTab', 'quizzes')
+            ->assertSet('activeTab', 'quizzes')
+            ->assertSee('Quiz Inicial do Curso')
+            ->call('deleteQuiz', $quiz->id)
+            ->assertDispatched('toast');
+
+        $this->assertDatabaseMissing('quizzes', [
+            'id' => $quiz->id,
+        ]);
+    }
 }

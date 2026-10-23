@@ -203,46 +203,35 @@
                         Atalhos para simulação com diferentes papéis do sistema. Protegido contra uso em ambiente de produção:
                     </p>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <!-- Super Admin -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <!-- 1. Admin -->
                         <button type="button"
                                 wire:click="loginAs('admin@alvora.com.br')"
                                 class="p-2.5 rounded-lg bg-white hover:bg-blue-50/60 border border-slate-200 text-left transition-all group cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                             <div class="flex items-center justify-between">
-                                <span class="font-semibold text-slate-800 group-hover:text-blue-600">Admin Alvora</span>
+                                <span class="font-semibold text-slate-800 group-hover:text-blue-600">Admin</span>
                                 <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">SaaS</span>
                             </div>
                             <span class="text-[11px] text-slate-500 block truncate mt-0.5">admin@alvora.com.br</span>
                         </button>
 
-                        <!-- Gestor RH (Company Admin) -->
-                        <button type="button"
-                                wire:click="loginAs('rh@acme.com.br')"
-                                class="p-2.5 rounded-lg bg-white hover:bg-emerald-50/60 border border-slate-200 text-left transition-all group cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/20">
-                            <div class="flex items-center justify-between">
-                                <span class="font-semibold text-slate-800 group-hover:text-emerald-700">Gestor RH</span>
-                                <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">Empresa</span>
-                            </div>
-                            <span class="text-[11px] text-slate-500 block truncate mt-0.5">rh@acme.com.br</span>
-                        </button>
-
-                        <!-- Instrutor / Professor -->
+                        <!-- 2. Instrutor -->
                         <button type="button"
                                 wire:click="loginAs('professor@acme.com.br')"
-                                class="p-2.5 rounded-lg bg-white hover:bg-amber-50/60 border border-slate-200 text-left transition-all group cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500/20">
+                                class="p-2.5 rounded-lg bg-white hover:bg-purple-50/60 border border-slate-200 text-left transition-all group cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/20">
                             <div class="flex items-center justify-between">
-                                <span class="font-semibold text-slate-800 group-hover:text-amber-700">Professor / Instrutor</span>
-                                <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Cursos</span>
+                                <span class="font-semibold text-slate-800 group-hover:text-purple-700">Instrutor</span>
+                                <span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">Empresa</span>
                             </div>
                             <span class="text-[11px] text-slate-500 block truncate mt-0.5">professor@acme.com.br</span>
                         </button>
 
-                        <!-- Aluno / Colaborador -->
+                        <!-- 3. Aluno -->
                         <button type="button"
                                 wire:click="loginAs('aluno@acme.com.br')"
                                 class="p-2.5 rounded-lg bg-white hover:bg-cyan-50/60 border border-slate-200 text-left transition-all group cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500/20">
                             <div class="flex items-center justify-between">
-                                <span class="font-semibold text-slate-800 group-hover:text-cyan-700">Aluno / Colaborador</span>
+                                <span class="font-semibold text-slate-800 group-hover:text-cyan-700">Aluno</span>
                                 <span class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200">Player</span>
                             </div>
                             <span class="text-[11px] text-slate-500 block truncate mt-0.5">aluno@acme.com.br</span>
