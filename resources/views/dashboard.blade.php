@@ -7,14 +7,14 @@
                 </h1>
                 <p class="text-xs text-slate-400 mt-1">
                     Ambiente corporativo de capacitação &bull; 
-                    <span class="text-emerald-400 font-semibold">{{ auth()->user()->role?->label() }}</span>
+                    <span class="text-emerald-400 font-semibold">{{ (auth()->user()->isInstructor() || auth()->user()->isCompanyAdmin()) ? 'Instrutor' : auth()->user()->role?->label() }}</span>
                     @if(auth()->user()->company)
                         &bull; {{ auth()->user()->company->name }}
                     @endif
                 </p>
             </div>
 
-            @if(auth()->user()->isCompanyAdmin())
+            @if(auth()->user()->isCompanyAdmin() || auth()->user()->isInstructor())
                 <a href="{{ route('employees.index') }}" class="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 transition-colors flex items-center gap-1.5 shadow-md shadow-indigo-600/30">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                     Gerenciar Colaboradores

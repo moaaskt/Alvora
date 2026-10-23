@@ -73,9 +73,9 @@ class MercadoPagoService
                 'email' => $payer->email,
             ],
             'back_urls' => [
-                'success' => url('/empresa/faturamento/sucesso'),
-                'pending' => url('/empresa/faturamento/pendente'),
-                'failure' => url('/empresa/faturamento/erro'),
+                'success' => url('/instrutor/faturamento/sucesso'),
+                'pending' => url('/instrutor/faturamento/pendente'),
+                'failure' => url('/instrutor/faturamento/erro'),
             ],
             'auto_return' => 'approved',
             'external_reference' => "company_{$company->id}_plan_{$plan}",
@@ -114,7 +114,7 @@ class MercadoPagoService
             ],
             'payer_email' => $payer->email,
             'card_token_id' => $cardTokenId,
-            'back_url' => url('/empresa/faturamento/sucesso'),
+            'back_url' => url('/instrutor/faturamento/sucesso'),
             'status' => 'authorized',
             'external_reference' => "company_{$company->id}_plan_{$plan}",
         ];

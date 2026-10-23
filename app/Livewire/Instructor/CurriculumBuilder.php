@@ -212,9 +212,18 @@ class CurriculumBuilder extends Component
         $this->dispatch('toast', message: 'Material anexo removido.', type: 'info');
     }
 
+    public function deleteQuiz(int $quizId): void
+    {
+        $quiz = \App\Models\Quiz::where('course_id', $this->courseId)->findOrFail($quizId);
+        $title = $quiz->title;
+        $quiz->delete();
+
+        $this->dispatch('toast', message: "Avaliação '{$title}' removida.", type: 'info');
+    }
+
     public function render()
     {
-        $course = Course::with(['modules.lessons.attachments'])->findOrFail($this->courseId);
+        $course = Course::with(['modules.lessons.attachments', 'quizzes.questions'])->findOrFail($this->courseId);
 
         return view('livewire.instructor.curriculum-builder', [
             'course' => $course,

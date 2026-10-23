@@ -1,33 +1,59 @@
 <div class="space-y-8">
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-800">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <a href="{{ route('instructor.courses.index') }}" class="text-xs text-slate-400 hover:text-white transition-colors">
-                    &larr; Catálogo
-                </a>
-                <span class="text-slate-600">&bull;</span>
-                <a href="{{ route('instructor.courses.edit', $course) }}" class="text-xs text-slate-400 hover:text-white transition-colors">
-                    Configurações do Curso
-                </a>
+    <div class="space-y-4 pb-6 border-b border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <a href="{{ route('instructor.courses.index') }}" class="text-xs text-slate-400 hover:text-white transition-colors">
+                        &larr; Catálogo
+                    </a>
+                    <span class="text-slate-600">&bull;</span>
+                    <a href="{{ route('instructor.courses.edit', $course) }}" class="text-xs text-slate-400 hover:text-white transition-colors">
+                        Configurações do Curso
+                    </a>
+                </div>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                        {{ $course->title }}
+                    </h1>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold 
+                        @if($course->isPublished()) bg-emerald-500/20 text-emerald-300 border border-emerald-500/30
+                        @else bg-amber-500/20 text-amber-300 border border-amber-500/30 @endif">
+                        {{ $course->isPublished() ? 'Publicado' : 'Rascunho' }}
+                    </span>
+                </div>
             </div>
+
             <div class="flex items-center gap-3">
-                <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                    {{ $course->title }}
-                </h1>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold 
-                    @if($course->isPublished()) bg-emerald-500/20 text-emerald-300 border border-emerald-500/30
-                    @else bg-amber-500/20 text-amber-300 border border-amber-500/30 @endif">
-                    {{ $course->isPublished() ? 'Publicado' : 'Rascunho' }}
-                </span>
+                <a href="{{ route('instructor.courses.quizzes.create', $course) }}" 
+                   class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold text-xs text-indigo-300 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                    <span>Nova Avaliação</span>
+                </a>
+
+                <button wire:click="$toggle('showNewModuleModal')" type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 shadow-md shadow-indigo-600/30 transition-all hover:scale-[1.02]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    <span>Adicionar Módulo</span>
+                </button>
             </div>
         </div>
 
-        <button wire:click="$toggle('showNewModuleModal')" type="button"
-                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 shadow-md shadow-indigo-600/30 transition-all hover:scale-[1.02]">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-            <span>Adicionar Módulo</span>
-        </button>
+        <!-- Course Contextual Navigation Tabs (Opção A) -->
+        <div class="flex items-center gap-2 border-t border-slate-800/80 pt-3 text-xs">
+            <span class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-semibold flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                Grade Curricular (Aulas & Módulos)
+            </span>
+            <a href="{{ route('instructor.courses.edit', $course) }}" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Configurações do Curso
+            </a>
+            <a href="#quizzes-do-curso" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                Avaliações & Quizzes ({{ $course->quizzes->count() }})
+            </a>
+        </div>
     </div>
 
     <!-- Gerador de Grade com IA (OpenRouter Fallback) -->
@@ -266,4 +292,65 @@
             @endforeach
         </div>
     @endif
+
+    <!-- Seção de Quizzes do Curso (Opção A) -->
+    <div id="quizzes-do-curso" class="pt-8 border-t border-slate-800 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+                <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                    Avaliações & Quizzes deste Curso ({{ $course->quizzes->count() }})
+                </h3>
+                <p class="text-xs text-slate-400">Avaliações pedagógicas de fixação com nota de corte vinculadas a este curso.</p>
+            </div>
+            <a href="{{ route('instructor.courses.quizzes.create', $course) }}" 
+               class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl font-semibold text-xs text-indigo-300 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 transition-colors self-start sm:self-auto">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>Criar Nova Avaliação</span>
+            </a>
+        </div>
+
+        @if($course->quizzes->isEmpty())
+            <div class="p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 text-center space-y-2">
+                <p class="text-xs text-slate-400">Nenhum quiz ou avaliação cadastrada para este treinamento ainda.</p>
+                <a href="{{ route('instructor.courses.quizzes.create', $course) }}" class="inline-block text-xs font-semibold text-indigo-400 hover:text-indigo-300">
+                    + Criar primeira avaliação &rarr;
+                </a>
+            </div>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach($course->quizzes as $quiz)
+                    <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 hover:border-slate-700 flex items-center justify-between gap-4 transition-all">
+                        <div class="space-y-1">
+                            <h4 class="text-sm font-bold text-white">{{ $quiz->title }}</h4>
+                            <div class="flex items-center gap-3 text-xs text-slate-400">
+                                <span>{{ $quiz->questions->count() }} questões</span>
+                                <span>&bull;</span>
+                                <span class="text-emerald-400 font-semibold">Corte: {{ $quiz->passing_score }}%</span>
+                                @if($quiz->module)
+                                    <span>&bull;</span>
+                                    <span class="text-slate-400 truncate max-w-[140px]">Módulo: {{ $quiz->module->title }}</span>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 shrink-0">
+                            <a href="{{ route('instructor.quizzes.edit', $quiz) }}" 
+                               class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors text-xs" 
+                               title="Editar Quiz">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            </a>
+                            <button wire:click="deleteQuiz({{ $quiz->id }})" 
+                                    wire:confirm="Excluir a avaliação '{{ $quiz->title }}'?"
+                                    type="button" 
+                                    class="p-2 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 transition-colors text-xs" 
+                                    title="Excluir Quiz">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
 </div>

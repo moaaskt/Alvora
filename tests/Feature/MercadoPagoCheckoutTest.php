@@ -137,23 +137,26 @@ class MercadoPagoCheckoutTest extends TestCase
             'role' => UserRole::COMPANY_ADMIN,
         ]);
 
-        $responseSuccess = $this->actingAs($admin)->get('/empresa/faturamento/sucesso?payment_id=987654');
+        $responseSuccess = $this->actingAs($admin)->get('/instrutor/faturamento/sucesso?payment_id=987654');
         $responseSuccess->assertOk();
         $responseSuccess->assertSee('Assinatura Corporativa Ativada com Sucesso!');
         $responseSuccess->assertSee('987654');
 
-        $responsePending = $this->actingAs($admin)->get('/empresa/faturamento/pendente');
+        // Testar que acesso legado a /empresa/faturamento/sucesso redireciona suavemente
+        $this->actingAs($admin)->get('/empresa/faturamento/sucesso')->assertRedirect('/instrutor/faturamento/sucesso');
+
+        $responsePending = $this->actingAs($admin)->get('/instrutor/faturamento/pendente');
         $responsePending->assertOk();
         $responsePending->assertSee('Pagamento em Análise');
 
-        $responseFailure = $this->actingAs($admin)->get('/empresa/faturamento/erro');
+        $responseFailure = $this->actingAs($admin)->get('/instrutor/faturamento/erro');
         $responseFailure->assertOk();
         $responseFailure->assertSee('Não Foi Possível Concluir o Pagamento');
     }
 
     public function test_unauthenticated_user_cannot_access_billing_return(): void
     {
-        $response = $this->get('/empresa/faturamento/sucesso');
+        $response = $this->get('/instrutor/faturamento/sucesso');
         $response->assertRedirect('/login');
     }
 }

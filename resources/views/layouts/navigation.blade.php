@@ -41,11 +41,11 @@
                         <a href="{{ route('dashboard') }}" class="text-slate-300 hover:text-white transition-colors py-2">
                             Configurações IA
                         </a>
-                    @elseif(auth()->user()->isCompanyAdmin())
-                        <!-- Gestor de RH Links -->
+                    @elseif(auth()->user()->isInstructor() || auth()->user()->isCompanyAdmin())
+                        <!-- Painel do Instrutor (O instrutor é a própria empresa) -->
                         <a href="{{ route('dashboard') }}" class="text-white hover:text-indigo-400 transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('dashboard') ? 'text-indigo-400 font-semibold' : '' }}">
                             <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                            Dashboard RH
+                            Painel do Instrutor
                         </a>
                         <a href="{{ route('instructor.courses.index') }}" class="text-slate-300 hover:text-white transition-colors py-2 {{ request()->routeIs('instructor.courses.*') ? 'text-indigo-400 font-semibold' : '' }}">
                             Cursos & Conteúdos
@@ -66,20 +66,6 @@
                         </a>
                         <a href="{{ route('company.billing') }}" class="text-slate-300 hover:text-white transition-colors py-2 {{ request()->routeIs('company.billing*') ? 'text-indigo-400 font-semibold' : '' }}">
                             Assinatura & Plano
-                        </a>
-                    @elseif(auth()->user()->isInstructor())
-                        <!-- Instrutor Links -->
-                        <a href="{{ route('dashboard') }}" class="text-white hover:text-indigo-400 transition-colors py-2 flex items-center gap-1.5">
-                            Painel do Instrutor
-                        </a>
-                        <a href="{{ route('instructor.courses.index') }}" class="text-slate-300 hover:text-white transition-colors py-2 {{ request()->routeIs('instructor.courses.*') ? 'text-indigo-400 font-semibold' : '' }}">
-                            Meus Cursos
-                        </a>
-                        <a href="{{ route('dashboard') }}" class="text-slate-300 hover:text-white transition-colors py-2">
-                            Aulas & Módulos
-                        </a>
-                        <a href="{{ route('dashboard') }}" class="text-slate-300 hover:text-white transition-colors py-2">
-                            Quizzes & Avaliações
                         </a>
                     @else
                         <!-- Aluno / Colaborador Links -->
@@ -104,11 +90,10 @@
                 <!-- Role Badge -->
                 <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
                     @if(auth()->user()->isAlvoraAdmin()) bg-indigo-500/20 text-indigo-300 border border-indigo-500/30
-                    @elseif(auth()->user()->isCompanyAdmin()) bg-emerald-500/20 text-emerald-300 border border-emerald-500/30
-                    @elseif(auth()->user()->isInstructor()) bg-purple-500/20 text-purple-300 border border-purple-500/30
+                    @elseif(auth()->user()->isInstructor() || auth()->user()->isCompanyAdmin()) bg-purple-500/20 text-purple-300 border border-purple-500/30
                     @else bg-slate-800 text-slate-300 border border-slate-700
                     @endif">
-                    {{ auth()->user()->role?->label() ?? 'Usuário' }}
+                    {{ auth()->user()->isAlvoraAdmin() ? 'Administrador Alvora' : ((auth()->user()->isInstructor() || auth()->user()->isCompanyAdmin()) ? 'Instrutor' : 'Aluno') }}
                 </span>
 
                 <!-- User Info -->

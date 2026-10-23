@@ -39,16 +39,16 @@ class CheckSubscriptionStatus
 
         // Caso a empresa esteja suspensa por inadimplência
         if ($company->isSuspended()) {
-            // Gestor de RH pode acessar exclusivamente as telas de faturamento para regularização
-            if ($user->isCompanyAdmin()) {
-                if ($request->is('empresa/faturamento*') || $request->is('logout') || $request->routeIs('company.billing*') || $request->routeIs('logout')) {
+            // Instrutor / Gestor da Empresa pode acessar exclusivamente as telas de faturamento para regularização
+            if ($user->isCompanyAdmin() || $user->isInstructor()) {
+                if ($request->is('instrutor/faturamento*') || $request->is('empresa/faturamento*') || $request->is('logout') || $request->routeIs('company.billing*') || $request->routeIs('logout')) {
                     return $next($request);
                 }
 
                 return redirect()->route('company.billing')->with('warning', 'Sua assinatura corporativa está suspensa por pendência financeira. Regularize o plano para restabelecer o acesso total da sua equipe.');
             }
 
-            // Alunos e instrutores têm o acesso aos cursos bloqueado
+            // Alunos têm o acesso aos cursos bloqueado
             if ($request->is('aluno/cursos*') || $request->is('aluno/quizzes*')) {
                 return redirect()->route('student.dashboard')->with('error', 'O acesso aos cursos e trilhas da sua organização está temporariamente suspenso para renovação contratual. Contate o setor de RH.');
             }
