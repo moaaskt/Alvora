@@ -228,4 +228,46 @@ class CourseTest extends TestCase
             'status' => 'draft',
         ]);
     }
+
+    public function test_instructor_can_manage_quizzes_in_dedicated_tab(): void
+    {
+        $company = Company::create(['name' => 'Empresa Alfa', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Carlos',
+            'email' => 'carlos@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Curso de Teste com Quizzes',
+            'slug' => 'curso-de-teste-com-quizzes',
+            'status' => 'draft',
+        ]);
+
+        $quiz = \App\Models\Quiz::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'title' => 'Quiz Inicial do Curso',
+            'passing_score' => 70,
+        ]);
+
+        $this->actingAs($instructor);
+
+        // Testa alternância para aba quizzes e exclusão
+        Livewire::test(CourseEditor::class, ['course' => $course])
+            ->set('activeTab', 'quizzes')
+            ->assertSet('activeTab', 'quizzes')
+            ->assertSee('Quiz Inicial do Curso')
+            ->call('deleteQuiz', $quiz->id)
+            ->assertDispatched('toast');
+
+        $this->assertDatabaseMissing('quizzes', [
+            'id' => $quiz->id,
+        ]);
+    }
 }

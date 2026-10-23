@@ -27,12 +27,11 @@ class QuizEditor extends Component
     /**
      * Mount component for new or existing quiz.
      */
-    public function mount(Course $course, ?Quiz $quiz = null): void
+    public function mount(?Course $course = null, ?Quiz $quiz = null): void
     {
-        $this->course = $course;
-        $this->quiz = $quiz;
-
         if ($quiz && $quiz->exists) {
+            $this->quiz = $quiz;
+            $this->course = ($course && $course->exists) ? $course : $quiz->course;
             $this->title = $quiz->title;
             $this->passing_score = $quiz->passing_score;
             $this->module_id = $quiz->module_id;
@@ -52,6 +51,7 @@ class QuizEditor extends Component
                 ];
             })->toArray();
         } else {
+            $this->course = $course ?? ($quiz?->course ?? new Course());
             // Template default com 1 pergunta e 2 opções
             $this->questions = [
                 [
@@ -209,7 +209,10 @@ class QuizEditor extends Component
 
         session()->flash('success', 'Quiz pedagógico salvo com sucesso!');
 
-        return redirect()->route('instructor.courses.curriculum', $this->course);
+        return redirect()->route('instructor.courses.edit', [
+            'course' => $this->course->id,
+            'tab' => 'quizzes',
+        ]);
     }
 
     /**

@@ -57,7 +57,7 @@ class QuizTest extends TestCase
                 ],
             ])
             ->call('save')
-            ->assertRedirect(route('instructor.courses.curriculum', $course));
+            ->assertRedirect(route('instructor.courses.edit', ['course' => $course, 'tab' => 'quizzes']));
 
         $this->assertDatabaseHas('quizzes', [
             'company_id' => $company->id,
@@ -264,5 +264,52 @@ class QuizTest extends TestCase
         // Acesso ao quiz de outra empresa deve falhar com 404 devido ao TenantScope
         $response = $this->get(route('student.quiz', $quizB));
         $response->assertStatus(404);
+    }
+
+    public function test_instructor_can_access_quiz_edit_screen_without_errors(): void
+    {
+        $company = Company::create(['name' => 'Empresa Alfa', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Roberto',
+            'email' => 'roberto@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'DevOps e CI/CD Corporativo',
+            'slug' => 'devops-e-ci-cd-corporativo-edit',
+            'status' => 'published',
+        ]);
+
+        $quiz = Quiz::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'title' => 'Avaliação Final DevOps',
+            'passing_score' => 75,
+        ]);
+
+        $this->actingAs($instructor);
+
+        // Testa rota /quizzes/{quiz}/editar (instructor.quizzes.edit) sem erros 500
+        $responseA = $this->get(route('instructor.quizzes.edit', $quiz));
+        $responseA->assertStatus(200);
+        $responseA->assertSee('Editar Avaliação / Quiz');
+        $responseA->assertSee('DevOps e CI/CD Corporativo');
+
+        // Testa rota alternativa /cursos/{course}/quizzes/{quiz}/editar (instructor.courses.quizzes.edit)
+        $responseB = $this->get(route('instructor.courses.quizzes.edit', ['course' => $course, 'quiz' => $quiz]));
+        $responseB->assertStatus(200);
+        $responseB->assertSee('Editar Avaliação / Quiz');
+        $responseB->assertSee('DevOps e CI/CD Corporativo');
+
+        // Testa montagem e estado inicial do componente Livewire
+        Livewire::test(QuizEditor::class, ['quiz' => $quiz])
+            ->assertSet('title', 'Avaliação Final DevOps')
+            ->assertSet('passing_score', 75);
     }
 }

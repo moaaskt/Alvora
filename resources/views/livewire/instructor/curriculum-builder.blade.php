@@ -58,7 +58,7 @@
             </span>
 
             <!-- Aba 3: Avaliações & Quizzes -->
-            <a href="#quizzes-do-curso"
+            <a href="{{ route('instructor.courses.edit', $course) }}?tab=quizzes"
                class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                 <span class="truncate">3. Quizzes & Avaliações</span>
@@ -313,64 +313,19 @@
         </div>
     @endif
 
-    <!-- Seção de Quizzes do Curso (Opção A) -->
-    <div id="quizzes-do-curso" class="pt-8 border-t border-slate-800 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div>
-                <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                    Avaliações & Quizzes deste Curso ({{ $course->quizzes->count() }})
-                </h3>
-                <p class="text-xs text-slate-400">Avaliações pedagógicas de fixação com nota de corte vinculadas a este curso.</p>
-            </div>
-            <a href="{{ route('instructor.courses.quizzes.create', $course) }}" 
-               class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl font-semibold text-xs text-indigo-300 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 transition-colors self-start sm:self-auto">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                <span>Criar Nova Avaliação</span>
-            </a>
-        </div>
+    <!-- Navegação de Rodapé da Grade Curricular -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-slate-800">
+        <a href="{{ route('instructor.courses.edit', $course) }}?tab=basic" 
+           class="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-800/80 transition-colors flex items-center gap-1.5 w-full sm:w-auto justify-center">
+            <span>&larr;</span>
+            <span>Voltar para Informações Básicas</span>
+        </a>
 
-        @if($course->quizzes->isEmpty())
-            <div class="p-8 rounded-2xl bg-slate-900/40 border border-slate-800/80 text-center space-y-2">
-                <p class="text-xs text-slate-400">Nenhum quiz ou avaliação cadastrada para este treinamento ainda.</p>
-                <a href="{{ route('instructor.courses.quizzes.create', $course) }}" class="inline-block text-xs font-semibold text-indigo-400 hover:text-indigo-300">
-                    + Criar primeira avaliação &rarr;
-                </a>
-            </div>
-        @else
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach($course->quizzes as $quiz)
-                    <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 hover:border-slate-700 flex items-center justify-between gap-4 transition-all">
-                        <div class="space-y-1">
-                            <h4 class="text-sm font-bold text-white">{{ $quiz->title }}</h4>
-                            <div class="flex items-center gap-3 text-xs text-slate-400">
-                                <span>{{ $quiz->questions->count() }} questões</span>
-                                <span>&bull;</span>
-                                <span class="text-emerald-400 font-semibold">Corte: {{ $quiz->passing_score }}%</span>
-                                @if($quiz->module)
-                                    <span>&bull;</span>
-                                    <span class="text-slate-400 truncate max-w-[140px]">Módulo: {{ $quiz->module->title }}</span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-2 shrink-0">
-                            <a href="{{ route('instructor.quizzes.edit', $quiz) }}" 
-                               class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors text-xs" 
-                               title="Editar Quiz">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                            </a>
-                            <button wire:click="deleteQuiz({{ $quiz->id }})" 
-                                    wire:confirm="Excluir a avaliação '{{ $quiz->title }}'?"
-                                    type="button" 
-                                    class="p-2 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 transition-colors text-xs" 
-                                    title="Excluir Quiz">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        @endif
+        <a href="{{ route('instructor.courses.edit', $course) }}?tab=quizzes" 
+           class="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 shadow-md shadow-indigo-600/30 transition-all flex items-center justify-center gap-1.5 w-full sm:w-auto">
+            <span>Avançar para Quizzes & Avaliações</span>
+            <span>&rarr;</span>
+        </a>
     </div>
+
 </div>

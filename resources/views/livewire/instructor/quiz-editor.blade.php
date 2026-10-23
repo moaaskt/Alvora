@@ -3,8 +3,8 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl">
         <div>
             <div class="flex items-center gap-2 text-xs text-slate-400 mb-1">
-                <a href="{{ route('instructor.courses.curriculum', $course) }}" class="hover:text-white transition flex items-center gap-1">
-                    &larr; Voltar para Grade Curricular
+                <a href="{{ route('instructor.courses.edit', ['course' => $course, 'tab' => 'quizzes']) }}" class="hover:text-white transition flex items-center gap-1">
+                    &larr; Voltar para Avaliações & Quizzes
                 </a>
                 <span>&bull;</span>
                 <span class="text-indigo-400 font-semibold">{{ $course->title }}</span>
@@ -15,7 +15,7 @@
         </div>
         <div class="flex items-center gap-3">
             <a
-                href="{{ route('instructor.courses.curriculum', $course) }}"
+                href="{{ route('instructor.courses.edit', ['course' => $course, 'tab' => 'quizzes']) }}"
                 class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-700"
             >
                 Cancelar

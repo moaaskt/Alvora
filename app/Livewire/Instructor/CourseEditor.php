@@ -17,7 +17,7 @@ class CourseEditor extends Component
     public string $thumbnail = '';
     public string $status = 'draft';
     public ?int $instructor_id = null;
-    public string $activeTab = 'basic'; // 'basic' | 'publish'
+    public string $activeTab = 'basic'; // 'basic' | 'quizzes' | 'publish'
 
     protected $queryString = [
         'activeTab' => ['except' => 'basic', 'as' => 'tab'],
@@ -44,7 +44,7 @@ class CourseEditor extends Component
     public function mount(?Course $course = null): void
     {
         $requestedTab = request()->query('tab', 'basic');
-        $this->activeTab = in_array($requestedTab, ['basic', 'publish']) ? $requestedTab : 'basic';
+        $this->activeTab = in_array($requestedTab, ['basic', 'quizzes', 'publish']) ? $requestedTab : 'basic';
 
         if ($course && $course->exists) {
             $this->courseId = $course->id;
@@ -61,7 +61,7 @@ class CourseEditor extends Component
 
     public function setTab(string $tab): void
     {
-        if (in_array($tab, ['basic', 'publish'])) {
+        if (in_array($tab, ['basic', 'quizzes', 'publish'])) {
             $this->activeTab = $tab;
         }
     }
@@ -125,6 +125,19 @@ class CourseEditor extends Component
         }
     }
 
+    public function deleteQuiz(int $quizId): void
+    {
+        if (!$this->courseId) {
+            return;
+        }
+
+        $quiz = \App\Models\Quiz::where('course_id', $this->courseId)->findOrFail($quizId);
+        $title = $quiz->title;
+        $quiz->delete();
+
+        $this->dispatch('toast', message: "Avaliação '{$title}' removida com sucesso.", type: 'info');
+    }
+
     public function render()
     {
         $user = Auth::user();
@@ -138,7 +151,9 @@ class CourseEditor extends Component
         }
 
         $course = $this->courseId 
-            ? Course::withCount(['modules', 'lessons', 'quizzes'])->find($this->courseId) 
+            ? Course::withCount(['modules', 'lessons', 'quizzes'])
+                ->with(['quizzes.questions', 'quizzes.module'])
+                ->find($this->courseId) 
             : null;
 
         return view('livewire.instructor.course-editor', [

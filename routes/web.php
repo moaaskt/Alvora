@@ -137,6 +137,7 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
         Route::get('/cursos/{course}/editar', CourseEditor::class)->name('courses.edit');
         Route::get('/cursos/{course}/curriculo', CurriculumBuilder::class)->name('courses.curriculum');
         Route::get('/cursos/{course}/quizzes/novo', QuizEditor::class)->name('courses.quizzes.create');
+        Route::get('/cursos/{course}/quizzes/{quiz}/editar', QuizEditor::class)->name('courses.quizzes.edit');
         Route::get('/quizzes/{quiz}/editar', QuizEditor::class)->name('quizzes.edit');
     });
 });
