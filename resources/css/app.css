@@ -18,25 +18,30 @@
     --color-alvora-indigo: #6366F1;
     --color-alvora-emerald: #10B981;
 
-    /* Design Tokens Editoriais (Ivory, Graphite, Sage) */
-    --color-editorial-ivory: #FAF8F5;
-    --color-editorial-ivory-warm: #F4EFEA;
-    --color-editorial-ivory-surface: #FFFFFF;
-    --color-editorial-border: #E8E2D9;
-    --color-editorial-border-light: #F0EBE3;
-    --color-editorial-graphite: #1A1C1E;
-    --color-editorial-graphite-soft: #2D3136;
-    --color-editorial-graphite-muted: #646973;
-    --color-editorial-sage: #385E4E;
-    --color-editorial-sage-light: #EBF2ED;
-    --color-editorial-sage-dark: #2B493D;
-    --color-editorial-sage-accent: #52826D;
+    /* Design Tokens EdTech Corporativa Moderna */
+    --color-edtech-bg: #F8FAFC;
+    --color-edtech-surface: #FFFFFF;
+    --color-edtech-border: #E2E8F0;
+    --color-edtech-border-light: #F1F5F9;
+    --color-edtech-text: #0F172A;
+    --color-edtech-muted: #64748B;
+    --color-edtech-blue: #2563EB;
+    --color-edtech-blue-hover: #1D4ED8;
+    --color-edtech-blue-light: #EFF6FF;
+    --color-edtech-blue-border: #BFDBFE;
+    --color-edtech-navy: #0F172A;
+    --color-edtech-navy-soft: #1E293B;
 }
 
 body {
     background-color: #090D16;
     color: #F8FAFC;
     font-family: var(--font-body);
+}
+
+html.light body {
+    background-color: #F8FAFC;
+    color: #0F172A;
 }
 
 h1, h2, h3, h4, h5, h6 {

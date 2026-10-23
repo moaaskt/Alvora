@@ -16,7 +16,54 @@ use App\Livewire\Student\QuizRunner;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('landing');
+    // Resolução segura de Tenant para a Vitrine Pública:
+    // Identifica exclusivamente a empresa parceira de demonstração oficial (Acme Corporation Brasil).
+    // Garante com rigor que cursos e dados privados de outros tenants jamais sejam vazados.
+    $demoCnpj = config('app.demo_tenant_cnpj', '12.345.678/0001-90');
+    $demoCompany = \App\Models\Company::where('cnpj', $demoCnpj)->first();
+
+    $showcaseCourses = collect();
+    $featuredInstructors = collect();
+    $featuredTracks = collect();
+
+    if ($demoCompany) {
+        // Consulta explícita restrita a $demoCompany->id e status 'published'
+        // Seleciona exclusivamente campos públicos, sem expor dados internos de negócio
+        $showcaseCourses = \App\Models\Course::where('company_id', $demoCompany->id)
+            ->where('status', 'published')
+            ->select(['id', 'company_id', 'instructor_id', 'title', 'slug', 'description', 'thumbnail', 'status'])
+            ->with([
+                'instructor' => fn ($query) => $query->select(['id', 'company_id', 'name', 'role']),
+            ])
+            ->withCount(['lessons', 'modules'])
+            ->withSum('lessons as total_duration_minutes', 'duration_minutes')
+            ->latest('id')
+            ->take(6)
+            ->get();
+
+        // Instrutores públicos atuantes nesses cursos de demonstração (somente nome e id)
+        $instructorIds = $showcaseCourses->pluck('instructor_id')->filter()->unique();
+        if ($instructorIds->isNotEmpty()) {
+            $featuredInstructors = \App\Models\User::where('company_id', $demoCompany->id)
+                ->whereIn('id', $instructorIds)
+                ->where('role', \App\Enums\UserRole::INSTRUCTOR)
+                ->select(['id', 'company_id', 'name', 'role'])
+                ->get();
+        }
+
+        // Trilhas ativas associadas à empresa demonstrativa
+        $featuredTracks = \App\Models\LearningTrack::where('company_id', $demoCompany->id)
+            ->select(['id', 'company_id', 'title', 'slug', 'description', 'department', 'is_mandatory'])
+            ->withCount('courses')
+            ->take(4)
+            ->get();
+    }
+
+    return view('landing', [
+        'showcaseCourses' => $showcaseCourses,
+        'featuredInstructors' => $featuredInstructors,
+        'featuredTracks' => $featuredTracks,
+    ]);
 })->name('home');
 
 Route::get('/planos', function () {
