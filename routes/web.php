@@ -78,7 +78,62 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
         if (auth()->user()->isStudent()) {
             return redirect()->route('student.dashboard');
         }
-        return view('dashboard');
+
+        $user = auth()->user();
+        $companyId = $user->company_id;
+        $company = $user->company;
+
+        $courses = \App\Models\Course::where('company_id', $companyId)
+            ->with(['instructor'])
+            ->withCount(['lessons', 'modules', 'enrollments'])
+            ->withSum('lessons as total_duration_minutes', 'duration_minutes')
+            ->latest('id')
+            ->get();
+
+        $totalCourses = $courses->count();
+        $publishedCourses = $courses->where('status', 'published')->count();
+        $draftCourses = $courses->where('status', 'draft')->count();
+        $archivedCourses = $courses->where('status', 'archived')->count();
+
+        $students = \App\Models\User::where('company_id', $companyId)
+            ->where('role', \App\Enums\UserRole::STUDENT)
+            ->with(['latestRiskScore', 'interventions'])
+            ->get();
+
+        $totalStudents = $students->count();
+        $highRiskStudents = $students->filter(fn($s) => $s->latestRiskScore?->isHighRisk());
+        $mediumRiskStudents = $students->filter(fn($s) => $s->latestRiskScore?->isMediumRisk());
+        $lowRiskStudents = $students->filter(fn($s) => $s->latestRiskScore?->isLowRisk());
+
+        $avgEvasionScore = $totalStudents > 0
+            ? round($students->avg(fn($s) => $s->latestRiskScore?->score ?? 0))
+            : 0;
+
+        $recentInterventions = \App\Models\AiIntervention::where('company_id', $companyId)
+            ->with(['user', 'recommendedLesson'])
+            ->latest('id')
+            ->take(5)
+            ->get();
+
+        $interventionsCount = \App\Models\AiIntervention::where('company_id', $companyId)->count();
+
+        return view('dashboard', [
+            'user' => $user,
+            'company' => $company,
+            'courses' => $courses,
+            'totalCourses' => $totalCourses,
+            'publishedCourses' => $publishedCourses,
+            'draftCourses' => $draftCourses,
+            'archivedCourses' => $archivedCourses,
+            'students' => $students,
+            'totalStudents' => $totalStudents,
+            'highRiskCount' => $highRiskStudents->count(),
+            'mediumRiskCount' => $mediumRiskStudents->count(),
+            'lowRiskCount' => $lowRiskStudents->count(),
+            'avgEvasionScore' => $avgEvasionScore,
+            'recentInterventions' => $recentInterventions,
+            'interventionsCount' => $interventionsCount,
+        ]);
     })->name('dashboard');
 
     // Portal do Aluno / Colaborador
