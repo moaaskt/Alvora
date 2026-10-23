@@ -9,11 +9,13 @@ class GuestLayout extends Component
 {
     public ?string $title;
     public string $theme;
+    public bool $hideNav;
 
-    public function __construct(?string $title = null, string $theme = 'dark')
+    public function __construct(?string $title = null, string $theme = 'dark', bool $hideNav = false)
     {
         $this->title = $title;
         $this->theme = $theme;
+        $this->hideNav = $hideNav;
     }
 
     /**
@@ -23,6 +25,7 @@ class GuestLayout extends Component
     {
         return view('layouts.guest', [
             'theme' => $this->theme,
+            'hideNav' => $this->hideNav,
         ]);
     }
 }
