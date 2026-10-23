@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -8,6 +8,7 @@
 
 @theme {
     --font-sans: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-serif: 'Newsreader', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
     --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
     --color-alvora-dark: #090D16;
@@ -16,6 +17,20 @@
     --color-alvora-border: #334155;
     --color-alvora-indigo: #6366F1;
     --color-alvora-emerald: #10B981;
+
+    /* Design Tokens Editoriais (Ivory, Graphite, Sage) */
+    --color-editorial-ivory: #FAF8F5;
+    --color-editorial-ivory-warm: #F4EFEA;
+    --color-editorial-ivory-surface: #FFFFFF;
+    --color-editorial-border: #E8E2D9;
+    --color-editorial-border-light: #F0EBE3;
+    --color-editorial-graphite: #1A1C1E;
+    --color-editorial-graphite-soft: #2D3136;
+    --color-editorial-graphite-muted: #646973;
+    --color-editorial-sage: #385E4E;
+    --color-editorial-sage-light: #EBF2ED;
+    --color-editorial-sage-dark: #2B493D;
+    --color-editorial-sage-accent: #52826D;
 }
 
 body {
@@ -26,4 +41,19 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-sans);
+}
+
+/* Suporte à tipografia editorial */
+.font-serif-editorial {
+    font-family: var(--font-serif);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
