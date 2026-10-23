@@ -1,4 +1,4 @@
-@props(['title' => null, 'theme' => 'dark'])
+@props(['title' => null, 'theme' => 'dark', 'hideNav' => false])
 <!DOCTYPE html>
 <html lang="pt-BR" class="{{ $theme === 'editorial' ? 'light scroll-smooth' : 'dark scroll-smooth' }}">
 <head>
@@ -19,6 +19,7 @@
     @livewireStyles
 </head>
 <body class="{{ $theme === 'editorial' ? 'bg-[#F8FAFC] text-[#0F172A] font-sans' : 'bg-[#090D16] text-slate-100 font-body' }} antialiased selection:bg-blue-600 selection:text-white min-h-screen flex flex-col justify-between">
+    @if (!$hideNav)
     @if ($theme === 'editorial')
         <!-- Header EdTech Corporativa Moderna -->
         <header x-data="{ mobileMenuOpen: false }" class="sticky top-0 z-50 backdrop-blur-md bg-white/95 border-b border-slate-200 transition-all duration-200">
@@ -136,6 +137,7 @@
             </div>
         </header>
     @endif
+    @endif
 
 
     <!-- Main Content -->
@@ -143,6 +145,7 @@
         {{ $slot }}
     </main>
 
+    @if (!$hideNav)
     @if ($theme === 'editorial')
         <!-- Rodapé EdTech Corporativo Limpo (sem mt-24 residual) -->
         <footer class="bg-white border-t border-slate-200 text-slate-500 text-sm">
@@ -251,6 +254,7 @@
                 </div>
             </div>
         </footer>
+    @endif
     @endif
 
     <!-- Container Global de Toasts (D-16) -->
