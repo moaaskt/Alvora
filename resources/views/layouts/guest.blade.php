@@ -21,12 +21,12 @@
 <body class="{{ $theme === 'editorial' ? 'bg-[#FAF8F5] text-[#1A1C1E] font-body' : 'bg-[#090D16] text-slate-100 font-body' }} antialiased selection:bg-[#385E4E] selection:text-white min-h-screen flex flex-col justify-between">
     @if ($theme === 'editorial')
         <!-- Header Editorial Compacto (LMS Academy B2B) -->
-        <header class="sticky top-0 z-50 backdrop-blur-md bg-[#FAF8F5]/90 border-b border-[#E8E2D9] transition-all duration-200">
+        <header x-data="{ mobileMenuOpen: false }" class="sticky top-0 z-50 backdrop-blur-md bg-[#FAF8F5]/95 border-b border-[#E8E2D9] transition-all duration-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-20">
                     <!-- Brand / Identidade -->
                     <div class="flex items-center space-x-3">
-                        <a href="{{ url('/') }}" class="flex items-center space-x-3.5 group focus:outline-none focus:ring-2 focus:ring-[#385E4E]/40 rounded-lg p-1">
+                        <a href="{{ url('/') }}" class="flex items-center space-x-3 group focus:outline-none focus:ring-2 focus:ring-[#385E4E]/40 rounded-lg p-1">
                             <div class="w-9 h-9 rounded-lg bg-[#1A1C1E] text-[#FAF8F5] flex items-center justify-center font-serif text-xl font-bold tracking-tight shadow-sm group-hover:bg-[#385E4E] transition-colors duration-200">
                                 A
                             </div>
@@ -37,8 +37,8 @@
                         </a>
                     </div>
 
-                    <!-- Navegação Editorial -->
-                    <nav class="hidden md:flex items-center space-x-9 text-sm font-medium text-[#2D3136]">
+                    <!-- Navegação Editorial Desktop -->
+                    <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-[#2D3136]">
                         <a href="{{ url('/#catalogo') }}" class="hover:text-[#385E4E] transition-colors py-1">Cursos & Programas</a>
                         <a href="{{ url('/#trilhas') }}" class="hover:text-[#385E4E] transition-colors py-1">Trilhas Corporativas</a>
                         <a href="{{ url('/#instrutores') }}" class="hover:text-[#385E4E] transition-colors py-1">Especialistas</a>
@@ -50,17 +50,48 @@
                     </nav>
 
                     <!-- Ações & Autenticação -->
-                    <div class="flex items-center space-x-4">
-                        <a href="{{ route('login') }}" class="text-sm font-medium text-[#2D3136] hover:text-[#1A1C1E] px-3 py-2 rounded-lg hover:bg-[#E8E2D9]/40 transition-colors focus:outline-none focus:ring-2 focus:ring-[#385E4E]/30">
-                            Acessar Plataforma
+                    <div class="flex items-center space-x-2 sm:space-x-3">
+                        <a href="{{ route('login') }}" class="text-xs sm:text-sm font-medium text-[#2D3136] hover:text-[#1A1C1E] px-2.5 py-2 sm:px-3 rounded-lg hover:bg-[#E8E2D9]/40 transition-colors focus:outline-none focus:ring-2 focus:ring-[#385E4E]/30">
+                            Acessar
                         </a>
-                        <a href="{{ url('/#demonstracao') }}" class="inline-flex items-center justify-center px-4.5 py-2.5 text-xs uppercase tracking-wider font-semibold text-white bg-[#1A1C1E] hover:bg-[#385E4E] rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#385E4E]/50">
+                        <a href="{{ url('/#demonstracao') }}" class="hidden sm:inline-flex items-center justify-center px-4 py-2 text-xs uppercase tracking-wider font-semibold text-white bg-[#1A1C1E] hover:bg-[#385E4E] rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#385E4E]/50">
+                            Falar com Consultor
+                        </a>
+                        <!-- Botão Hambúrguer Mobile -->
+                        <button @click="mobileMenuOpen = !mobileMenuOpen" 
+                                type="button" 
+                                class="md:hidden p-2 rounded-lg text-[#2D3136] hover:text-[#1A1C1E] hover:bg-[#E8E2D9]/40 focus:outline-none focus:ring-2 focus:ring-[#385E4E]/30"
+                                aria-label="Abrir menu de navegação">
+                            <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                            <svg x-show="mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Menu Dropdown Mobile -->
+                <div x-show="mobileMenuOpen" 
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 -translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 -translate-y-2"
+                     class="md:hidden py-4 border-t border-[#E8E2D9] space-y-3"
+                     style="display: none;">
+                    <a @click="mobileMenuOpen = false" href="{{ url('/#catalogo') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#2D3136] hover:bg-[#E8E2D9]/40 hover:text-[#385E4E]">Cursos & Programas</a>
+                    <a @click="mobileMenuOpen = false" href="{{ url('/#trilhas') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#2D3136] hover:bg-[#E8E2D9]/40 hover:text-[#385E4E]">Trilhas Corporativas</a>
+                    <a @click="mobileMenuOpen = false" href="{{ url('/#instrutores') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#2D3136] hover:bg-[#E8E2D9]/40 hover:text-[#385E4E]">Especialistas</a>
+                    <a @click="mobileMenuOpen = false" href="{{ url('/#metodologia-ia') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#2D3136] hover:bg-[#E8E2D9]/40 hover:text-[#385E4E]">IA & Retenção</a>
+                    <a @click="mobileMenuOpen = false" href="{{ url('/planos') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-[#2D3136] hover:bg-[#E8E2D9]/40 hover:text-[#385E4E]">Planos B2B</a>
+                    <div class="pt-2">
+                        <a @click="mobileMenuOpen = false" href="{{ url('/#demonstracao') }}" class="block w-full text-center px-4 py-2.5 text-xs uppercase tracking-wider font-semibold text-white bg-[#1A1C1E] hover:bg-[#385E4E] rounded-lg">
                             Falar com Consultor
                         </a>
                     </div>
                 </div>
             </div>
         </header>
+
     @else
         <!-- Navbar Pública Padrão (Dark) -->
         <header class="sticky top-0 z-50 backdrop-blur-md bg-[#090D16]/80 border-b border-slate-800/80">

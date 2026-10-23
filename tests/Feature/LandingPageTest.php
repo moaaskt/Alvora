@@ -21,6 +21,13 @@ class LandingPageTest extends TestCase
         $response->assertSee('Catálogo de Cursos');
         $response->assertSee('Solicitar Demonstração');
         $response->assertSee('Score Preditivo de Evasão');
+
+        // Validação do Requisito 1: Fontes transparentes e identificação de dados demonstrativos
+        $response->assertSee('Benchmark de Mercado');
+        $response->assertSee('Dado Demonstrativo');
+        $response->assertSee('Censo EAD / ABED');
+        $response->assertSee('Simulação Algorítmica Alvora');
+        $response->assertSee('Nota de transparência:');
     }
 
     public function test_landing_page_displays_only_published_demo_courses_and_never_leaks_other_tenants(): void

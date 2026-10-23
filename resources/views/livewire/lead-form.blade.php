@@ -1,39 +1,42 @@
-<div class="relative bg-gradient-to-b from-slate-900/90 to-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 sm:p-8 lg:p-10 shadow-2xl shadow-indigo-950/30">
+<div class="relative bg-white border border-[#E8E2D9] rounded-2xl p-6 sm:p-8 lg:p-10 shadow-sm">
     @if ($submitted)
         <div class="text-center py-10 space-y-4">
-            <div class="w-16 h-16 mx-auto rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+            <div class="w-16 h-16 mx-auto rounded-full bg-[#EBF2ED] border border-[#385E4E]/30 flex items-center justify-center text-[#385E4E]">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
             </div>
-            <h3 class="text-2xl font-bold text-white">Solicitação Recebida com Sucesso!</h3>
-            <p class="text-slate-400 text-sm max-w-md mx-auto">
-                Obrigado pelo interesse. Um especialista Alvora entrará em contato em menos de 24 horas para apresentar uma demonstração personalizada para sua organização.
+            <h3 class="font-serif text-2xl font-medium text-[#1A1C1E]">Solicitação Recebida com Sucesso</h3>
+            <p class="text-[#646973] text-sm max-w-md mx-auto leading-relaxed">
+                Agradecemos o contato. Um consultor executivo da Alvora entrará em contato em menos de 24 horas úteis para preparar uma demonstração adaptada às necessidades do seu time.
             </p>
             <div class="pt-4">
-                <button wire:click="resetForm" type="button" class="inline-flex items-center text-sm font-semibold text-indigo-400 hover:text-indigo-300">
+                <button wire:click="resetForm" type="button" class="inline-flex items-center text-xs uppercase tracking-wider font-semibold text-[#385E4E] hover:text-[#2B493D] cursor-pointer">
                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     Enviar nova solicitação
                 </button>
             </div>
         </div>
     @else
-        <div class="mb-8">
-            <h3 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Agende uma Apresentação Executiva</h3>
-            <p class="text-slate-400 text-sm mt-2">
-                Descubra como nossa IA preditiva identifica padrões de desistência e aumenta a conclusão dos cursos do seu time.
+        <div class="mb-7">
+            <span class="text-[11px] uppercase tracking-[0.2em] text-[#385E4E] font-semibold">Contato Institucional</span>
+            <h3 class="font-serif text-2xl sm:text-3xl font-medium text-[#1A1C1E] tracking-tight mt-1.5">
+                Agende uma Apresentação Executiva
+            </h3>
+            <p class="text-[#646973] text-xs sm:text-sm mt-2 leading-relaxed">
+                Conheça na prática como o Score de Risco de Evasão antecipa a desistência e eleva as taxas de conclusão do seu treinamento corporativo.
             </p>
         </div>
 
-        <form wire:submit="submit" class="space-y-5">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <form wire:submit="submit" class="space-y-4 sm:space-y-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                 <!-- Nome -->
                 <div>
-                    <label for="lead_name" class="block text-xs font-semibold text-slate-300 mb-1.5">Seu Nome Completo *</label>
+                    <label for="lead_name" class="block text-xs font-medium text-[#2D3136] mb-1.5">Nome Completo *</label>
                     <input type="text" id="lead_name" wire:model="name" placeholder="Ex: Carlos Silva"
-                           class="w-full bg-slate-950/60 border @error('name') border-rose-500 @else border-slate-700/80 @enderror rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                           class="w-full bg-[#FAF8F5] border @error('name') border-rose-400 focus:ring-rose-400 @else border-[#E8E2D9] focus:ring-[#385E4E]/30 focus:border-[#385E4E] @enderror rounded-xl px-3.5 py-2.5 sm:py-3 text-sm text-[#1A1C1E] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 transition-all">
                     @error('name')
-                        <p class="text-rose-400 text-xs mt-1.5 flex items-center gap-1">
+                        <p class="text-rose-600 text-xs mt-1.5 flex items-center gap-1">
                             <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             {{ $message }}
                         </p>
@@ -42,11 +45,11 @@
 
                 <!-- Email Corporativo -->
                 <div>
-                    <label for="lead_email" class="block text-xs font-semibold text-slate-300 mb-1.5">E-mail Corporativo *</label>
+                    <label for="lead_email" class="block text-xs font-medium text-[#2D3136] mb-1.5">E-mail Corporativo *</label>
                     <input type="email" id="lead_email" wire:model="email" placeholder="carlos@empresa.com.br"
-                           class="w-full bg-slate-950/60 border @error('email') border-rose-500 @else border-slate-700/80 @enderror rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                           class="w-full bg-[#FAF8F5] border @error('email') border-rose-400 focus:ring-rose-400 @else border-[#E8E2D9] focus:ring-[#385E4E]/30 focus:border-[#385E4E] @enderror rounded-xl px-3.5 py-2.5 sm:py-3 text-sm text-[#1A1C1E] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 transition-all">
                     @error('email')
-                        <p class="text-rose-400 text-xs mt-1.5 flex items-center gap-1">
+                        <p class="text-rose-600 text-xs mt-1.5 flex items-center gap-1">
                             <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             {{ $message }}
                         </p>
@@ -54,14 +57,14 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                 <!-- Empresa -->
                 <div>
-                    <label for="lead_company" class="block text-xs font-semibold text-slate-300 mb-1.5">Nome da Empresa *</label>
+                    <label for="lead_company" class="block text-xs font-medium text-[#2D3136] mb-1.5">Empresa *</label>
                     <input type="text" id="lead_company" wire:model="company" placeholder="Sua Empresa S.A."
-                           class="w-full bg-slate-950/60 border @error('company') border-rose-500 @else border-slate-700/80 @enderror rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                           class="w-full bg-[#FAF8F5] border @error('company') border-rose-400 focus:ring-rose-400 @else border-[#E8E2D9] focus:ring-[#385E4E]/30 focus:border-[#385E4E] @enderror rounded-xl px-3.5 py-2.5 sm:py-3 text-sm text-[#1A1C1E] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 transition-all">
                     @error('company')
-                        <p class="text-rose-400 text-xs mt-1.5 flex items-center gap-1">
+                        <p class="text-rose-600 text-xs mt-1.5 flex items-center gap-1">
                             <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             {{ $message }}
                         </p>
@@ -70,45 +73,47 @@
 
                 <!-- Cargo / Função -->
                 <div>
-                    <label for="lead_role" class="block text-xs font-semibold text-slate-300 mb-1.5">Cargo / Departamento</label>
+                    <label for="lead_role" class="block text-xs font-medium text-[#2D3136] mb-1.5">Cargo / Departamento</label>
                     <input type="text" id="lead_role" wire:model="role" placeholder="Ex: Diretor de RH, Head de T&D"
-                           class="w-full bg-slate-950/60 border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                           class="w-full bg-[#FAF8F5] border border-[#E8E2D9] focus:ring-[#385E4E]/30 focus:border-[#385E4E] rounded-xl px-3.5 py-2.5 sm:py-3 text-sm text-[#1A1C1E] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 transition-all">
                 </div>
             </div>
 
             <!-- Número de Colaboradores -->
             <div>
-                <label for="lead_employees" class="block text-xs font-semibold text-slate-300 mb-1.5">Número de Colaboradores para Capacitar</label>
+                <label for="lead_employees" class="block text-xs font-medium text-[#2D3136] mb-1.5">Tamanho da Equipe a Capacitar</label>
                 <select id="lead_employees" wire:model="employees_count"
-                        class="w-full bg-slate-950/60 border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
-                    <option value="1-20" class="bg-slate-900 text-white">Até 20 colaboradores (Starter)</option>
-                    <option value="21-100" class="bg-slate-900 text-white">21 a 100 colaboradores (Pro)</option>
-                    <option value="101-500" class="bg-slate-900 text-white">101 a 500 colaboradores (Enterprise)</option>
-                    <option value="500+" class="bg-slate-900 text-white">Mais de 500 colaboradores (Custom)</option>
+                        class="w-full bg-[#FAF8F5] border border-[#E8E2D9] focus:ring-[#385E4E]/30 focus:border-[#385E4E] rounded-xl px-3.5 py-2.5 sm:py-3 text-sm text-[#1A1C1E] focus:outline-none focus:ring-2 transition-all cursor-pointer">
+                    <option value="1-20">Até 20 colaboradores (Plano Starter)</option>
+                    <option value="21-100">21 a 100 colaboradores (Plano Pro + IA)</option>
+                    <option value="101-500">101 a 500 colaboradores (Plano Enterprise)</option>
+                    <option value="500+">Mais de 500 colaboradores (Customizado / Corporativo)</option>
                 </select>
             </div>
 
             <!-- Mensagem Opcional -->
             <div>
-                <label for="lead_message" class="block text-xs font-semibold text-slate-300 mb-1.5">Principais Desafios de Treinamento (Opcional)</label>
-                <textarea id="lead_message" wire:model="message" rows="3" placeholder="Ex: Alta taxa de abandono nos cursos de onboarding..."
-                          class="w-full bg-slate-950/60 border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"></textarea>
+                <label for="lead_message" class="block text-xs font-medium text-[#2D3136] mb-1.5">Objetivos ou Desafios Principais (Opcional)</label>
+                <textarea id="lead_message" wire:model="message" rows="3" placeholder="Ex: Desejamos reduzir o abandono no onboarding técnico de líderes..."
+                          class="w-full bg-[#FAF8F5] border border-[#E8E2D9] focus:ring-[#385E4E]/30 focus:border-[#385E4E] rounded-xl px-3.5 py-2.5 sm:py-3 text-sm text-[#1A1C1E] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 transition-all resize-y"></textarea>
             </div>
 
-            <!-- Submit Button -->
+            <!-- Botão de Envio -->
             <button type="submit" 
                     wire:loading.attr="disabled"
-                    class="w-full py-3.5 px-6 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-indigo-600 via-indigo-500 to-emerald-500 hover:from-indigo-500 hover:to-emerald-400 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-wait">
-                <span wire:loading.remove>Solicitar Demonstração</span>
+                    class="w-full py-3.5 px-6 rounded-xl font-medium text-xs uppercase tracking-wider text-white bg-[#1A1C1E] hover:bg-[#385E4E] shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-wait">
+                <span wire:loading.remove>Solicitar Apresentação Executiva</span>
                 <span wire:loading class="flex items-center gap-2">
                     <svg class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-                    Processando...
+                    Enviando solicitação...
                 </span>
             </button>
 
-            <p class="text-[11px] text-center text-slate-500 mt-2">
-                🔒 Seus dados estão seguros e protegidos em conformidade rigorosa com a LGPD.
+            <p class="text-[11px] text-center text-[#7A7F8A] mt-2 flex items-center justify-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-[#385E4E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <span>Privacidade garantida em estrita conformidade com a LGPD.</span>
             </p>
         </form>
     @endif
 </div>
+
