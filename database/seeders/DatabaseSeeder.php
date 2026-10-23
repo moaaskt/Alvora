@@ -71,11 +71,21 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 4. Instrutor Corporativo / Professor
+        // 4. Instrutores Corporativos
         $instructor = User::firstOrCreate(
             ['email' => 'professor@acme.com.br'],
             [
                 'name' => 'Prof. Carlos Eduardo',
+                'password' => $defaultPassword,
+                'role' => UserRole::INSTRUCTOR,
+                'company_id' => $company->id,
+            ]
+        );
+
+        $instructor2 = User::firstOrCreate(
+            ['email' => 'helena.valenca@acme.com.br'],
+            [
+                'name' => 'Dra. Helena Valença',
                 'password' => $defaultPassword,
                 'role' => UserRole::INSTRUCTOR,
                 'company_id' => $company->id,
@@ -104,7 +114,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 7. Criar Curso Demo com Módulo e Aula
+        // 7. Cursos Executivos Demo com Módulos e Aulas
         $course = Course::firstOrCreate(
             [
                 'company_id' => $company->id,
@@ -113,7 +123,33 @@ class DatabaseSeeder extends Seeder
             [
                 'instructor_id' => $instructor->id,
                 'title' => 'Fundamentos de Liderança e Alta Performance',
-                'description' => 'Programa corporativo completo para desenvolvimento de líderes de equipe e gestão humanizada.',
+                'description' => 'Programa corporativo completo para desenvolvimento de líderes de equipe, comunicação estratégica e gestão humanizada.',
+                'status' => 'published',
+            ]
+        );
+
+        $course2 = Course::firstOrCreate(
+            [
+                'company_id' => $company->id,
+                'slug' => 'inteligencia-de-dados-e-analytics-para-decisoes-estrategicas',
+            ],
+            [
+                'instructor_id' => $instructor2->id,
+                'title' => 'Inteligência de Dados e Analytics para Decisões Estratégicas',
+                'description' => 'Capacitação prática em visualização de métricas, modelos preditivos e tomada de decisão orientada a dados para gestores de alta performance.',
+                'status' => 'published',
+            ]
+        );
+
+        $course3 = Course::firstOrCreate(
+            [
+                'company_id' => $company->id,
+                'slug' => 'cultura-de-feedback-e-gestao-de-times-hibridos',
+            ],
+            [
+                'instructor_id' => $instructor->id,
+                'title' => 'Cultura de Feedback e Gestão de Times Híbridos',
+                'description' => 'Metodologias práticas para alinhamento de expectativas, rituais de liderança remota, avaliação contínua e retenção de talentos estratégicos.',
                 'status' => 'published',
             ]
         );
