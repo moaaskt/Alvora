@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="ALVORA — Corporate Academy com IA Preditiva" theme="editorial">
     <!-- HERO SECTION -->
     <section class="relative pt-12 pb-24 lg:pt-20 lg:pb-32 overflow-hidden">
         <!-- Background Glows -->
