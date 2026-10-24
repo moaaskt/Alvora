@@ -227,6 +227,9 @@ class CurriculumBuilder extends Component
 
         return view('livewire.instructor.curriculum-builder', [
             'course' => $course,
-        ])->layout('layouts.app', ['title' => 'Grade Curricular — ' . $course->title]);
+        ])->layout('layouts.instructor', [
+            'title' => 'Grade Curricular — ' . $course->title . ' — ALVORA',
+            'breadcrumb' => 'Grade Curricular',
+        ]);
     }
 }

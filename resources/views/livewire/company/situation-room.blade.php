@@ -1,219 +1,489 @@
-<div class="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-    {{-- Header --}}
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <div>
-            <div class="flex items-center gap-3">
-                <span class="inline-flex items-center justify-center p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+<div class="px-space-xl py-space-lg flex flex-col gap-space-lg max-w-[1600px] mx-auto w-full">
+
+    <!-- Header da Seção: Título Executivo, Contexto da Empresa e Ações -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+        <div class="flex flex-col gap-1.5 max-w-3xl">
+            <div class="flex items-center flex-wrap gap-2.5">
+                <h1 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">Sala de Situação</h1>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-tertiary-fixed text-on-tertiary-fixed">
+                    <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+                    Motor Preditivo Ativo
                 </span>
-                <div>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Sala de Situação</h1>
-                    <p class="text-sm text-slate-400 mt-0.5">Painel de telemetria preditiva de risco de evasão e intervenção ativa Alvora AI.</p>
-                </div>
             </div>
+            <p class="font-body-md text-body-md text-on-surface-variant">
+                Painel de telemetria preditiva de risco de evasão e intervenção ativa Alvora AI em tempo real.
+            </p>
         </div>
 
-        <div class="flex items-center gap-3">
-            <button wire:click="recalculateAllScores" wire:loading.attr="disabled" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700/80 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
-                <svg wire:loading.class="animate-spin" class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <!-- Ações de topo: Recomputar Scores -->
+        <div class="flex items-center gap-3 shrink-0 self-start lg:self-center">
+            <button wire:click="recalculateAllScores" wire:loading.attr="disabled"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md font-semibold hover:bg-primary shadow-sm hover:shadow transition-all active:scale-[0.98]">
+                <svg wire:loading.class="animate-spin" class="w-4 h-4 shrink-0 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                 </svg>
-                <span>Recomputar Scores</span>
+                <span wire:loading.remove wire:target="recalculateAllScores">Recomputar Scores</span>
+                <span wire:loading wire:target="recalculateAllScores">Processando IA...</span>
             </button>
         </div>
     </div>
 
-    {{-- Feedback Message --}}
+    <!-- Feedback Message / Session Flash -->
     @if (session()->has('success'))
-        <div class="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm flex items-center gap-3">
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="p-4 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary/20 text-body-md font-medium flex items-center gap-3 shadow-sm">
+            <svg class="w-5 h-5 flex-shrink-0 text-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>{{ session('success') }}</span>
         </div>
     @endif
 
-    {{-- KPI Cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {{-- Card 1: Alto Risco --}}
-        <div class="p-5 rounded-2xl bg-gradient-to-br from-rose-950/40 via-slate-900/80 to-slate-950 border border-rose-500/30 relative overflow-hidden">
+    <!-- Grid de Métricas / KPIs (Executive KPI Tiles) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
+        <!-- Card 1: Alto Risco -->
+        <div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow border border-slate-200/60">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold uppercase tracking-wider text-rose-400">Alto Risco de Evasão</span>
-                <span class="relative flex h-3 w-3">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Alto Risco de Evasão</span>
+                <span class="inline-flex items-center rounded-md bg-error text-on-error px-2.5 py-0.5 text-xs font-semibold shadow-sm">
+                    Crítico
                 </span>
             </div>
-            <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl font-black text-white">{{ $highRiskCount }}</span>
-                <span class="text-sm font-semibold text-rose-400">({{ $highRiskPercent }}%)</span>
+            <div class="my-3 flex items-baseline gap-2">
+                <span class="font-stat-value text-stat-value text-on-surface font-bold tracking-tight">{{ $highRiskCount }}</span>
+                <span class="font-label-md text-label-md text-error font-semibold">({{ $highRiskPercent }}%)</span>
             </div>
-            <p class="text-xs text-slate-400 mt-1">Colaboradores com score de risco > 70</p>
+            <div class="flex items-center justify-between pt-1 border-t border-slate-100">
+                <span class="font-label-sm text-label-sm text-on-surface-variant">Score de risco &gt; 70 pts</span>
+                <span class="font-label-sm text-label-sm text-error font-semibold">Ação Imediata</span>
+            </div>
         </div>
 
-        {{-- Card 2: Médio Risco --}}
-        <div class="p-5 rounded-2xl bg-slate-900/80 border border-amber-500/20">
-            <span class="text-xs font-semibold uppercase tracking-wider text-amber-400">Atenção / Médio Risco</span>
-            <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl font-black text-white">{{ $mediumRiskCount }}</span>
+        <!-- Card 2: Médio Risco / Atenção -->
+        <div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow border border-slate-200/60">
+            <div class="flex items-center justify-between">
+                <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Atenção / Médio Risco</span>
+                <span class="inline-flex items-center rounded-md bg-amber-500 text-white px-2.5 py-0.5 text-xs font-semibold shadow-sm">
+                    Alerta Ativo
+                </span>
             </div>
-            <p class="text-xs text-slate-400 mt-1">Score entre 40 e 69</p>
+            <div class="my-3 flex items-baseline gap-2">
+                <span class="font-stat-value text-stat-value text-on-surface font-bold tracking-tight">{{ $mediumRiskCount }}</span>
+                <span class="font-label-md text-label-md text-amber-600 font-semibold">
+                    ({{ $totalStudents > 0 ? round(($mediumRiskCount / $totalStudents) * 100) : 0 }}%)
+                </span>
+            </div>
+            <div class="flex items-center justify-between pt-1 border-t border-slate-100">
+                <span class="font-label-sm text-label-sm text-on-surface-variant">Score entre 40 e 69 pts</span>
+                <span class="font-label-sm text-label-sm text-amber-600 font-semibold">Monitoramento</span>
+            </div>
         </div>
 
-        {{-- Card 3: Baixo Risco / Estáveis --}}
-        <div class="p-5 rounded-2xl bg-slate-900/80 border border-emerald-500/20">
-            <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400">Engajados / Baixo Risco</span>
-            <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl font-black text-white">{{ $lowRiskCount }}</span>
+        <!-- Card 3: Baixo Risco / Engajados -->
+        <div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow border border-slate-200/60">
+            <div class="flex items-center justify-between">
+                <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Engajados / Baixo Risco</span>
+                <span class="inline-flex items-center rounded-md bg-emerald-600 text-white px-2.5 py-0.5 text-xs font-semibold shadow-sm">
+                    Saudável
+                </span>
             </div>
-            <p class="text-xs text-slate-400 mt-1">Score entre 0 e 39</p>
+            <div class="my-3 flex items-baseline gap-2">
+                <span class="font-stat-value text-stat-value text-on-surface font-bold tracking-tight">{{ $lowRiskCount }}</span>
+                <span class="font-label-md text-label-md text-emerald-600 font-semibold">
+                    ({{ $totalStudents > 0 ? round(($lowRiskCount / $totalStudents) * 100) : 0 }}%)
+                </span>
+            </div>
+            <div class="flex items-center justify-between pt-1 border-t border-slate-100">
+                <span class="font-label-sm text-label-sm text-on-surface-variant">Score entre 0 e 39 pts</span>
+                <span class="font-label-sm text-label-sm text-emerald-600 font-semibold">Ritmo Constante</span>
+            </div>
         </div>
 
-        {{-- Card 4: Intervenções no Mês --}}
-        <div class="p-5 rounded-2xl bg-slate-900/80 border border-purple-500/20">
-            <span class="text-xs font-semibold uppercase tracking-wider text-purple-400">Intervenções Alvora AI</span>
-            <div class="mt-4 flex items-baseline gap-2">
-                <span class="text-3xl font-black text-white">{{ $interventionsCount }}</span>
+        <!-- Card 4: Intervenções Alvora AI -->
+        <div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow border border-slate-200/60">
+            <div class="flex items-center justify-between">
+                <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Intervenções Alvora AI</span>
+                <span class="inline-flex items-center rounded-md bg-blue-600 text-white px-2.5 py-0.5 text-xs font-semibold shadow-sm">
+                    Autônomo
+                </span>
             </div>
-            <p class="text-xs text-slate-400 mt-1">Mensagens proativas enviadas este mês</p>
+            <div class="my-3 flex items-baseline gap-2">
+                <span class="font-stat-value text-stat-value text-on-surface font-bold tracking-tight">{{ $interventionsCount }}</span>
+                <span class="font-label-md text-label-md text-on-surface-variant">ações este mês</span>
+            </div>
+            <div class="flex items-center justify-between pt-1 border-t border-slate-100">
+                <span class="font-label-sm text-label-sm text-on-surface-variant">Disparos proativos</span>
+                <span class="font-label-sm text-label-sm text-primary font-semibold">Copilot AI</span>
+            </div>
         </div>
     </div>
 
-    {{-- Heatmap Visual Matrix --}}
-    <div class="p-6 rounded-2xl bg-slate-900/70 border border-slate-800 mb-8">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
-            <div>
-                <h2 class="text-lg font-bold text-white">Heatmap de Engajamento em Tempo Real</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Cores indicam a probabilidade preditiva de evasão do colaborador.</p>
+    <!-- Heatmap & Matriz de Risco em Tempo Real -->
+    <div class="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm flex flex-col gap-space-md border border-slate-200/60">
+        <!-- Topo do Heatmap: Título e Legendas -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2 border-b border-slate-200/60">
+            <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-primary shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
+                    </svg>
+                    <h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">Distribuição da Base por Matriz de Risco (Heatmap de Engajamento em Tempo Real)</h2>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Classificação algorítmica multidimensional combinando frequência de acesso, conclusão de atividades e aproveitamento em quizzes.
+                </p>
             </div>
-            <div class="flex items-center gap-4 text-xs text-slate-300">
-                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500"></span> 0-39 Seguro</span>
-                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-500"></span> 40-69 Atenção</span>
-                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-500"></span> 70-100 Crítico</span>
+
+            <!-- Legenda Explicativa -->
+            <div class="flex items-center flex-wrap gap-2 text-label-sm font-label-sm">
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                    Verde (0-39 pts): Seguro / Saudável
+                </div>
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary-fixed text-on-secondary-fixed font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                    Amarelo (40-69 pts): Atenção / Risco Médio
+                </div>
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-error-container text-on-error-container font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-error"></span>
+                    Vermelho (70-100 pts): Crítico / Alto Risco
+                </div>
             </div>
         </div>
 
-        @if ($totalStudents === 0)
-            <div class="text-center py-8 text-sm text-slate-500">Nenhum colaborador matriculado encontrado para exibir no heatmap.</div>
-        @else
-            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2.5">
-                @foreach ($students as $student)
-                    @php
-                        $score = $student->latestRiskScore?->score ?? 0;
-                        $colorClass = match (true) {
-                            $score >= 70 => 'bg-rose-500/20 border-rose-500 text-rose-300 hover:bg-rose-500/30',
-                            $score >= 40 => 'bg-amber-500/20 border-amber-500 text-amber-300 hover:bg-amber-500/30',
-                            default => 'bg-emerald-500/20 border-emerald-500 text-emerald-300 hover:bg-emerald-500/30',
-                        };
-                    @endphp
-                    <div class="p-2.5 rounded-xl border flex flex-col justify-between transition-all cursor-pointer {{ $colorClass }}"
-                         title="{{ $student->name }} - Score: {{ $score }}/100"
-                         wire:click="openInterventionModal({{ $student->id }})">
-                        <div class="text-xs font-semibold truncate">{{ $student->name }}</div>
-                        <div class="mt-2 flex items-baseline justify-between text-[11px]">
-                            <span class="font-bold">{{ $score }} pts</span>
-                            <span class="text-[10px] opacity-75">{{ $student->latestRiskScore?->level ?? 'low' }}</span>
+        <!-- Grid Visual de 3 Raias do Heatmap -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2 items-stretch">
+            <!-- Raia 1: Verde (0-39 pts) Seguro / Saudável -->
+            <div class="flex flex-col justify-between h-full p-4 rounded-xl bg-surface-container-low border border-slate-200/60">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-200/60">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <span class="font-label-md text-label-md text-on-surface font-bold">Faixa Segura (0 - 39 pts)</span>
                         </div>
+                        <span class="inline-flex items-center rounded-md bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white shadow-sm">
+                            {{ $safeStudents->count() }} colaboradores
+                        </span>
                     </div>
-                @endforeach
+
+                    <!-- Lista de Mini-cards do Colaborador Seguro -->
+                    <div class="flex flex-col gap-2.5 max-h-96 overflow-y-auto pr-1">
+                        @forelse($safeStudents as $student)
+                            @php
+                                $score = $student->latestRiskScore?->score ?? 0;
+                                $breakdown = $student->latestRiskScore?->breakdown ?? [];
+                                $initials = strtoupper(substr($student->name, 0, 2));
+                            @endphp
+                            <div class="p-3.5 rounded-xl bg-surface-container-lowest border border-slate-200/80 shadow-sm flex flex-col gap-2.5 hover:border-emerald-400 transition-colors">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="w-8 h-8 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-headline-sm text-xs flex items-center justify-center font-bold shrink-0">
+                                            {{ $initials }}
+                                        </div>
+                                        <div class="flex flex-col min-w-0">
+                                            <span class="font-headline-sm text-body-sm text-on-surface font-semibold truncate">{{ $student->name }}</span>
+                                            <span class="font-body-sm text-[11px] text-on-surface-variant truncate">{{ $student->email }}</span>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed font-bold shrink-0">
+                                        {{ $score }} pts
+                                    </span>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex items-center justify-between font-label-sm text-[11px] text-on-surface-variant">
+                                        <span>Engajamento Saudável</span>
+                                        <span class="text-tertiary font-semibold">Baixo Risco</span>
+                                    </div>
+                                    <div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+                                        <div class="bg-tertiary h-full rounded-full" style="width: {{ max(5, $score) }}%;"></div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-1 pt-0.5 text-center font-label-sm text-[10px] text-on-surface-variant">
+                                    <div class="bg-surface-container-low py-0.5 px-1 rounded">Inat: <strong class="text-on-surface">{{ $breakdown['inactivity']['score'] ?? 0 }}%</strong></div>
+                                    <div class="bg-surface-container-low py-0.5 px-1 rounded">Estag: <strong class="text-on-surface">{{ $breakdown['stagnation']['score'] ?? 0 }}%</strong></div>
+                                    <div class="bg-surface-container-low py-0.5 px-1 rounded">Quiz: <strong class="text-on-surface">{{ $breakdown['quiz']['score'] ?? 0 }}%</strong></div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="p-6 rounded-xl bg-surface-container-lowest/80 border border-dashed border-slate-200/80 flex flex-col items-center justify-center text-center gap-1.5">
+                                <span class="font-label-md text-label-md text-secondary font-medium">Nenhum colaborador nesta faixa</span>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
             </div>
-        @endif
+
+            <!-- Raia 2: Amarelo (40-69 pts) Atenção / Risco Médio -->
+            <div class="flex flex-col justify-between h-full p-4 rounded-xl bg-surface-container-low border border-slate-200/60">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-200/60">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                            <span class="font-label-md text-label-md text-on-surface font-bold">Atenção (40 - 69 pts)</span>
+                        </div>
+                        <span class="inline-flex items-center rounded-md bg-amber-500 px-2 py-0.5 text-xs font-semibold text-white shadow-sm">
+                            {{ $warningStudents->count() }} colaboradores
+                        </span>
+                    </div>
+
+                    <!-- Lista de Mini-cards de Atenção -->
+                    <div class="flex flex-col gap-2.5 max-h-96 overflow-y-auto pr-1">
+                        @forelse($warningStudents as $student)
+                            @php
+                                $score = $student->latestRiskScore?->score ?? 0;
+                                $breakdown = $student->latestRiskScore?->breakdown ?? [];
+                                $initials = strtoupper(substr($student->name, 0, 2));
+                            @endphp
+                            <div class="p-3.5 rounded-xl bg-surface-container-lowest border border-slate-200/80 shadow-sm flex flex-col gap-2.5 hover:border-amber-400 transition-colors cursor-pointer"
+                                 wire:click="openInterventionModal({{ $student->id }})">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed font-headline-sm text-xs flex items-center justify-center font-bold shrink-0">
+                                            {{ $initials }}
+                                        </div>
+                                        <div class="flex flex-col min-w-0">
+                                            <span class="font-headline-sm text-body-sm text-on-surface font-semibold truncate">{{ $student->name }}</span>
+                                            <span class="font-body-sm text-[11px] text-on-surface-variant truncate">{{ $student->email }}</span>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed font-bold shrink-0">
+                                        {{ $score }} pts
+                                    </span>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex items-center justify-between font-label-sm text-[11px] text-on-surface-variant">
+                                        <span>Risco Médio de Desistência</span>
+                                        <span class="text-amber-600 font-semibold">Médio Risco</span>
+                                    </div>
+                                    <div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+                                        <div class="bg-amber-500 h-full rounded-full" style="width: {{ $score }}%;"></div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-1 pt-0.5 text-center font-label-sm text-[10px] text-on-surface-variant">
+                                    <div class="bg-surface-container-low py-0.5 px-1 rounded">Inat: <strong class="text-on-surface">{{ $breakdown['inactivity']['score'] ?? 0 }}%</strong></div>
+                                    <div class="bg-surface-container-low py-0.5 px-1 rounded">Estag: <strong class="text-on-surface">{{ $breakdown['stagnation']['score'] ?? 0 }}%</strong></div>
+                                    <div class="bg-surface-container-low py-0.5 px-1 rounded">Quiz: <strong class="text-on-surface">{{ $breakdown['quiz']['score'] ?? 0 }}%</strong></div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="p-6 rounded-xl bg-surface-container-lowest/80 border border-dashed border-slate-200/80 flex flex-col items-center justify-center text-center gap-1.5">
+                                <span class="font-label-md text-label-md text-secondary font-medium">Nenhum colaborador nesta faixa</span>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <!-- Raia 3: Vermelho (70-100 pts) Crítico / Alto Risco -->
+            <div class="flex flex-col justify-between h-full p-4 rounded-xl bg-surface-container-low border border-slate-200/60">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-200/60">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-error"></span>
+                            <span class="font-label-md text-label-md text-on-surface font-bold">Crítico (70 - 100 pts)</span>
+                        </div>
+                        <span class="inline-flex items-center rounded-md bg-error px-2 py-0.5 text-xs font-semibold text-on-error shadow-sm">
+                            {{ $criticalStudents->count() }} críticos
+                        </span>
+                    </div>
+
+                    <!-- Lista de Mini-cards Críticos ou Empty State Elegante -->
+                    <div class="flex flex-col gap-2.5 max-h-96 overflow-y-auto pr-1">
+                        @forelse($criticalStudents as $student)
+                            @php
+                                $score = $student->latestRiskScore?->score ?? 0;
+                                $breakdown = $student->latestRiskScore?->breakdown ?? [];
+                                $initials = strtoupper(substr($student->name, 0, 2));
+                            @endphp
+                            <div class="p-3.5 rounded-xl bg-surface-container-lowest border border-error/40 shadow-sm flex flex-col gap-2.5 hover:border-error transition-colors">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="w-8 h-8 rounded-full bg-error-container text-error font-headline-sm text-xs flex items-center justify-center font-bold shrink-0">
+                                            {{ $initials }}
+                                        </div>
+                                        <div class="flex flex-col min-w-0">
+                                            <span class="font-headline-sm text-body-sm text-on-surface font-semibold truncate">{{ $student->name }}</span>
+                                            <span class="font-body-sm text-[11px] text-on-surface-variant truncate">{{ $student->email }}</span>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-error-container text-error font-bold shrink-0">
+                                        {{ $score }} pts
+                                    </span>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex items-center justify-between font-label-sm text-[11px] text-error font-semibold">
+                                        <span>Alto Risco de Evasão</span>
+                                        <span>Crítico</span>
+                                    </div>
+                                    <div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+                                        <div class="bg-error h-full rounded-full" style="width: {{ $score }}%;"></div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between pt-1">
+                                    <div class="text-[10px] text-secondary">
+                                        Inat: <strong>{{ $breakdown['inactivity']['score'] ?? 0 }}%</strong> • Estag: <strong>{{ $breakdown['stagnation']['score'] ?? 0 }}%</strong>
+                                    </div>
+                                    <button wire:click="openInterventionModal({{ $student->id }})" type="button"
+                                            class="px-2.5 py-1 rounded bg-error text-on-error font-label-sm text-xs font-semibold shadow-sm hover:bg-error/90 transition-colors">
+                                        Intervir IA
+                                    </button>
+                                </div>
+                            </div>
+                        @empty
+                            <!-- Empty State Elegante Oficial do Stitch -->
+                            <div class="p-6 rounded-xl bg-surface-container-lowest/80 border border-dashed border-slate-200/80 flex flex-col items-center justify-center text-center gap-2.5 min-h-[168px] my-auto">
+                                <div class="w-9 h-9 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center">
+                                    <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+                                </div>
+                                <span class="font-headline-sm text-label-md text-on-surface font-semibold">Nenhum colaborador nesta faixa</span>
+                                <span class="font-body-sm text-body-sm text-on-surface-variant max-w-[220px]">
+                                    Excelente sinal! Nenhuma evasão iminente detectada pelo motor preditivo.
+                                </span>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    {{-- Filter and Table Controls --}}
-    <div class="p-6 rounded-2xl bg-slate-900/70 border border-slate-800">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div class="flex items-center gap-3">
-                <button wire:click="$set('filterLevel', 'all')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all {{ $filterLevel === 'all' ? 'bg-emerald-500 text-slate-950 shadow-sm' : 'bg-slate-800 text-slate-300 hover:bg-slate-700' }}">Todos ({{ $totalStudents }})</button>
-                <button wire:click="$set('filterLevel', 'high')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all {{ $filterLevel === 'high' ? 'bg-rose-500 text-white shadow-sm' : 'bg-slate-800 text-slate-300 hover:bg-slate-700' }}">Críticos ({{ $highRiskCount }})</button>
-                <button wire:click="$set('filterLevel', 'medium')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all {{ $filterLevel === 'medium' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'bg-slate-800 text-slate-300 hover:bg-slate-700' }}">Atenção ({{ $mediumRiskCount }})</button>
-                <button wire:click="$set('filterLevel', 'low')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all {{ $filterLevel === 'low' ? 'bg-emerald-500 text-slate-950 shadow-sm' : 'bg-slate-800 text-slate-300 hover:bg-slate-700' }}">Engajados ({{ $lowRiskCount }})</button>
+    <!-- Tabela de Dados e Gestão Preditiva de Colaboradores -->
+    <div class="rounded-xl bg-surface-container-lowest shadow-sm overflow-hidden flex flex-col border border-slate-200/60">
+        <!-- Toolbar: Segmented Controls + Busca + Atalho ⌘K -->
+        <div class="p-space-md flex flex-col lg:flex-row lg:items-center justify-between gap-space-md bg-surface-container-lowest border-b border-slate-200/60">
+            <!-- Segmented Tabs shadcn -->
+            <div class="inline-flex items-center p-1 rounded-xl bg-surface-container-low gap-1 self-start border border-slate-200/60">
+                <button wire:click="setFilter('all')" type="button"
+                        class="px-3 py-1.5 rounded-lg text-body-sm font-label-md font-semibold transition-all flex items-center gap-1.5 {{ $filterLevel === 'all' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface' }}">
+                    <span>Todos</span>
+                    <span class="px-1.5 py-0.2 rounded-full font-label-sm text-label-sm bg-surface-container text-secondary">{{ $totalStudents }}</span>
+                </button>
+                <button wire:click="setFilter('high')" type="button"
+                        class="px-3 py-1.5 rounded-lg text-body-sm font-label-md font-medium transition-all flex items-center gap-1.5 {{ $filterLevel === 'high' ? 'bg-surface-container-lowest text-error font-semibold shadow-sm' : 'text-on-surface-variant hover:text-error' }}">
+                    <span>Críticos</span>
+                    <span class="px-1.5 py-0.2 rounded-full font-label-sm text-label-sm bg-error-container text-error font-bold">{{ $highRiskCount }}</span>
+                </button>
+                <button wire:click="setFilter('medium')" type="button"
+                        class="px-3 py-1.5 rounded-lg text-body-sm font-label-md font-medium transition-all flex items-center gap-1.5 {{ $filterLevel === 'medium' ? 'bg-surface-container-lowest text-amber-600 font-semibold shadow-sm' : 'text-on-surface-variant hover:text-amber-600' }}">
+                    <span>Atenção</span>
+                    <span class="px-1.5 py-0.2 rounded-full font-label-sm text-label-sm bg-surface-container text-secondary">{{ $mediumRiskCount }}</span>
+                </button>
+                <button wire:click="setFilter('low')" type="button"
+                        class="px-3 py-1.5 rounded-lg text-body-sm font-label-md font-medium transition-all flex items-center gap-1.5 {{ $filterLevel === 'low' ? 'bg-surface-container-lowest text-tertiary font-semibold shadow-sm' : 'text-on-surface-variant hover:text-tertiary' }}">
+                    <span>Engajados</span>
+                    <span class="px-1.5 py-0.2 rounded-full font-label-sm text-label-sm bg-surface-container text-secondary">{{ $lowRiskCount }}</span>
+                </button>
             </div>
 
-            <div class="relative w-full sm:w-64">
-                <input type="text" wire:model.live.debounce.300ms="search" placeholder="Buscar colaborador..." class="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500">
-                <svg class="w-4 h-4 absolute left-3 top-2.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <!-- Busca Rápida -->
+            <div class="relative w-full sm:w-80">
+                <svg class="w-4 h-4 absolute left-3 top-3 text-secondary stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                 </svg>
+                <input wire:model.live.debounce.300ms="search"
+                       class="w-full h-10 pl-9 pr-12 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface placeholder:text-outline-variant shadow-sm border border-slate-200/80 focus:outline-none focus:ring-2 focus:ring-primary-container"
+                       placeholder="Buscar por colaborador ou email..." type="text">
+                <span class="absolute right-2.5 top-2.5 px-1.5 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-mono">⌘K</span>
             </div>
         </div>
 
-        {{-- Table --}}
+        <!-- Tabela -->
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-slate-300">
-                <thead class="bg-slate-800/50 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-700/60">
-                    <tr>
-                        <th class="py-3 px-4">Colaborador</th>
-                        <th class="py-3 px-4">Score de Risco</th>
-                        <th class="py-3 px-4">Fatores Ponderados</th>
-                        <th class="py-3 px-4">Status de Intervenção</th>
-                        <th class="py-3 px-4 text-right">Ação</th>
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-surface-container-low h-11 font-table-header text-table-header text-secondary uppercase tracking-wider border-b border-slate-200/60">
+                        <th class="px-space-md py-2 font-semibold">Colaborador</th>
+                        <th class="px-space-md py-2 font-semibold">Score de Risco</th>
+                        <th class="px-space-md py-2 font-semibold">Fatores Ponderados</th>
+                        <th class="px-space-md py-2 font-semibold">Status de Intervenção</th>
+                        <th class="px-space-md py-2 font-semibold text-right">Ação</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-800">
+                <tbody class="divide-y divide-surface-container-low font-body-md text-body-md text-on-surface">
                     @forelse ($students as $student)
                         @php
                             $scoreRecord = $student->latestRiskScore;
                             $score = $scoreRecord?->score ?? 0;
+                            $level = $scoreRecord?->level ?? 'low';
                             $breakdown = $scoreRecord?->breakdown ?? [];
+                            $latestIntervention = $student->interventions()->latest()->first();
+                            $initials = strtoupper(substr($student->name, 0, 2));
                         @endphp
-                        <tr class="hover:bg-slate-800/30 transition-colors">
-                            <td class="py-3.5 px-4 font-medium text-white">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-xs text-emerald-400">
-                                        {{ substr($student->name, 0, 1) }}
+                        <tr class="hover:bg-surface-container-low/60 transition-colors">
+                            <!-- Colaborador -->
+                            <td class="px-space-md py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-xs text-primary shrink-0">
+                                        {{ $initials }}
                                     </div>
-                                    <div>
-                                        <div>{{ $student->name }}</div>
-                                        <div class="text-[11px] text-slate-400">{{ $student->email }}</div>
+                                    <div class="flex flex-col min-w-0">
+                                        <span class="font-headline-sm text-body-md text-on-surface font-semibold truncate">{{ $student->name }}</span>
+                                        <span class="font-body-sm text-xs text-secondary truncate">{{ $student->email }}</span>
                                     </div>
                                 </div>
                             </td>
-                            <td class="py-3.5 px-4">
+
+                            <!-- Score de Risco -->
+                            <td class="px-space-md py-4">
                                 <div class="flex items-center gap-2">
-                                    <span class="font-bold text-sm {{ $score >= 70 ? 'text-rose-400' : ($score >= 40 ? 'text-amber-400' : 'text-emerald-400') }}">
+                                    <span class="font-bold text-sm {{ $score >= 70 ? 'text-error' : ($score >= 40 ? 'text-amber-600' : 'text-tertiary') }}">
                                         {{ $score }}/100
                                     </span>
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full uppercase font-bold {{ $score >= 70 ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : ($score >= 40 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20') }}">
-                                        {{ $scoreRecord?->level ?? 'low' }}
-                                    </span>
+                                    @if($score >= 70)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-error-container text-error">
+                                            Crítico
+                                        </span>
+                                    @elseif($score >= 40)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-secondary-fixed text-on-secondary-fixed">
+                                            Atenção
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-tertiary-fixed text-on-tertiary-fixed">
+                                            Seguro
+                                        </span>
+                                    @endif
                                 </div>
                             </td>
-                            <td class="py-3.5 px-4">
-                                <div class="flex items-center gap-2 text-[10px] text-slate-400">
-                                    <span>Inat: {{ $breakdown['inactivity']['score'] ?? 0 }}%</span>
+
+                            <!-- Fatores Ponderados -->
+                            <td class="px-space-md py-4">
+                                <div class="flex items-center gap-2 text-xs text-secondary">
+                                    <span class="bg-surface-container-low px-1.5 py-0.5 rounded">Inat: <strong class="text-on-surface">{{ $breakdown['inactivity']['score'] ?? 0 }}%</strong></span>
                                     <span>•</span>
-                                    <span>Estag: {{ $breakdown['stagnation']['score'] ?? 0 }}%</span>
+                                    <span class="bg-surface-container-low px-1.5 py-0.5 rounded">Estag: <strong class="text-on-surface">{{ $breakdown['stagnation']['score'] ?? 0 }}%</strong></span>
                                     <span>•</span>
-                                    <span>Quiz: {{ $breakdown['quiz']['score'] ?? 0 }}%</span>
+                                    <span class="bg-surface-container-low px-1.5 py-0.5 rounded">Quiz: <strong class="text-on-surface">{{ $breakdown['quiz']['score'] ?? 0 }}%</strong></span>
                                 </div>
                             </td>
-                            <td class="py-3.5 px-4">
-                                @php
-                                    $latestIntervention = $student->interventions()->latest()->first();
-                                @endphp
+
+                            <!-- Status de Intervenção -->
+                            <td class="px-space-md py-4">
                                 @if ($latestIntervention)
-                                    <span class="inline-flex items-center gap-1.5 text-purple-400">
+                                    <span class="inline-flex items-center gap-1.5 text-xs text-primary font-medium">
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                         </svg>
                                         <span>Enviada {{ $latestIntervention->created_at->diffForHumans() }}</span>
                                     </span>
                                 @else
-                                    <span class="text-slate-500">Nenhuma intervenção</span>
+                                    <span class="text-xs text-secondary italic">Nenhuma intervenção</span>
                                 @endif
                             </td>
-                            <td class="py-3.5 px-4 text-right">
-                                <button wire:click="openInterventionModal({{ $student->id }})" class="px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors">
+
+                            <!-- Ação -->
+                            <td class="px-space-md py-4 text-right">
+                                <button wire:click="openInterventionModal({{ $student->id }})" type="button"
+                                        class="h-8 px-3 rounded-md text-xs font-semibold transition-colors shadow-sm {{ $score >= 70 ? 'bg-error text-on-error hover:bg-error/90' : 'bg-surface-container-low text-on-surface hover:bg-surface-container' }}">
                                     Intervir
                                 </button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-8 text-center text-slate-500">Nenhum colaborador encontrado com os filtros selecionados.</td>
+                            <td colspan="5" class="px-space-md py-12 text-center text-secondary">
+                                Nenhum colaborador encontrado com os filtros selecionados.
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -221,28 +491,48 @@
         </div>
     </div>
 
-    {{-- Modal de Intervenção Manual --}}
+    <!-- Modal de Intervenção Manual / Alvora Copilot IA -->
     @if ($showModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div class="w-full max-w-lg rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-2xl relative">
-                <h3 class="text-lg font-bold text-white mb-2">Enviar Intervenção Personalizada</h3>
-                <p class="text-xs text-slate-400 mb-4">Esta mensagem será entregue diretamente ao colaborador no painel de treinamentos.</p>
-
-                <div class="mb-4">
-                    <label class="block text-xs font-medium text-slate-300 mb-1.5">Mensagem de Apoio / Incentivo</label>
-                    <textarea wire:model="manualMessage" rows="5" class="w-full p-3 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"></textarea>
-                    @error('manualMessage') <span class="text-xs text-rose-400 mt-1 block">{{ $message }}</span> @enderror
+        <div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+            <div class="w-full max-w-lg rounded-2xl bg-surface-container-lowest border border-slate-200/80 p-6 shadow-2xl relative flex flex-col gap-4">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200/60">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
+                            <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Enviar Intervenção Personalizada</h3>
+                            <p class="font-body-sm text-xs text-on-surface-variant">Esta mensagem será entregue diretamente ao colaborador no painel de treinamentos.</p>
+                        </div>
+                    </div>
+                    <button wire:click="closeModal" type="button" class="p-1 rounded-lg text-secondary hover:text-on-surface transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
 
-                <div class="flex items-center justify-end gap-3">
-                    <button wire:click="closeModal" class="px-4 py-2 text-xs font-semibold rounded-xl text-slate-400 hover:text-white transition-colors">
+                <div class="flex flex-col gap-1.5">
+                    <label class="block font-label-md text-xs font-semibold text-on-surface">Mensagem de Apoio / Incentivo Pedagógico</label>
+                    <textarea wire:model="manualMessage" rows="5"
+                              placeholder="Digite a mensagem de apoio para incentivar o colaborador..."
+                              class="w-full p-3 font-body-md text-body-md rounded-xl bg-surface-container-low border border-slate-200 text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary-container"></textarea>
+                    @error('manualMessage')
+                        <span class="font-label-sm text-xs text-error mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-200/60">
+                    <button wire:click="closeModal" type="button" class="px-4 py-2 text-xs font-semibold rounded-lg text-secondary hover:text-on-surface transition-colors">
                         Cancelar
                     </button>
-                    <button wire:click="sendManualIntervention" class="px-4 py-2 text-xs font-semibold rounded-xl text-slate-950 bg-emerald-500 hover:bg-emerald-400 transition-colors">
-                        Disparar Intervenção
+                    <button wire:click="sendManualIntervention" type="button"
+                            class="px-5 py-2.5 text-xs font-semibold rounded-lg text-on-primary bg-primary-container hover:bg-primary shadow-sm transition-all flex items-center gap-2">
+                        <span>Disparar Intervenção</span>
                     </button>
                 </div>
             </div>
         </div>
     @endif
+
 </div>

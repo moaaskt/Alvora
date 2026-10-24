@@ -226,6 +226,9 @@ class TrackManager extends Component
             'tracks' => $tracks,
             'availableCourses' => $availableCourses,
             'availableEmployees' => $availableEmployees,
-        ])->layout('layouts.app', ['title' => 'Trilhas de Aprendizado Corporativas — ALVORA']);
+        ])->layout('layouts.instructor', [
+            'title' => 'Trilhas de Aprendizado Corporativas — ALVORA',
+            'breadcrumb' => 'Trilhas de Aprendizado',
+        ]);
     }
 }

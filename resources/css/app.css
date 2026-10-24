@@ -31,6 +31,32 @@
     --color-edtech-blue-border: #BFDBFE;
     --color-edtech-navy: #0F172A;
     --color-edtech-navy-soft: #1E293B;
+
+    /* Stitch Design Tokens - Clean Enterprise */
+    --color-surface: #F8F9FF;
+    --color-surface-dim: #CBDBF5;
+    --color-surface-bright: #F8F9FF;
+    --color-surface-container: #E5EEFF;
+    --color-surface-container-low: #EFF4FF;
+    --color-surface-container-lowest: #FFFFFF;
+    --color-surface-container-high: #DCE9FF;
+    --color-surface-container-highest: #D3E4FE;
+    --color-on-surface: #0B1C30;
+    --color-on-surface-variant: #434655;
+    --color-primary: #004AC6;
+    --color-primary-container: #2563EB;
+    --color-on-primary: #FFFFFF;
+    --color-on-primary-container: #EEEFFF;
+    --color-tertiary: #006242;
+    --color-tertiary-fixed: #6FFBBE;
+    --color-on-tertiary-fixed: #002113;
+    --color-tertiary-container: #007D55;
+    --color-on-tertiary-container: #BDFFDB;
+    --color-secondary: #565E74;
+    --color-secondary-container: #DAE2FD;
+    --color-on-secondary-container: #5C647A;
+    --color-outline: #737686;
+    --color-outline-variant: #C3C6D7;
 }
 
 body {

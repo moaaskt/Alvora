@@ -1,510 +1,561 @@
-<div class="max-w-5xl mx-auto space-y-8">
-    <!-- Header Superior com Navegação & Status -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-800">
-        <div>
-            <div class="flex items-center gap-2 mb-1.5">
-                <a href="{{ route('instructor.courses.index') }}" class="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                    <span>Voltar para Meus Cursos</span>
-                </a>
-            </div>
-            <div class="flex items-center gap-3">
-                <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                    {{ $courseId ? $title : 'Criar Novo Treinamento' }}
-                </h1>
-                @if($courseId)
-                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold 
-                        @if($status === 'published') bg-emerald-500/20 text-emerald-300 border border-emerald-500/30
-                        @elseif($status === 'draft') bg-amber-500/20 text-amber-300 border border-amber-500/30
-                        @else bg-slate-800 text-slate-400 border border-slate-700 @endif">
-                        {{ $status === 'published' ? 'Publicado' : ($status === 'draft' ? 'Rascunho' : 'Arquivado') }}
-                    </span>
-                @else
-                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                        Novo Curso
-                    </span>
-                @endif
-            </div>
+<div class="px-space-xl py-space-lg flex flex-col gap-6 max-w-[1600px] mx-auto w-full">
+    <!-- SUB-NAV / BREADCRUMBS & STATUS TOP BAR -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+            <a href="{{ route('instructor.courses.index') }}" 
+               class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
+                <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"></path>
+                </svg>
+                <span>Voltar aos Cursos</span>
+            </a>
+            <span class="text-slate-300">/</span>
+            <span class="text-xs text-slate-500 font-medium">Home</span>
+            <span class="text-slate-300">/</span>
+            <span class="text-xs text-slate-500 font-medium">Cursos</span>
+            <span class="text-slate-300">/</span>
+            <span class="text-xs text-slate-800 font-semibold">{{ $courseId ? 'Atualizar Curso' : 'Novo Curso' }}</span>
         </div>
 
-        @if($courseId)
-            <div class="flex items-center gap-2">
-                <a href="{{ route('instructor.courses.curriculum', $courseId) }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-indigo-300 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                    <span>Ir para Grade de Aulas &rarr;</span>
-                </a>
-            </div>
-        @endif
+        <div class="flex items-center gap-2">
+            @if($courseId)
+                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-mono font-medium bg-slate-100 text-slate-600 border border-slate-200/80">
+                    ID: #{{ $courseId }}
+                </span>
+                @if($status === 'published')
+                    <span class="inline-flex items-center rounded-md bg-emerald-600 px-2.5 py-0.5 text-xs font-semibold text-white shadow-sm">
+                        Publicado
+                    </span>
+                @elseif($status === 'draft')
+                    <span class="inline-flex items-center rounded-md bg-amber-500 px-2.5 py-0.5 text-xs font-semibold text-white shadow-sm">
+                        Rascunho
+                    </span>
+                @else
+                    <span class="inline-flex items-center rounded-md bg-slate-600 px-2.5 py-0.5 text-xs font-semibold text-white shadow-sm">
+                        Arquivado
+                    </span>
+                @endif
+            @else
+                <span class="inline-flex items-center rounded-md bg-blue-600 px-2.5 py-0.5 text-xs font-semibold text-white shadow-sm">
+                    Novo Cadastro
+                </span>
+            @endif
+        </div>
     </div>
 
-    <!-- Barra de 4 Abas (Academy LMS Pattern) -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl text-xs font-semibold shadow-xl">
+    <!-- FORM HEADER COM AÇÕES NO CANTO DIREITO -->
+    <header class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-slate-200/70">
+        <div class="flex flex-col gap-1 max-w-3xl">
+            <h1 class="font-headline-lg text-headline-lg text-slate-900 font-bold tracking-tight">
+                {{ $courseId ? 'Atualizar: ' . ($title ?: 'Curso') : 'Criar Novo Treinamento Corporativo' }}
+            </h1>
+            <p class="text-xs text-slate-500">
+                {{ $courseId ? 'Atualize as informações gerais, grade curricular e avaliações deste programa corporativo.' : 'Preencha os dados essenciais para cadastrar um novo programa de capacitação no catálogo da empresa.' }}
+            </p>
+        </div>
+
+        <div class="flex items-center gap-2.5 shrink-0">
+            <a href="{{ route('instructor.courses.index') }}" 
+               class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-xs font-semibold">
+                Cancelar
+            </a>
+
+            @if($courseId)
+                <a href="{{ route('instructor.courses.curriculum', $courseId) }}" 
+                   class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-colors text-xs font-semibold border border-slate-200 shadow-2xs">
+                    <svg class="w-4 h-4 text-slate-500 shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"></path>
+                    </svg>
+                    <span>Grade Curricular</span>
+                </a>
+            @endif
+
+            <button type="button" 
+                    wire:click="save" 
+                    wire:loading.attr="disabled"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all text-xs font-semibold shadow-sm cursor-pointer disabled:opacity-50">
+                <span wire:loading.remove wire:target="save" class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4 shrink-0 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path>
+                    </svg>
+                    <span>{{ $courseId ? 'Salvar Alterações' : 'Criar Curso' }}</span>
+                </span>
+                <span wire:loading wire:target="save" class="flex items-center gap-1.5">
+                    <svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Salvando...</span>
+                </span>
+            </button>
+        </div>
+    </header>
+
+    <!-- NAVEGAÇÃO DE ABAS NO PADRÃO STITCH -->
+    <div class="flex items-center gap-2 border-b border-slate-200 overflow-x-auto select-none">
         <!-- Aba 1: Informações Básicas -->
-        <button type="button" wire:click="setTab('basic')"
-                class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl transition-all {{ $activeTab === 'basic' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/60' }}">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-            <span class="truncate">1. Informações Básicas</span>
+        <button type="button" 
+                wire:click="setTab('basic')" 
+                class="flex items-center gap-2 px-4 py-3 text-sm shrink-0 transition-colors {{ $activeTab === 'basic' ? 'font-semibold text-blue-600 border-b-2 border-blue-600' : 'font-medium text-slate-500 hover:text-slate-800 border-b-2 border-transparent' }}">
+            <span class="flex items-center justify-center w-5 h-5 rounded-full {{ $activeTab === 'basic' ? 'bg-blue-50 text-blue-600' : 'bg-slate-100 text-slate-500' }} text-xs font-bold">1</span>
+            <span>Informações Básicas</span>
         </button>
 
         <!-- Aba 2: Grade Curricular -->
         @if($courseId)
-            <a href="{{ route('instructor.courses.curriculum', $courseId) }}"
-               class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                <span class="truncate">2. Grade Curricular</span>
-                @if($course && $course->lessons_count > 0)
-                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-500/20 text-indigo-300 font-mono">{{ $course->lessons_count }}</span>
+            <a href="{{ route('instructor.courses.curriculum', $courseId) }}" 
+               class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-800 border-b-2 border-transparent transition-colors shrink-0">
+                <span class="flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-500 text-xs font-bold">2</span>
+                <span>Grade Curricular</span>
+                @if($course)
+                    <span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200/60">
+                        {{ $course->modules_count }} Módulos / {{ $course->lessons_count }} Aulas
+                    </span>
                 @endif
             </a>
         @else
-            <div class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-slate-600 cursor-not-allowed" title="Preencha o básico e salve para liberar a grade">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                <span class="truncate">2. Grade Curricular</span>
+            <div class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent shrink-0 opacity-60 cursor-not-allowed" title="Disponível após criar o curso">
+                <span class="flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-400 text-xs font-bold">2</span>
+                <span>Grade Curricular</span>
             </div>
         @endif
 
         <!-- Aba 3: Avaliações & Quizzes -->
         @if($courseId)
-            <button type="button" wire:click="setTab('quizzes')"
-                    class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl transition-all {{ $activeTab === 'quizzes' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/60' }}">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                <span class="truncate">3. Quizzes & Avaliações</span>
+            <button type="button" 
+                    wire:click="setTab('quizzes')" 
+                    class="flex items-center gap-2 px-4 py-3 text-sm shrink-0 transition-colors {{ $activeTab === 'quizzes' ? 'font-semibold text-blue-600 border-b-2 border-blue-600' : 'font-medium text-slate-500 hover:text-slate-800 border-b-2 border-transparent' }}">
+                <span class="flex items-center justify-center w-5 h-5 rounded-full {{ $activeTab === 'quizzes' ? 'bg-blue-50 text-blue-600' : 'bg-slate-100 text-slate-500' }} text-xs font-bold">3</span>
+                <span>Avaliações & Quizzes</span>
                 @if($course && $course->quizzes_count > 0)
-                    <span class="px-1.5 py-0.2 rounded-full text-[10px] {{ $activeTab === 'quizzes' ? 'bg-white/20 text-white' : 'bg-indigo-500/20 text-indigo-300' }} font-mono">{{ $course->quizzes_count }}</span>
+                    <span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200/60">
+                        {{ $course->quizzes_count }} Quizzes
+                    </span>
                 @endif
             </button>
         @else
-            <div class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-slate-600 cursor-not-allowed" title="Liberado após criar o curso">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                <span class="truncate">3. Quizzes & Avaliações</span>
+            <div class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-400 border-b-2 border-transparent shrink-0 opacity-60 cursor-not-allowed" title="Disponível após criar o curso">
+                <span class="flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-400 text-xs font-bold">3</span>
+                <span>Avaliações & Quizzes</span>
             </div>
         @endif
 
         <!-- Aba 4: Mídia & Publicação -->
         @if($courseId)
-            <button type="button" wire:click="setTab('publish')"
-                    class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl transition-all {{ $activeTab === 'publish' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/60' }}">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                <span class="truncate">4. Mídia & Publicação</span>
+            <button type="button" 
+                    wire:click="setTab('publish')" 
+                    class="flex items-center gap-2 px-4 py-3 text-sm shrink-0 transition-colors {{ $activeTab === 'publish' ? 'font-semibold text-blue-600 border-b-2 border-blue-600' : 'font-medium text-slate-500 hover:text-slate-800 border-b-2 border-transparent' }}">
+                <span class="flex items-center justify-center w-5 h-5 rounded-full {{ $activeTab === 'publish' ? 'bg-blue-50 text-blue-600' : 'bg-slate-100 text-slate-500' }} text-xs font-bold">4</span>
+                <span>Mídia & Publicação</span>
+                @if($status === 'published')
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-600 text-white shadow-sm">
+                        Publicado
+                    </span>
+                @else
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-500 text-white shadow-sm">
+                        Rascunho
+                    </span>
+                @endif
             </button>
-        @else
-            <div class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-slate-600 cursor-not-allowed" title="Liberado após criar o curso">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                <span class="truncate">4. Mídia & Publicação</span>
-            </div>
         @endif
     </div>
 
-    <!-- ========================================== -->
-    <!-- CONTEÚDO DA ABA 1: Informações Básicas     -->
-    <!-- ========================================== -->
+    <!-- ======================================================== -->
+    <!-- ABA 1: INFORMAÇÕES BÁSICAS (LAYOUT 2 COLUNAS DO STITCH) -->
+    <!-- ======================================================== -->
     @if($activeTab === 'basic')
-        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
-            <div class="border-b border-slate-800 pb-4">
-                <h2 class="text-base font-bold text-white flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                    Etapa 1: Informações Fundamentais do Treinamento
-                </h2>
-                <p class="text-xs text-slate-400 mt-0.5">Defina o tema central, a autoria do instrutor e os objetivos de aprendizagem para os alunos.</p>
-            </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <!-- COLUNA ESQUERDA: DADOS GERAIS (8 COLUNAS) -->
+            <div class="lg:col-span-8 flex flex-col gap-6">
+                <!-- CARD 1: FORMULÁRIO GERAL -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col gap-5">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
+                                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-semibold text-slate-800">Dados Gerais do Treinamento</h2>
+                                <p class="text-xs text-slate-400">Informações fundamentais visíveis no catálogo corporativo</p>
+                            </div>
+                        </div>
+                        <span class="text-[11px] text-slate-400">Campos obrigatórios com *</span>
+                    </div>
 
-            <form wire:submit="save" class="space-y-6">
-                <!-- Título do Curso -->
-                <div>
-                    <label for="course_title" class="block text-xs font-semibold text-slate-300 mb-1.5">
-                        Título do Treinamento Corporativo *
-                    </label>
-                    <input type="text" id="course_title" wire:model.live.debounce.300ms="title" 
-                           placeholder="Ex: Arquitetura de Microsserviços e Observabilidade em Nuvem"
-                           class="w-full bg-slate-950/70 border @error('title') border-rose-500 @else border-slate-700 @enderror rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    @error('title')
-                        <p class="text-rose-400 text-xs mt-1.5">{{ $message }}</p>
-                    @enderror
-                </div>
+                    <!-- Título do Curso -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-xs font-semibold text-slate-700" for="course-title">
+                            Título do Curso *
+                        </label>
+                        <input id="course-title" 
+                               wire:model.live.debounce.300ms="title" 
+                               type="text" 
+                               placeholder="Ex: Desenvolvimento de temas WordPress com Bootstrap"
+                               class="w-full h-10 px-3.5 rounded-xl bg-white border @error('title') border-rose-500 @else border-slate-200 @enderror text-slate-800 text-sm font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs transition-all">
+                        @error('title')
+                            <span class="text-rose-500 text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
 
-                <!-- Instrutor Responsável -->
-                <div>
-                    <label for="course_instructor" class="block text-xs font-semibold text-slate-300 mb-1.5">
-                        Professor / Instrutor Titular *
-                    </label>
-                    <select id="course_instructor" wire:model="instructor_id"
-                            class="w-full bg-slate-950/70 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        @foreach($instructors as $inst)
-                            <option value="{{ $inst->id }}">{{ $inst->name }} ({{ $inst->email }})</option>
-                        @endforeach
-                    </select>
-                    @error('instructor_id')
-                        <p class="text-rose-400 text-xs mt-1.5">{{ $message }}</p>
-                    @enderror
-                </div>
+                    <!-- Grid: Instrutor Titular & Categoria -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-semibold text-slate-700" for="course-instructor">
+                                Instrutor Responsável *
+                            </label>
+                            <div class="relative">
+                                <select id="course-instructor" 
+                                        wire:model="instructor_id"
+                                        class="w-full h-10 pl-3.5 pr-8 rounded-xl bg-white border @error('instructor_id') border-rose-500 @else border-slate-200 @enderror text-slate-800 text-xs font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer shadow-2xs">
+                                    <option value="">Selecione o instrutor titular...</option>
+                                    @foreach($instructors as $inst)
+                                        <option value="{{ $inst->id }}">{{ $inst->name }} ({{ $inst->email }})</option>
+                                    @endforeach
+                                </select>
+                                <svg class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="m19.5 8.25-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </div>
+                            @error('instructor_id')
+                                <span class="text-rose-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
 
-                <!-- Descrição e Objetivos Pedagógicos -->
-                <div>
-                    <label for="course_description" class="block text-xs font-semibold text-slate-300 mb-1.5">
-                        Descrição e Objetivos de Aprendizagem
-                    </label>
-                    <textarea id="course_description" wire:model="description" rows="5" 
-                              placeholder="Explique o que os alunos vão dominar após concluir este curso, público-alvo recomendado e competências profissionais desenvolvidas..."
-                              class="w-full bg-slate-950/70 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed"></textarea>
-                    <p class="text-[11px] text-slate-500 mt-1">Este texto será exibido na página de apresentação do curso aos alunos.</p>
-                </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-semibold text-slate-700" for="course-category">
+                                Categoria do Treinamento
+                            </label>
+                            <div class="relative">
+                                <select id="course-category" class="w-full h-10 pl-3.5 pr-8 rounded-xl bg-white border border-slate-200 text-slate-800 text-xs font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer shadow-2xs">
+                                    <option selected>Tecnologia e Engenharia de Software</option>
+                                    <option>Liderança & Gestão de Pessoas</option>
+                                    <option>Analytics & Inteligência de Dados</option>
+                                    <option>Design & Experiência do Usuário</option>
+                                    <option>Compliance & Boas Práticas B2B</option>
+                                </select>
+                                <svg class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="m19.5 8.25-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Botões de Ação da Aba 1 -->
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-800">
-                    <a href="{{ route('instructor.courses.index') }}" class="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-800/80 transition-colors w-full sm:w-auto text-center">
-                        Cancelar
-                    </a>
+                    <!-- Descrição Completa com Estilo Stitch -->
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-semibold text-slate-700" for="course-description">
+                                Descrição Completa e Objetivos Pedagógicos
+                            </label>
+                            <span class="inline-flex items-center gap-1 text-[11px] text-blue-600 font-medium">
+                                <svg class="w-3.5 h-3.5 text-blue-600 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z"></path>
+                                </svg>
+                                <span>Assistente Alvora IA Habilitado</span>
+                            </span>
+                        </div>
 
-                    <div class="flex items-center gap-3 w-full sm:w-auto">
-                        @if($courseId)
-                            <button type="submit" 
-                                    wire:loading.attr="disabled"
-                                    class="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto">
-                                <span wire:loading.remove>Salvar Informações Básicas</span>
-                                <span wire:loading>Salvando...</span>
-                            </button>
+                        <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs bg-white">
+                            <div class="flex items-center gap-1 px-3 py-2 bg-slate-50 border-b border-slate-200 text-slate-600 flex-wrap">
+                                <span class="p-1 rounded font-bold text-xs">B</span>
+                                <span class="p-1 rounded italic text-xs">I</span>
+                                <span class="p-1 rounded underline text-xs">U</span>
+                                <span class="w-px h-4 bg-slate-200 mx-1"></span>
+                                <span class="text-[11px] text-slate-400 ml-auto font-mono">Texto & Markdown Suportado</span>
+                            </div>
+                            <textarea id="course-description" 
+                                      wire:model="description" 
+                                      rows="5" 
+                                      placeholder="Descreva a ementa do treinamento, competências desenvolvidas e metas de aprendizagem para os colaboradores..."
+                                      class="w-full p-4 text-xs font-normal text-slate-800 leading-relaxed focus:outline-none resize-y min-h-[140px]"></textarea>
+                        </div>
+                    </div>
 
-                            <a href="{{ route('instructor.courses.curriculum', $courseId) }}" 
-                               class="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 shadow-md shadow-indigo-600/30 transition-all flex items-center justify-center gap-1.5 w-full sm:w-auto">
-                                <span>Avançar para Grade Curricular</span>
-                                <span>&rarr;</span>
-                            </a>
-                        @else
-                            <button type="submit" 
-                                    wire:loading.attr="disabled"
-                                    class="px-6 py-3 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-indigo-600 to-emerald-500 hover:from-indigo-500 hover:to-emerald-400 shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto">
-                                <span wire:loading.remove>Criar Curso e Montar Grade Curricular &rarr;</span>
-                                <span wire:loading>Criando Curso...</span>
-                            </button>
-                        @endif
+                    <!-- URL da Capa / Thumbnail (Campo Real do Eloquent) -->
+                    <div class="flex flex-col gap-1.5 pt-2 border-t border-slate-100">
+                        <label class="text-xs font-semibold text-slate-700" for="course-thumbnail">
+                            URL da Imagem de Capa (Banner 16:9)
+                        </label>
+                        <input id="course-thumbnail" 
+                               wire:model.live.debounce.300ms="thumbnail" 
+                               type="url" 
+                               placeholder="https://exemplo.com/imagem-do-curso.jpg"
+                               class="w-full h-10 px-3.5 rounded-xl bg-white border border-slate-200 text-slate-800 text-xs font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs transition-all">
+                        <span class="text-[11px] text-slate-400">Recomendado formato horizontal widescreen (ex: 1280x720).</span>
                     </div>
                 </div>
-            </form>
+
+                <!-- CARD 2: OBJETIVOS & COMPETÊNCIAS PEDAGÓGICAS (ESTILO STITCH) -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col gap-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm">
+                                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-semibold text-slate-800">Objetivos de Aprendizagem & Competências</h2>
+                                <p class="text-xs text-slate-400">Critérios validados e monitorados pelo Score de Retenção de IA</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-2.5">
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0">1</div>
+                                <span class="text-xs font-medium text-slate-700">Domínio técnico e aplicação prática nas demandas corporativas da empresa</span>
+                            </div>
+                            <span class="text-xs text-emerald-600 font-semibold">Monitorado</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0">2</div>
+                                <span class="text-xs font-medium text-slate-700">Participação ativa nas aulas e fixação contínua do conteúdo através de avaliações</span>
+                            </div>
+                            <span class="text-xs text-emerald-600 font-semibold">Monitorado</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0">3</div>
+                                <span class="text-xs font-medium text-slate-700">Geração e emissão automática de certificado após cumprimento integral da ementa</span>
+                            </div>
+                            <span class="text-xs text-emerald-600 font-semibold">Automático</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUNA DIREITA: RESUMO, SAÚDE & PUBLICATÓRIO (4 COLUNAS) -->
+            <div class="lg:col-span-4 flex flex-col gap-6">
+                <!-- CARD RESUMO & SAÚDE DO CURSO -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col gap-4">
+                    <h2 class="text-sm font-semibold text-slate-800 border-b border-slate-100 pb-2.5">
+                        Resumo Rápido & Saúde do Curso
+                    </h2>
+
+                    <!-- Thumbnail Preview -->
+                    <div class="relative rounded-xl overflow-hidden border border-slate-200 shadow-2xs group aspect-video bg-slate-100 flex items-center justify-center">
+                        @if($thumbnail)
+                            <img alt="Capa do Curso" class="w-full h-full object-cover" src="{{ $thumbnail }}">
+                        @else
+                            <div class="flex flex-col items-center justify-center text-slate-400 gap-1">
+                                <svg class="w-8 h-8 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"></path>
+                                </svg>
+                                <span class="text-xs font-semibold">Sem Imagem de Capa</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- 4 Métricas em Grid -->
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+                            <span class="text-[11px] text-slate-400 font-medium block">Matrículas Ativas</span>
+                            <span class="text-base font-bold text-slate-800">{{ $course?->enrollments_count ?? 0 }} {{ ($course?->enrollments_count ?? 0) === 1 ? 'Aluno' : 'Alunos' }}</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+                            <span class="text-[11px] text-slate-400 font-medium block">Total de Aulas</span>
+                            <span class="text-base font-bold text-slate-800">{{ $course?->lessons_count ?? 0 }} Lições</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+                            <span class="text-[11px] text-slate-400 font-medium block">Módulos</span>
+                            <span class="text-base font-bold text-slate-800">{{ $course?->modules_count ?? 0 }} Seções</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+                            <span class="text-[11px] text-slate-400 font-medium block">Quizzes Ativos</span>
+                            <span class="text-base font-bold text-slate-800">{{ $course?->quizzes_count ?? 0 }} Provas</span>
+                        </div>
+                    </div>
+
+                    <!-- Box IA Copilot Insights do Stitch -->
+                    <div class="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200/80 flex flex-col gap-2">
+                        <div class="flex items-center gap-1.5 text-blue-700 text-xs font-semibold">
+                            <svg class="w-4 h-4 text-blue-600 shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z"></path>
+                            </svg>
+                            <span>Alvora Copilot Insights</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            O cálculo preditivo do Score de Evasão analisa a frequência com que os colaboradores acessam as lições deste curso para acionar suporte preventivo.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- CARD PARÂMETROS DE ACESSO & PUBLICAÇÃO -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col gap-4">
+                    <h2 class="text-sm font-semibold text-slate-800 border-b border-slate-100 pb-2.5">
+                        Parâmetros de Acesso & Publicação
+                    </h2>
+
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500 font-medium">Modalidade</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100 font-semibold text-slate-700 border border-slate-200/60">
+                                Corporativo Ilimitado
+                            </span>
+                        </div>
+
+                        <!-- Seletor de Status -->
+                        <div class="flex flex-col gap-1.5 pt-2 border-t border-slate-100">
+                            <label class="text-xs font-semibold text-slate-700">Status de Disponibilidade</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="p-2.5 rounded-xl border cursor-pointer transition-all flex items-center justify-between {{ $status === 'published' ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-semibold' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
+                                    <span class="text-xs">Publicado</span>
+                                    <input type="radio" wire:model.live="status" value="published" class="text-emerald-600 focus:ring-emerald-500">
+                                </label>
+
+                                <label class="p-2.5 rounded-xl border cursor-pointer transition-all flex items-center justify-between {{ $status === 'draft' ? 'bg-amber-50 border-amber-300 text-amber-800 font-semibold' : 'bg-slate-50 border-slate-200 text-slate-600' }}">
+                                    <span class="text-xs">Rascunho</span>
+                                    <input type="radio" wire:model.live="status" value="draft" class="text-amber-600 focus:ring-amber-500">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-semibold text-slate-700">Certificado Automático</span>
+                                <span class="text-[11px] text-slate-400">Emitir ao atingir 100% das aulas</span>
+                            </div>
+                            <div class="w-9 h-5 rounded-full bg-blue-600 flex items-center justify-end px-0.5">
+                                <div class="w-4 h-4 rounded-full bg-white shadow-2xs"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     @endif
 
-    <!-- ============================================== -->
-    <!-- CONTEÚDO DA ABA 3: Quizzes & Avaliações        -->
-    <!-- ============================================== -->
+    <!-- ======================================================== -->
+    <!-- ABA 3: AVALIAÇÕES & QUIZZES (SE O CURSO ESTIVER SALVO)  -->
+    <!-- ======================================================== -->
     @if($activeTab === 'quizzes' && $courseId)
-        <div class="space-y-6">
-            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
-                <!-- Header da Seção -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800 pb-5">
-                    <div>
-                        <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                            Etapa 3: Quizzes e Avaliações de Aprendizado
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-0.5">
-                            Crie provas de fixação com nota mínima de corte para medir o progresso e reter os alunos.
-                        </p>
-                    </div>
-
-                    <a href="{{ route('instructor.courses.quizzes.create', $courseId) }}" 
-                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 shadow-md shadow-indigo-600/30 transition-all hover:scale-[1.02] self-start sm:self-auto">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        <span>Nova Avaliação</span>
-                    </a>
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col gap-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                    <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                        Avaliações e Quizzes de Retenção
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                        Testes de fixação aplicados aos colaboradores para medir aproveitamento e calibrar o Score de Risco de Evasão.
+                    </p>
                 </div>
 
-                <!-- Lista de Quizzes ou Estado Vazio -->
-                @if(!$course || $course->quizzes->isEmpty())
-                    <div class="p-12 text-center rounded-2xl bg-slate-950/40 border border-slate-800/80 space-y-4">
-                        <div class="w-16 h-16 mx-auto rounded-2xl bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                        </div>
-                        <div class="space-y-1">
-                            <h3 class="text-base font-bold text-white">Nenhuma avaliação cadastrada ainda</h3>
-                            <p class="text-xs text-slate-400 max-w-md mx-auto">
-                                Avaliações e quizzes ajudam a reforçar o conteúdo ensinado nos módulos e garantem maior retenção dos colaboradores.
-                            </p>
-                        </div>
-                        <a href="{{ route('instructor.courses.quizzes.create', $courseId) }}" 
-                           class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/30 transition-all">
-                            <span>+ Criar Primeira Avaliação</span>
-                            <span>&rarr;</span>
-                        </a>
-                    </div>
-                @else
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @foreach($course->quizzes as $quiz)
-                            <div class="p-5 rounded-xl bg-slate-950/70 border border-slate-800/90 hover:border-slate-700 transition-all flex flex-col justify-between gap-4 shadow-lg group">
-                                <div class="space-y-2">
-                                    <div class="flex items-start justify-between gap-2">
-                                        <h3 class="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">
-                                            {{ $quiz->title }}
-                                        </h3>
-                                        <span class="shrink-0 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                            Corte: {{ $quiz->passing_score }}%
-                                        </span>
-                                    </div>
+                <a href="{{ route('instructor.courses.quizzes.create', $courseId) }}" 
+                   class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-colors shadow-sm self-start sm:self-auto">
+                    <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
+                    </svg>
+                    <span>Nova Avaliação</span>
+                </a>
+            </div>
 
-                                    <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-                                        <span class="flex items-center gap-1">
-                                            <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                            {{ $quiz->questions->count() }} questões
-                                        </span>
+            @if(!$course || $course->quizzes->isEmpty())
+                <div class="p-12 text-center rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+                    <div class="w-12 h-12 mx-auto rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <svg class="w-6 h-6 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-sm font-semibold text-slate-800">Nenhuma avaliação cadastrada</h3>
+                    <p class="text-xs text-slate-500 max-w-md mx-auto">
+                        Crie quizzes ao final de cada módulo para certificar a retenção dos colaboradores.
+                    </p>
+                    <a href="{{ route('instructor.courses.quizzes.create', $courseId) }}" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white font-medium text-xs hover:bg-blue-700 transition-colors">
+                        + Criar Primeira Avaliação
+                    </a>
+                </div>
+            @else
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @foreach($course->quizzes as $quiz)
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-50 transition-colors flex flex-col justify-between gap-3 shadow-2xs">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-slate-800">{{ $quiz->title }}</h3>
+                                    <div class="flex items-center gap-2 text-xs text-slate-400 mt-1">
+                                        <span>{{ $quiz->questions->count() }} questões</span>
                                         @if($quiz->module)
-                                            <span class="text-slate-600">&bull;</span>
-                                            <span class="text-slate-400 truncate max-w-[200px]" title="{{ $quiz->module->title }}">
-                                                Módulo: {{ $quiz->module->title }}
-                                            </span>
+                                            <span>&bull;</span>
+                                            <span>Módulo: {{ $quiz->module->title }}</span>
                                         @endif
                                     </div>
                                 </div>
+                                <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700">
+                                    Corte: {{ $quiz->passing_score }}%
+                                </span>
+                            </div>
 
-                                <div class="flex items-center justify-between pt-3 border-t border-slate-800/80">
-                                    <span class="text-[11px] text-slate-500 font-mono">ID #{{ $quiz->id }}</span>
-                                    <div class="flex items-center gap-2">
-                                        <a href="{{ route('instructor.quizzes.edit', $quiz) }}" 
-                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-colors"
-                                           title="Editar Quiz e Questões">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                                            <span>Editar</span>
-                                        </a>
-
-                                        <button wire:click="deleteQuiz({{ $quiz->id }})" 
-                                                wire:confirm="Tem certeza que deseja excluir a avaliação '{{ $quiz->title }}'?"
-                                                type="button" 
-                                                class="p-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 transition-colors text-xs"
-                                                title="Excluir Avaliação">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                        </button>
-                                    </div>
+                            <div class="flex items-center justify-between pt-3 border-t border-slate-200/70">
+                                <span class="text-[11px] font-mono text-slate-400">ID #{{ $quiz->id }}</span>
+                                <div class="flex items-center gap-1.5">
+                                    <a href="{{ route('instructor.quizzes.edit', $quiz) }}" 
+                                       class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors">
+                                        Editar Questões
+                                    </a>
+                                    <button wire:click="deleteQuiz({{ $quiz->id }})" 
+                                            wire:confirm="Tem certeza de que deseja excluir a avaliação '{{ $quiz->title }}'?"
+                                            type="button" 
+                                            class="p-1 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors">
+                                        <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
-                @endif
-
-                <!-- Rodapé de Navegação da Aba 3 -->
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-5 border-t border-slate-800">
-                    <a href="{{ route('instructor.courses.curriculum', $courseId) }}" 
-                       class="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-800/80 transition-colors flex items-center gap-1.5 w-full sm:w-auto justify-center">
-                        <span>&larr;</span>
-                        <span>Voltar para Grade Curricular</span>
-                    </a>
-
-                    <button type="button" wire:click="setTab('publish')"
-                            class="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 shadow-md shadow-indigo-600/30 transition-all flex items-center justify-center gap-1.5 w-full sm:w-auto cursor-pointer">
-                        <span>Avançar para Mídia & Publicação</span>
-                        <span>&rarr;</span>
-                    </button>
+                        </div>
+                    @endforeach
                 </div>
-            </div>
+            @endif
         </div>
     @endif
 
-    <!-- ========================================== -->
-    <!-- CONTEÚDO DA ABA 4: Mídia & Publicação      -->
-    <!-- ========================================== -->
+    <!-- ======================================================== -->
+    <!-- ABA 4: MÍDIA & PUBLICAÇÃO (SE O CURSO ESTIVER SALVO)     -->
+    <!-- ======================================================== -->
     @if($activeTab === 'publish' && $courseId)
-        <div class="space-y-6">
-            <form wire:submit="save" class="space-y-6">
-                <!-- Card 1: Identidade Visual / Capa -->
-                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-5">
-                    <div class="border-b border-slate-800 pb-3">
-                        <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
-                            Identidade Visual & Capa do Treinamento
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Defina a imagem de apresentação que os alunos verão no catálogo e na vitrine.</p>
-                    </div>
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col gap-6">
+            <div class="border-b border-slate-100 pb-3">
+                <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                    Configurações de Publicação & URL Amigável
+                </h2>
+                <p class="text-xs text-slate-400 mt-0.5">
+                    Ajuste o identificador permanente (slug) do curso e o status de catálogo.
+                </p>
+            </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                        <div class="space-y-3">
-                            <div>
-                                <label for="course_thumbnail" class="block text-xs font-semibold text-slate-300 mb-1.5">
-                                    URL da Imagem de Capa (Banner 16:9)
-                                </label>
-                                <input type="url" id="course_thumbnail" wire:model.live.debounce.300ms="thumbnail" 
-                                       placeholder="https://images.unsplash.com/photo-... ou URL da imagem"
-                                       class="w-full bg-slate-950/70 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <p class="text-[11px] text-slate-500 mt-1">Recomendado: 1280x720px (formato widescreen 16:9 em JPG ou PNG).</p>
-                            </div>
-
-                            @if($thumbnail)
-                                <button type="button" wire:click="$set('thumbnail', '')" 
-                                        class="text-xs text-rose-400 hover:text-rose-300 transition-colors flex items-center gap-1">
-                                    <span>Remover imagem</span>
-                                </button>
-                            @endif
-                        </div>
-
-                        <!-- Pré-visualização ao Vivo -->
-                        <div>
-                            <span class="block text-xs font-semibold text-slate-400 mb-2">Pré-visualização do Card do Aluno:</span>
-                            <div class="rounded-xl overflow-hidden border border-slate-800 bg-slate-950 shadow-lg">
-                                <div class="aspect-video relative bg-gradient-to-tr from-slate-900 via-indigo-950/60 to-slate-900 flex items-center justify-center overflow-hidden">
-                                    @if($thumbnail)
-                                        <img src="{{ $thumbnail }}" alt="{{ $title }}" class="w-full h-full object-cover">
-                                    @else
-                                        <div class="text-center p-4">
-                                            <span class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">
-                                                {{ substr($title ?: 'Curso', 0, 2) }}
-                                            </span>
-                                            <span class="block text-[10px] text-slate-500 uppercase tracking-widest mt-1 font-semibold">Sem Imagem</span>
-                                        </div>
-                                    @endif
-                                    <span class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold 
-                                        @if($status === 'published') bg-emerald-500/20 text-emerald-300 border border-emerald-500/30
-                                        @else bg-amber-500/20 text-amber-300 border border-amber-500/30 @endif">
-                                        {{ $status === 'published' ? 'Publicado' : 'Rascunho' }}
-                                    </span>
-                                </div>
-                                <div class="p-3.5 space-y-1">
-                                    <h4 class="text-xs font-bold text-white line-clamp-1">{{ $title ?: 'Título do Curso' }}</h4>
-                                    <p class="text-[11px] text-slate-400 line-clamp-1">{{ $description ?: 'Descrição do curso...' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Slug da URL -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold text-slate-700" for="course-slug">
+                    Identificador de URL (Slug Permanente)
+                </label>
+                <div class="flex items-center rounded-xl border border-slate-200 bg-slate-50 overflow-hidden focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
+                    <span class="px-3.5 py-2.5 text-xs text-slate-400 bg-slate-100 border-r border-slate-200 font-mono select-none">
+                        /aluno/cursos/
+                    </span>
+                    <input id="course-slug" 
+                           wire:model="slug" 
+                           type="text" 
+                           class="w-full bg-transparent px-3 py-2 text-xs text-slate-800 font-mono focus:outline-none">
                 </div>
+            </div>
 
-                <!-- Card 2: URL Amigável / SEO -->
-                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-4">
-                    <div class="border-b border-slate-800 pb-3">
-                        <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                            Link de Acesso dos Alunos (Slug)
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Endereço direto pelo qual os alunos acessarão as aulas e módulos.</p>
-                    </div>
-
-                    <div>
-                        <label for="course_slug" class="block text-xs font-semibold text-slate-300 mb-1.5">Slug da URL *</label>
-                        <div class="flex items-center rounded-xl bg-slate-950/70 border @error('slug') border-rose-500 @else border-slate-700 @enderror overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500">
-                            <span class="px-3.5 py-2.5 text-xs text-slate-500 bg-slate-900 border-r border-slate-800 font-mono select-none">
-                                /aluno/cursos/
-                            </span>
-                            <input type="text" id="course_slug" wire:model="slug" placeholder="meu-curso-corporativo"
-                                   class="w-full bg-transparent px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none font-mono">
-                        </div>
-                        @error('slug')
-                            <p class="text-rose-400 text-xs mt-1.5">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- Card 3: Checklist de Prontidão -->
-                @if($course)
-                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-4">
-                        <div class="border-b border-slate-800 pb-3">
-                            <h2 class="text-base font-bold text-white flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                                Checklist de Prontidão para Lançamento
-                            </h2>
-                            <p class="text-xs text-slate-400 mt-0.5">Verifique se o treinamento está pronto para os alunos começarem a aprender.</p>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <!-- Item 1: Metadados -->
-                            <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
-                                    ✓
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-white block">Dados Básicos</span>
-                                    <span class="text-[11px] text-slate-400">Título e descrição preenchidos</span>
-                                </div>
-                            </div>
-
-                            <!-- Item 2: Grade Curricular -->
-                            <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg {{ $course->lessons_count > 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400' }} flex items-center justify-center font-bold">
-                                    {{ $course->lessons_count > 0 ? '✓' : '!' }}
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-white block">Conteúdo das Aulas</span>
-                                    <span class="text-[11px] text-slate-400">
-                                        {{ $course->modules_count }} módulos &bull; {{ $course->lessons_count }} aulas
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- Item 3: Capa -->
-                            <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg {{ $thumbnail ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400' }} flex items-center justify-center font-bold">
-                                    {{ $thumbnail ? '✓' : '!' }}
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-white block">Identidade Visual</span>
-                                    <span class="text-[11px] text-slate-400">
-                                        {{ $thumbnail ? 'Capa configurada' : 'Sem banner (recomendado)' }}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-
-                <!-- Card 4: Seletor de Status & Lançamento -->
-                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-4">
-                    <div class="border-b border-slate-800 pb-3">
-                        <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                            Status de Publicação
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Alterne entre rascunho privado e publicação aberta na plataforma.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <!-- Rascunho -->
-                        <label class="p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between gap-3 {{ $status === 'draft' ? 'bg-amber-500/10 border-amber-500/50 text-white shadow-md' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700' }}">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold flex items-center gap-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                                    Rascunho
-                                </span>
-                                <input type="radio" wire:model.live="status" value="draft" class="text-amber-500 focus:ring-amber-500">
-                            </div>
-                            <p class="text-[11px] text-slate-400 leading-relaxed">
-                                Visível exclusivamente para você (professor/instrutor). Alunos não conseguem visualizar nem iniciar.
-                            </p>
-                        </label>
-
-                        <!-- Publicado -->
-                        <label class="p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between gap-3 {{ $status === 'published' ? 'bg-emerald-500/10 border-emerald-500/50 text-white shadow-md' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700' }}">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold flex items-center gap-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                                    Publicado
-                                </span>
-                                <input type="radio" wire:model.live="status" value="published" class="text-emerald-500 focus:ring-emerald-500">
-                            </div>
-                            <p class="text-[11px] text-slate-400 leading-relaxed">
-                                Disponível imediatamente no catálogo. Alunos matriculados podem assistir às aulas e responder aos quizzes.
-                            </p>
-                        </label>
-
-                        <!-- Arquivado -->
-                        <label class="p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between gap-3 {{ $status === 'archived' ? 'bg-slate-800 border-slate-600 text-white shadow-md' : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700' }}">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold flex items-center gap-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-slate-500"></span>
-                                    Arquivado
-                                </span>
-                                <input type="radio" wire:model.live="status" value="archived" class="text-slate-500 focus:ring-slate-500">
-                            </div>
-                            <p class="text-[11px] text-slate-400 leading-relaxed">
-                                Treinamento desativado temporariamente. Oculto para novas matrículas na plataforma.
-                            </p>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Botões de Ação da Aba 4 -->
-                <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-                    <button type="submit" 
-                            wire:loading.attr="disabled"
-                            class="px-6 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-indigo-600 to-emerald-500 hover:from-indigo-500 hover:to-emerald-400 shadow-md shadow-indigo-600/30 transition-all cursor-pointer">
-                        <span wire:loading.remove>Salvar Configurações de Publicação</span>
-                        <span wire:loading>Salvando...</span>
-                    </button>
-                </div>
-            </form>
+            <!-- Botão Salvar -->
+            <div class="flex justify-end pt-4 border-t border-slate-100">
+                <button type="button" 
+                        wire:click="save" 
+                        wire:loading.attr="disabled"
+                        class="px-5 py-2 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-all shadow-sm">
+                    Salvar Publicação
+                </button>
+            </div>
         </div>
     @endif
 </div>

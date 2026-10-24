@@ -66,6 +66,7 @@ class SituationRoom extends Component
         if ($company) {
             app(EvasionRiskCalculatorService::class)->calculateForCompany($company);
             session()->flash('success', 'Scores de risco recomputados com sucesso para todos os colaboradores!');
+            $this->dispatch('toast', message: 'Scores de risco recomputados com sucesso via Copilot IA!', type: 'success');
         }
     }
 
@@ -110,6 +111,11 @@ class SituationRoom extends Component
             $studentsList = $allStudents->sortByDesc(fn($u) => $u->latestRiskScore?->score ?? 0);
         }
 
+        // Cohorts for Heatmap
+        $safeStudents = $allStudents->filter(fn($u) => $u->latestRiskScore?->isLowRisk() || (!$u->latestRiskScore));
+        $warningStudents = $allStudents->filter(fn($u) => $u->latestRiskScore?->isMediumRisk());
+        $criticalStudents = $allStudents->filter(fn($u) => $u->latestRiskScore?->isHighRisk());
+
         return view('livewire.company.situation-room', [
             'totalStudents' => $totalStudents,
             'highRiskCount' => $highRiskCount,
@@ -119,6 +125,18 @@ class SituationRoom extends Component
             'averageScore' => $averageScore,
             'interventionsCount' => $interventionsCount,
             'students' => $studentsList,
-        ])->layout('layouts.app');
+            'safeStudents' => $safeStudents,
+            'warningStudents' => $warningStudents,
+            'criticalStudents' => $criticalStudents,
+        ])->layout('layouts.instructor', [
+            'title' => 'Sala de Situação — Telemetria Preditiva & Retenção IA — ALVORA',
+            'breadcrumb' => 'Sala de Situação',
+        ]);
+    }
+
+    public function setFilter(string $level): void
+    {
+        $this->filterLevel = $level;
+        $this->resetPage();
     }
 }

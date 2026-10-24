@@ -49,7 +49,12 @@ class CourseList extends Component
 
     public function render()
     {
+        $totalCount = Course::count();
+        $publishedCount = Course::where('status', 'published')->count();
+        $draftCount = Course::where('status', 'draft')->count();
+
         $query = Course::with('instructor')
+            ->withCount(['modules', 'lessons', 'enrollments'])
             ->when(!empty($this->search), function ($q) {
                 $q->where(function ($sub) {
                     $sub->where('title', 'like', "%{$this->search}%")
@@ -61,10 +66,16 @@ class CourseList extends Component
             })
             ->orderByDesc('created_at');
 
-        $courses = $query->paginate(9);
+        $courses = $query->paginate(10);
 
         return view('livewire.instructor.course-list', [
             'courses' => $courses,
-        ])->layout('layouts.app', ['title' => 'Gestão de Cursos — ALVORA']);
+            'totalCount' => $totalCount,
+            'publishedCount' => $publishedCount,
+            'draftCount' => $draftCount,
+        ])->layout('layouts.instructor', [
+            'title' => 'Meus Cursos — Catálogo do Instrutor — ALVORA',
+            'breadcrumb' => 'Meus Cursos',
+        ]);
     }
 }
