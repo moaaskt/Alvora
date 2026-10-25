@@ -38,17 +38,17 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                         <div class="p-4 rounded-xl bg-gray-950/60 border border-white/5">
                             <span class="text-gray-500 uppercase tracking-wider block font-semibold">Colaborador / Aluno</span>
-                            <span class="text-base font-bold text-white mt-1 block">{{ $certificate->user->name }}</span>
+                            <span class="text-base font-bold text-white mt-1 block">{{ $certificate->user?->name ?? 'Colaborador' }}</span>
                         </div>
 
                         <div class="p-4 rounded-xl bg-gray-950/60 border border-white/5">
                             <span class="text-gray-500 uppercase tracking-wider block font-semibold">Empresa Contratante</span>
-                            <span class="text-base font-bold text-white mt-1 block">{{ $certificate->company->name ?? 'Empresa Cliente' }}</span>
+                            <span class="text-base font-bold text-white mt-1 block">{{ $certificate->company?->name ?? 'Empresa Cliente' }}</span>
                         </div>
 
                         <div class="p-4 rounded-xl bg-gray-950/60 border border-white/5 sm:col-span-2">
                             <span class="text-gray-500 uppercase tracking-wider block font-semibold">Curso Concluído</span>
-                            <span class="text-base font-bold text-indigo-400 mt-1 block">{{ $certificate->course->title }}</span>
+                            <span class="text-base font-bold text-indigo-400 mt-1 block">{{ $certificate->course?->title ?? 'Curso Concluído' }}</span>
                         </div>
 
                         <div class="p-4 rounded-xl bg-gray-950/60 border border-white/5">
@@ -58,7 +58,7 @@
 
                         <div class="p-4 rounded-xl bg-gray-950/60 border border-white/5">
                             <span class="text-gray-500 uppercase tracking-wider block font-semibold">Data da Emissão</span>
-                            <span class="text-sm font-semibold text-gray-300 mt-1 block">{{ $certificate->issued_at->format('d/m/Y \à\s H:i') }}</span>
+                            <span class="text-sm font-semibold text-gray-300 mt-1 block">{{ $certificate->issued_at?->format('d/m/Y \à\s H:i') ?? '—' }}</span>
                         </div>
                     </div>
 
