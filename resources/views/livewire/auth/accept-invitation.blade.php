@@ -19,10 +19,8 @@
         @else
             <!-- Header do Convite Válido -->
             <div class="text-center space-y-2">
-                <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-emerald-400 p-[2px] shadow-lg shadow-indigo-600/30 mb-2">
-                    <div class="w-full h-full bg-[#090D16] rounded-[14px] flex items-center justify-center font-black text-2xl text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">
-                        A
-                    </div>
+                <div class="inline-flex items-center justify-center mb-2">
+                    <img src="{{ asset('images/logo-symbol.png') }}" alt="ALVORA" class="h-12 w-auto shrink-0 drop-shadow-md">
                 </div>
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Ativar Seu Acesso</h2>
                 <p class="text-slate-400 text-xs sm:text-sm">
