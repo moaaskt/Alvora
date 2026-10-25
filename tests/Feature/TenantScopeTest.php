@@ -121,6 +121,31 @@ class TenantScopeTest extends TestCase
         $this->assertCount(2, $results);
     }
 
+    public function test_authenticated_user_without_company_id_cannot_see_any_tenant_records(): void
+    {
+        $unique = uniqid();
+        $companyA = Company::create(['name' => "Empresa A {$unique}", 'status' => 'active']);
+        $companyB = Company::create(['name' => "Empresa B {$unique}", 'status' => 'active']);
+
+        TestTenantDocument::create(['title' => 'Doc 1', 'company_id' => $companyA->id]);
+        TestTenantDocument::create(['title' => 'Doc 2', 'company_id' => $companyB->id]);
+
+        $orphanUser = User::create([
+            'name' => 'Usuário Órfão',
+            'email' => "orfao_{$unique}@alvora.com",
+            'password' => bcrypt('password'),
+            'company_id' => null,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $this->actingAs($orphanUser);
+
+        $results = TestTenantDocument::all();
+
+        // Usuário não-admin com company_id nulo não deve ter acesso a nenhum documento
+        $this->assertCount(0, $results);
+    }
+
     public function test_ensure_user_has_role_middleware(): void
     {
         $unique = uniqid();
