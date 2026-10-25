@@ -8,12 +8,10 @@
         <!-- Topo: Marca e Badge do Portal Corporativo -->
         <div class="relative z-10 flex items-center justify-between">
             <a href="{{ url('/') }}" class="flex items-center space-x-3 group focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg p-1">
-                <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg tracking-tight shadow-md shadow-blue-500/25 group-hover:bg-blue-500 transition-colors">
-                    A
-                </div>
-                <div class="flex flex-col">
-                    <span class="font-bold text-xl tracking-tight text-white group-hover:text-blue-400 transition-colors">ALVORA</span>
-                    <span class="text-[9px] uppercase tracking-[0.18em] text-blue-300/80 font-semibold -mt-1">Corporate EdTech</span>
+                <img src="{{ asset('images/logo-symbol.png') }}" alt="ALVORA" class="h-8 w-auto shrink-0 transition-transform duration-200 group-hover:scale-105">
+                <div class="flex flex-col justify-center">
+                    <span class="font-bold text-xl tracking-tight text-white group-hover:text-blue-400 transition-colors leading-none">ALVORA</span>
+                    <span class="text-[9px] uppercase tracking-[0.18em] text-blue-300/80 font-semibold mt-0.5">Corporate EdTech</span>
                 </div>
             </a>
 
