@@ -4,11 +4,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-4xl mx-auto space-y-5 sm:space-y-6">
                 <!-- Badge de Posicionamento EdTech -->
-                <div class="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-[11px] sm:text-xs font-semibold shadow-xs">
-                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
-                    <span>Corporate Learning & AI Retention</span>
-                </div>
-
+           
                 <!-- Headline Principal EdTech -->
                 <h1 class="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.18] sm:leading-[1.12]">
                     Capacitação corporativa de alto impacto com <span class="text-blue-600">previsão ativa</span> de retenção.
