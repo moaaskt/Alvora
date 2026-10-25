@@ -6,27 +6,26 @@
 
 ## 🏛️ Filosofia: Monolito Modular de Alta Concorrência
 
-O **ALVORA** é arquitetado como um **Monolito Modular** em Laravel 12 rodando sobre **Laravel Octane com FrankenPHP**. 
+O **ALVORA** é arquitetado como um **Monolito Modular** em Laravel 13 / PHP 8.3.
 
 A aplicação rejeita a complexidade operacional precoce de microsserviços em favor de um sistema coeso que oferece:
 1. **Transações Atômicas:** Garantia ACID nativa no MySQL para operações financeiras, matrículas e concessão de certificados.
 2. **Separação por Contextos Delimitados:** Módulos lógicos (`Admin`, `Company`, `Instructor`, `Student`, `AI`, `Billing`).
-3. **Execução em Memória:** FrankenPHP e Octane eliminam o overhead de boot do framework a cada request HTTP.
+3. **Desenvolvimento e Testes Ágeis:** Execução local simples com SQLite e testes em MySQL para validação de integridade referencial.
 
 ```mermaid
 graph TD
-    Client["Navegador / Dispositivo (Tailwind + Livewire)"]
+    Client["Navegador / Dispositivo (Tailwind 4 + Livewire 4)"]
     
-    subgraph "Camada de Rede & Segurança"
-        Proxy["FrankenPHP (Porta 8000)"]
-        ReverbServer["Laravel Reverb (Porta 8080)"]
+    subgraph "Camada de Rede & Aplicação"
+        Web["Servidor Web HTTP (Porta 8000)"]
     end
     
-    subgraph "Camada de Aplicação Laravel 12"
+    subgraph "Camada de Aplicação Laravel 13"
         AuthMiddleware["Middlewares (auth, role, subscription.active)"]
-        LivewireComponents["Livewire 3 (UI Reativa no Servidor)"]
+        LivewireComponents["Livewire 4 (UI Reativa no Servidor)"]
         Controllers["Controladores Web & API"]
-        DomainServices["Domain Services (EvasionRisk, MercadoPago, AI)"]
+        DomainServices["Domain Services (EvasionRisk, MercadoPago, AI, Certificate)"]
         ORM["Eloquent ORM (BelongsToTenant Scope)"]
     end
     
@@ -120,7 +119,26 @@ $$\text{Score Total} = (0.35 \times I) + (0.25 \times E) + (0.20 \times Q) + (0.
 
 ## 📜 5. Módulo de Certificação e Auditoria
 
-1. **Elegibilidade Rígida:** Conclusão de 100% das aulas ativas do curso via [`CertificateService`](file:///c:/Users/Windows%20Lite%20BR/alvora/app/Services/CertificateService.php).
-2. **Código de Autenticidade Único:** Gerado no formato `ALV-2026-XXXXXX` com UUID global.
-3. **Renderização de PDF:** DomPDF em folha A4 formato paisagem com layout institucional.
-4. **Endpoint Público de Verificação:** `/validar-certificado/{code}` permite a recrutadores e empresas auditarem a legitimidade do certificado sem necessidade de login.
+### Diretrizes Técnicas Aprovadas:
+ 1. **Estabilização Prévia à Evolução:** O fluxo existente de emissão e validação deve ser corrigido e blindado com testes de regressão antes da introdução do editor visual.
+ 2. **Preservação de Contratos Públicos e Rotas:**
+    - Manter as rotas `student.certificate` (`/aluno/cursos/{course:slug}/certificado`) e `certificates.verify` (`/validar-certificado/{code}`).
+    - Preservar o UUID e o formato legível único `ALV-YYYY-XXXXXX`.
+    - Manter os requisitos de elegibilidade (progresso 100% e aprovação em todos os quizzes).
+ 3. **Ponto Único de Entrada para Renderização:**
+    - `CertificateService::generatePdf(Certificate $certificate)` é o ponto centralizador.
+    - Se `certificate->template_version_id` for nulo: utiliza o renderizador legado (`certificates.template`).
+    - Se `certificate->template_version_id` estiver associado a uma versão: utiliza o novo renderizador alimentado pelo schema JSON daquela versão.
+ 4. **Geração Síncrona e Sob Demanda:**
+    - Os arquivos PDF são gerados no momento da solicitação (tempo medido ~81ms via Dompdf); não há requisito de armazenamento permanente de binários.
+    - O carregamento remoto de recursos no Dompdf é mantido desativado (`enable_remote = false`) para prevenir vulnerabilidades de SSRF. Assets locais são servidos via storage privado/data URIs.
+ 5. **Snapshots Históricos e Integridade:**
+    - Os dados do certificado são preservados em snapshot no momento da emissão, evitando que futuras alterações em cursos, usuários ou empresas alterem retroativamente um certificado já emitido.
+    - Certificados antigos cujos snapshots forem preenchidos a partir de dados atuais devem ser identificados explicitamente como reconstruídos, sem alegar precisão histórica não comprovada.
+    - Exclusões de cursos ou usuários não podem apagar silenciosamente certificados históricos.
+ 6. **Editor Visual com Schema JSON como Fonte da Verdade:**
+    - O layout visual é representado por um schema JSON versionado (coordenadas em mm, tipografia aprovada, elementos fixos, variáveis permitidas, imagens e QR Code).
+    - O servidor valida o schema JSON antes de qualquer publicação.
+    - A prévia interativa no editor utiliza o mesmo renderizador de backend responsável pelo PDF final, garantindo fidelidade absoluta.
+ 7. **Decisões de Negócio Não Presumidas:**
+    - Decisões pendentes de produto (tais como política de reemissão, retenção/anonimização em exclusão, escopo do template por empresa vs global, e mascaramento de dados pessoais na validação pública) não podem ser inventadas pelo agente de código e requerem validação prévia.
