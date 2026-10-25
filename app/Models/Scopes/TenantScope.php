@@ -30,6 +30,9 @@ class TenantScope implements Scope
         // Apply tenant isolation if user belongs to a company
         if (!empty($user->company_id)) {
             $builder->where($model->getTable() . '.company_id', $user->company_id);
+        } else {
+            // Usuário não-admin com company_id nulo não pode acessar registros de nenhum tenant
+            $builder->whereRaw('1 = 0');
         }
     }
 }
