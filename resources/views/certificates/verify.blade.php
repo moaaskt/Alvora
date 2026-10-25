@@ -55,17 +55,17 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                         <div class="p-4 rounded-xl bg-gray-950/60 border border-white/5">
                             <span class="text-gray-500 uppercase tracking-wider block font-semibold">Colaborador / Aluno</span>
-                            <span class="text-base font-bold text-white mt-1 block">{{ $certificate->student_name }}</span>
+                            <span class="text-base font-bold text-white mt-1 block">{{ $certificate->student_name ?? 'Não informado' }}</span>
                         </div>
 
                         <div class="p-4 rounded-xl bg-gray-950/60 border border-white/5">
                             <span class="text-gray-500 uppercase tracking-wider block font-semibold">Empresa Contratante</span>
-                            <span class="text-base font-bold text-white mt-1 block">{{ $certificate->company_name }}</span>
+                            <span class="text-base font-bold text-white mt-1 block">{{ $certificate->company_name ?? 'Não informada' }}</span>
                         </div>
 
                         <div class="p-4 rounded-xl bg-gray-950/60 border border-white/5 sm:col-span-2">
                             <span class="text-gray-500 uppercase tracking-wider block font-semibold">Curso Concluído</span>
-                            <span class="text-base font-bold text-indigo-400 mt-1 block">{{ $certificate->course_title }}</span>
+                            <span class="text-base font-bold text-indigo-400 mt-1 block">{{ $certificate->course_title ?? 'Não informado' }}</span>
                         </div>
 
                         <div class="p-4 rounded-xl bg-gray-950/60 border border-white/5">
