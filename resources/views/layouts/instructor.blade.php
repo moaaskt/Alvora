@@ -8,6 +8,12 @@
 
     <title>{{ $title ?? 'ALVORA — Corporate EdTech' }}</title>
 
+    <!-- Favicon & System Icons -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+
     <!-- Google Fonts & Material Symbols -->
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
@@ -152,15 +158,11 @@
         <div class="flex flex-col">
             <!-- Brand Logo Header -->
             <div class="h-16 px-space-lg flex items-center justify-between border-b border-slate-100">
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-space-xs group">
-                    <div class="w-9 h-9 rounded-lg bg-primary-container flex items-center justify-center text-on-primary font-headline-md text-headline-md shadow-sm">
-                        A
-                    </div>
-                    <div class="flex flex-col">
-                        <div class="flex items-center gap-1.5">
-                            <span class="font-headline-sm text-headline-sm tracking-tight text-on-surface font-bold">ALVORA</span>
-                        </div>
-                        <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Corporate EdTech</span>
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 group py-1">
+                    <img src="{{ asset('images/logo-symbol.png') }}" alt="ALVORA" class="h-8 w-auto shrink-0 transition-transform duration-200 group-hover:scale-105">
+                    <div class="flex flex-col justify-center">
+                        <span class="font-headline-sm text-headline-sm tracking-tight text-on-surface font-bold leading-none">ALVORA</span>
+                        <span class="font-label-sm text-label-sm text-on-surface-variant font-medium mt-0.5">Corporate EdTech</span>
                     </div>
                 </a>
             </div>

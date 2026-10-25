@@ -20,14 +20,12 @@
         .border-outer {
             border: 3px solid #6366f1;
             padding: 10px;
-            height: 100%;
             box-sizing: border-box;
             background-color: #0d121f;
         }
         .border-inner {
             border: 1px dashed rgba(255, 255, 255, 0.2);
-            padding: 40px;
-            height: 100%;
+            padding: 30px 35px;
             box-sizing: border-box;
             text-align: center;
             position: relative;
@@ -38,45 +36,45 @@
             letter-spacing: 4px;
             color: #6366f1;
             text-transform: uppercase;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
         .brand-sub {
             font-size: 11px;
             letter-spacing: 2px;
             color: #94a3b8;
             text-transform: uppercase;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         .title {
-            font-size: 32px;
+            font-size: 30px;
             font-weight: bold;
             color: #ffffff;
             text-transform: uppercase;
             letter-spacing: 3px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         .certifies {
-            font-size: 13px;
+            font-size: 12px;
             color: #94a3b8;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         .student-name {
-            font-size: 30px;
+            font-size: 28px;
             font-weight: bold;
             color: #38bdf8;
             border-bottom: 2px solid rgba(99, 102, 241, 0.4);
             display: inline-block;
-            padding-bottom: 5px;
-            margin-bottom: 25px;
+            padding-bottom: 4px;
+            margin-bottom: 20px;
         }
         .description {
-            font-size: 14px;
-            line-height: 1.8;
+            font-size: 13px;
+            line-height: 1.7;
             color: #cbd5e1;
-            max-width: 700px;
-            margin: 0 auto 35px auto;
+            max-width: 720px;
+            margin: 0 auto 25px auto;
         }
         .course-title {
             color: #ffffff;
@@ -84,7 +82,7 @@
         }
         .footer-table {
             width: 100%;
-            margin-top: 30px;
+            margin-top: 25px;
         }
         .footer-table td {
             text-align: center;
@@ -93,13 +91,13 @@
             color: #94a3b8;
         }
         .signature-line {
-            width: 200px;
+            width: 190px;
             border-top: 1px solid #475569;
-            margin: 0 auto 8px auto;
+            margin: 0 auto 6px auto;
         }
         .validation-code {
             position: absolute;
-            bottom: 20px;
+            bottom: 15px;
             right: 25px;
             font-size: 10px;
             color: #64748b;

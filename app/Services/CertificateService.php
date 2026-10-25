@@ -43,6 +43,7 @@ class CertificateService
     {
         $existing = Certificate::where('user_id', $user->id)
             ->where('course_id', $course->id)
+            ->where('company_id', $user->company_id)
             ->first();
 
         if ($existing) {
@@ -56,13 +57,68 @@ class CertificateService
         // Calculate total workload in minutes from all lessons of the course
         $totalMinutes = (int) $course->lessons()->sum('duration_minutes');
 
-        return Certificate::create([
-            'company_id' => $user->company_id,
-            'user_id' => $user->id,
-            'course_id' => $course->id,
-            'total_hours_minutes' => $totalMinutes,
-            'issued_at' => now(),
-        ]);
+        try {
+            return Certificate::create([
+                'company_id' => $user->company_id,
+                'user_id' => $user->id,
+                'course_id' => $course->id,
+                'total_hours_minutes' => $totalMinutes,
+                'issued_at' => now(),
+            ]);
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            return $this->resolveConcurrentCertificate($user, $course, $e);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($this->isUniqueConstraintViolation($e)) {
+                return $this->resolveConcurrentCertificate($user, $course, $e);
+            }
+
+            // Falhas de banco não relacionadas a unicidade nunca são mascaradas
+            throw $e;
+        }
+    }
+
+    /**
+     * Retrieve the existing certificate in case of verified concurrent collision.
+     */
+    protected function resolveConcurrentCertificate(User $user, Course $course, \Throwable $originalException): Certificate
+    {
+        $existing = Certificate::where('user_id', $user->id)
+            ->where('course_id', $course->id)
+            ->where('company_id', $user->company_id)
+            ->first();
+
+        if ($existing) {
+            return $existing;
+        }
+
+        throw $originalException;
+    }
+
+    /**
+     * Determine if a QueryException represents a unique constraint violation across database drivers.
+     */
+    protected function isUniqueConstraintViolation(\Illuminate\Database\QueryException $e): bool
+    {
+        $code = (string) $e->getCode();
+        $message = $e->getMessage();
+        $driverCode = $e->errorInfo[1] ?? null;
+
+        // MySQL / MariaDB (driver code 1062)
+        if ($driverCode === 1062 || str_contains($message, 'Duplicate entry')) {
+            return true;
+        }
+
+        // SQLite (driver code 19 / 2067 ou mensagem 'UNIQUE constraint failed')
+        if ($driverCode === 19 || $driverCode === 2067 || str_contains($message, 'UNIQUE constraint failed')) {
+            return true;
+        }
+
+        // PostgreSQL (SQLSTATE 23505)
+        if ($code === '23505' || str_contains($message, 'unique constraint')) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

@@ -229,6 +229,19 @@ class LessonPlayer extends Component
     }
 
     /**
+     * Check if current student is eligible for certificate emission.
+     */
+    public function isEligibleForCertificate(): bool
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return false;
+        }
+
+        return app(\App\Services\CertificateService::class)->isEligible($user, $this->course);
+    }
+
+    /**
      * Render the lesson player view.
      */
     public function render(): View

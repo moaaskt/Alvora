@@ -36,7 +36,11 @@ class CertificateController extends Controller
     {
         $certificate = Certificate::withoutGlobalScopes()
             ->where('validation_code', $code)
-            ->with(['user', 'course', 'company'])
+            ->with([
+                'user',
+                'company',
+                'course' => fn ($query) => $query->withoutGlobalScopes(),
+            ])
             ->first();
 
         return view('certificates.verify', [

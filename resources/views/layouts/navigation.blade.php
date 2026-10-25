@@ -4,18 +4,14 @@
             <!-- Left Side: Brand + Nav Links by Role (D-14) -->
             <div class="flex items-center space-x-8">
                 <!-- Brand -->
-                <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 group">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 p-[2px] shadow-md shadow-indigo-500/20">
-                        <div class="w-full h-full bg-[#090D16] rounded-[9px] flex items-center justify-center">
-                            <span class="font-extrabold text-lg text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">A</span>
-                        </div>
-                    </div>
-                    <div class="flex flex-col">
-                        <span class="text-lg font-bold tracking-tight text-white group-hover:text-indigo-300 transition-colors">ALVORA</span>
+                <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 group py-1">
+                    <img src="{{ asset('images/logo-symbol.png') }}" alt="ALVORA" class="h-8 w-auto shrink-0 transition-transform duration-200 group-hover:scale-105">
+                    <div class="flex flex-col justify-center">
+                        <span class="text-lg font-bold tracking-tight text-white group-hover:text-indigo-300 transition-colors leading-none">ALVORA</span>
                         @if(auth()->user()->company)
-                            <span class="text-[10px] text-slate-400 font-medium -mt-1 truncate max-w-[140px]">{{ auth()->user()->company->name }}</span>
+                            <span class="text-[10px] text-slate-400 font-medium mt-0.5 truncate max-w-[140px]">{{ auth()->user()->company->name }}</span>
                         @else
-                            <span class="text-[10px] uppercase tracking-widest text-emerald-400 font-semibold -mt-1">Super Admin</span>
+                            <span class="text-[10px] uppercase tracking-widest text-emerald-400 font-semibold mt-0.5">Super Admin</span>
                         @endif
                     </div>
                 </a>
