@@ -24,6 +24,7 @@ class Certificate extends Model
         'uuid',
         'validation_code',
         'total_hours_minutes',
+        'snapshot',
         'issued_at',
     ];
 
@@ -36,6 +37,7 @@ class Certificate extends Model
     {
         return [
             'total_hours_minutes' => 'integer',
+            'snapshot' => 'array',
             'issued_at' => 'datetime',
         ];
     }
@@ -101,12 +103,79 @@ class Certificate extends Model
     }
 
     /**
+     * Check if certificate has an original immutable snapshot captured at issuance.
+     */
+    public function hasOriginalSnapshot(): bool
+    {
+        return is_array($this->snapshot) && ($this->snapshot['mode'] ?? null) === 'original';
+    }
+
+    /**
+     * Check if certificate has a snapshot retroactively reconstructed.
+     */
+    public function isReconstructed(): bool
+    {
+        return is_array($this->snapshot) && ($this->snapshot['mode'] ?? null) === 'reconstructed';
+    }
+
+    /**
+     * Check if certificate is a legacy record without snapshot.
+     */
+    public function isLegacyWithoutSnapshot(): bool
+    {
+        return empty($this->snapshot);
+    }
+
+    /**
+     * Get effective student name from snapshot or current user fallback.
+     */
+    public function getStudentNameAttribute(): string
+    {
+        return $this->snapshot['student_name']
+            ?? $this->user?->name
+            ?? 'Colaborador';
+    }
+
+    /**
+     * Get effective course title from snapshot or current course fallback.
+     */
+    public function getCourseTitleAttribute(): string
+    {
+        return $this->snapshot['course_title']
+            ?? $this->course?->title
+            ?? 'Curso Concluído';
+    }
+
+    /**
+     * Get effective company name from snapshot or current company fallback.
+     */
+    public function getCompanyNameAttribute(): string
+    {
+        return $this->snapshot['company_name']
+            ?? $this->company?->name
+            ?? 'Empresa Cliente';
+    }
+
+    /**
+     * Get effective workload in minutes from snapshot or total_hours_minutes column.
+     */
+    public function getEffectiveWorkloadMinutesAttribute(): int
+    {
+        if (isset($this->snapshot['workload_minutes'])) {
+            return (int) $this->snapshot['workload_minutes'];
+        }
+
+        return (int) $this->total_hours_minutes;
+    }
+
+    /**
      * Formatted course workload string.
      */
     public function formattedWorkload(): string
     {
-        $hours = floor($this->total_hours_minutes / 60);
-        $minutes = $this->total_hours_minutes % 60;
+        $minutesTotal = $this->effective_workload_minutes;
+        $hours = floor($minutesTotal / 60);
+        $minutes = $minutesTotal % 60;
 
         if ($hours > 0 && $minutes > 0) {
             return "{$hours}h {$minutes}min";

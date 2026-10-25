@@ -41,6 +41,12 @@ class Course extends Model
                 $course->slug = static::generateUniqueSlug($baseSlug, $course->company_id);
             }
         });
+
+        static::deleting(function (Course $course) {
+            if ($course->certificates()->exists()) {
+                throw new \DomainException("Não é possível excluir o curso '{$course->title}' pois ele possui certificados emitidos.");
+            }
+        });
     }
 
     /**
