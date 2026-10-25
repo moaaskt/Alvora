@@ -129,31 +129,37 @@ class Certificate extends Model
     /**
      * Get effective student name from snapshot or current user fallback.
      */
-    public function getStudentNameAttribute(): string
+    public function getStudentNameAttribute(): ?string
     {
-        return $this->snapshot['student_name']
-            ?? $this->user?->name
-            ?? 'Colaborador';
+        if (is_array($this->snapshot) && array_key_exists('student_name', $this->snapshot)) {
+            return $this->snapshot['student_name'];
+        }
+
+        return $this->user?->name;
     }
 
     /**
      * Get effective course title from snapshot or current course fallback.
      */
-    public function getCourseTitleAttribute(): string
+    public function getCourseTitleAttribute(): ?string
     {
-        return $this->snapshot['course_title']
-            ?? $this->course?->title
-            ?? 'Curso Concluído';
+        if (is_array($this->snapshot) && array_key_exists('course_title', $this->snapshot)) {
+            return $this->snapshot['course_title'];
+        }
+
+        return $this->course?->title;
     }
 
     /**
      * Get effective company name from snapshot or current company fallback.
      */
-    public function getCompanyNameAttribute(): string
+    public function getCompanyNameAttribute(): ?string
     {
-        return $this->snapshot['company_name']
-            ?? $this->company?->name
-            ?? 'Empresa Cliente';
+        if (is_array($this->snapshot) && array_key_exists('company_name', $this->snapshot)) {
+            return $this->snapshot['company_name'];
+        }
+
+        return $this->company?->name;
     }
 
     /**
@@ -161,7 +167,7 @@ class Certificate extends Model
      */
     public function getEffectiveWorkloadMinutesAttribute(): int
     {
-        if (isset($this->snapshot['workload_minutes'])) {
+        if (is_array($this->snapshot) && isset($this->snapshot['workload_minutes'])) {
             return (int) $this->snapshot['workload_minutes'];
         }
 
