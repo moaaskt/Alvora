@@ -10,10 +10,11 @@ Alvora é uma plataforma de treinamento corporativo (B2B) onde empresas contrata
 
 ### Constraints
 
-- **Tech Stack**: Monolito Laravel 12 + Livewire 3 + Blade + MySQL 8 + Redis.
+- **Tech Stack**: Monolito Modular Laravel 13 (`laravel/framework v13.37.0`) + Livewire 4 (`livewire/livewire v4.4.7`) + Blade + Tailwind CSS 4 + PHP 8.3.
+- **Banco de Dados**: MySQL 8.0 em Produção (ACID, multi-tenant); SQLite para testes locais rápidos (`database/testing.sqlite`). Testes de concorrência, integridade referencial e restrições devem rodar também em MySQL.
 - **IA Fallback**: Groq API para chat de baixa latência; OpenRouter para análise/geração com fallback não hardcoded (`deepseek/deepseek-r1:free`, `meta-llama/llama-3.3-70b-instruct:free`, `qwen/qwen3-235b-a22b:free`).
 - **Idiomático**: Código e documentação orientados em PT-BR.
-- **Infraestrutura**: Orquestração com Docker e monitoramento de filas com Horizon.
+- **Infraestrutura**: Orquestração via Docker Compose com serviços previstos (`app`, `mysql`, `redis`, `horizon`, `reverb`). Horizon, Reverb e Octane **não são requisitos obrigatórios de runtime** para o funcionamento da aplicação nem do módulo de certificados.
 
 <!-- GSD:project-end -->
 
@@ -21,13 +22,19 @@ Alvora é uma plataforma de treinamento corporativo (B2B) onde empresas contrata
 
 ## Technology Stack
 
-- **Backend:** Monolito Modular em Laravel 12 / PHP 8.3 rodando em memória com Laravel Octane (FrankenPHP).
-- **Frontend & Reatividade:** Livewire 3/4 + Blade + Tailwind CSS 4 + Vite.
-- **Armazenamento:** MySQL 8.0 (ACID transacional, multi-tenant) + Redis 7 (cache, sessões, filas assíncronas).
-- **Supervisão e Tempo Real:** Laravel Horizon (workers em fila) + Laravel Reverb (WebSockets na porta 8080).
+- **Backend:** Monolito Modular em Laravel 13 (`laravel/framework: v13.37.0`) / PHP 8.3.
+- **Frontend & Reatividade:** Livewire 4 (`livewire/livewire: v4.4.7`) + Blade + Tailwind CSS 4 (`@tailwindcss/vite: 4.3.3`, `tailwindcss: 4.3.3`) + Vite 8 (`vite: 8.3.4`).
+- **Armazenamento & Persistência:**
+  - **Produção:** MySQL 8.0 (ACID transacional, isolamento lógico multi-tenant).
+  - **Testes Locais:** SQLite (`database/testing.sqlite`).
+  - **Validação de Concorrência:** Testes de concorrência, restrições e comportamento específico de banco devem executar também em MySQL (via container local ou CI); não presumir que testes SQLite comprovam o comportamento concorrente em MySQL.
+- **Cache, Sessões e Filas:** Driver de banco (`database`) / cache em memória localmente; Redis 7 configurado no Docker Compose para ambientes produtivos.
+- **Infraestrutura Operacional:**
+  - Emissão e download de certificados operam de forma síncrona sob demanda via Dompdf (`barryvdh/laravel-dompdf v3.1.2`, `dompdf/dompdf v3.1.6`).
+  - Horizon, Reverb e Octane constam no Docker Compose como alvo de infraestrutura assíncrona/tempo real, mas **não são dependências obrigatórias instaladas** no runtime atual.
 - **Inteligência Artificial:** Dual-Engine: Groq API (`llama-3.3-70b-versatile` sub-1.5s chat) + OpenRouter com fallback dinâmico em 3 tiers (`deepseek-r1` ➔ `llama-3.3-70b` ➔ `qwen3`).
-- **Faturamento & Documentos:** Mercado Pago API v1 (Checkout Pro e Preapprovals com webhooks HMAC-SHA256) + DomPDF (certificados A4).
-- **Orquestração:** Docker Compose com 5 serviços integrados (`app`, `mysql`, `redis`, `horizon`, `reverb`).
+- **Faturamento & Documentos:** Mercado Pago API v1 (Checkout Pro e Preapprovals com webhooks HMAC-SHA256) + DomPDF (certificados A4 sob demanda).
+- **Orquestração:** Docker Compose com serviços previstos (`app`, `mysql`, `redis`, `horizon`, `reverb`).
 
 <!-- GSD:stack-end -->
 
@@ -39,7 +46,7 @@ Alvora é uma plataforma de treinamento corporativo (B2B) onde empresas contrata
 - **Multi-Tenancy:** Todo modelo pertencente a empresas deve usar o trait `BelongsToTenant` (com `TenantScope` e injeção automática de `company_id`).
 - **Autorização (RBAC):** Uso do enum `UserRole` (`admin_alvora`, `company_admin`, `instructor`, `student`) com middleware `role:`.
 - **Assinatura Corporativa:** Rotas protegidas por `subscription.active` com esteira de 5 dias de carência.
-- **Tarefas de IA:** Processadas em background via Horizon ou com feedback visual de carregamento (`wire:loading`).
+- **Tarefas de IA:** Processadas em background ou acionadas com feedback visual de carregamento (`wire:loading`).
 - **Webhooks Seguros:** Validação criptográfica do cabeçalho `x-signature` via HMAC-SHA256 antes de qualquer processamento.
 
 <!-- GSD:conventions-end -->
@@ -51,8 +58,15 @@ Alvora é uma plataforma de treinamento corporativo (B2B) onde empresas contrata
 - **Padrão:** Monolito Modular Laravel com domínios delimitados (`Admin`, `Company`, `Instructor`, `Student`, `AI`, `Billing`).
 - **Multi-Tenancy:** Single-database com isolamento lógico via `company_id` e bypass exclusivo para Super Admin (`admin_alvora`).
 - **Motor Anti-Evasão:** Cálculo contínuo do Score (0–100) ponderando 4 fatores: Inatividade (35%), Estagnação (25%), Quizzes (20%) e Desvio de Pares (20%), persistido em `risk_scores` com breakdown JSON.
-- **Gatilho de Intervenção:** Score crítico (≥ 70) dispara alerta WebSocket via Reverb para a Sala de Situação e mensagem personalizada ao colaborador via `EvasionInterventionService`.
-- **Certificação:** Emissão condicionada a 100% de conclusão de aulas com código único `ALV-2026-XXXX` e validação pública em `/validar-certificado/{code}`.
+- **Gatilho de Intervenção:** Score crítico (≥ 70) dispara alerta para a Sala de Situação e mensagem personalizada ao colaborador via `EvasionInterventionService`.
+- **Módulo de Certificados (Diretrizes Aprovadas):**
+  - **Estabilização prévia:** Estabilizar o fluxo existente (correção de página do PDF, tratamento cross-tenant em validação, concorrência) antes de construir o editor visual.
+  - **Preservação de rotas e códigos:** Manter `student.certificate`, `certificates.verify`, UUID e formato de código único `ALV-YYYY-XXXXXX`.
+  - **Ponto único de renderização:** `CertificateService::generatePdf()` despacha para o renderizador legado (quando `template_version_id` for nulo) ou para o renderizador versionado (quando vinculado a uma versão baseada em schema JSON).
+  - **Geração sob demanda síncrona:** PDFs gerados no momento do download sem exigência de armazenamento permanente de binários; carregamento remoto do Dompdf mantido desativado (`enable_remote = false`).
+  - **Snapshots históricos:** Certificados utilizam snapshots dos dados de emissão. Certificados antigos migrados a partir de dados atuais devem ser identificados explicitamente como reconstruídos, sem alegar precisão histórica não comprovada.
+  - **Fonte da verdade do editor:** Schema JSON validado no servidor; prévia gerada pelo mesmo renderizador de servidor utilizado no PDF final.
+  - **Decisões de negócio pendentes:** Questões como fluxo de reemissão, regras de exclusão/retenção, escopo dos templates e mascaramento LGPD de dados públicos requerem aprovação e não podem ser inventadas pelo agente.
 
 <!-- GSD:architecture-end -->
 
