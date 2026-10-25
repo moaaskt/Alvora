@@ -41,6 +41,12 @@ class CourseList extends Component
     public function deleteCourse(int $courseId): void
     {
         $course = Course::findOrFail($courseId);
+
+        if ($course->certificates()->exists()) {
+            $this->dispatch('toast', message: "Não é possível excluir o curso '{$course->title}' pois ele possui certificados emitidos.", type: 'error');
+            return;
+        }
+
         $title = $course->title;
         $course->delete();
 

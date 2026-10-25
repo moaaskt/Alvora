@@ -35,20 +35,37 @@
 
             @if ($certificate)
                 <div class="mt-8 space-y-4 pt-6 border-t border-white/5">
+                    @if ($certificate->hasOriginalSnapshot())
+                        <div class="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-500/20 px-3.5 py-2.5 rounded-xl">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                            <span>Registro Histórico Original: Dados imutáveis preservados desde a emissão.</span>
+                        </div>
+                    @elseif ($certificate->isReconstructed())
+                        <div class="flex items-center gap-2 text-xs text-blue-400 bg-blue-950/30 border border-blue-500/20 px-3.5 py-2.5 rounded-xl">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                            <span>Registro Histórico Reconstruído: Snapshot recomposto retroativamente.</span>
+                        </div>
+                    @else
+                        <div class="flex items-center gap-2 text-xs text-amber-300 bg-amber-950/30 border border-amber-500/20 px-3.5 py-2.5 rounded-xl">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Registro Histórico Legado: Documento emitido no formato anterior (dados cadastrais vigentes).</span>
+                        </div>
+                    @endif
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                         <div class="p-4 rounded-xl bg-gray-950/60 border border-white/5">
                             <span class="text-gray-500 uppercase tracking-wider block font-semibold">Colaborador / Aluno</span>
-                            <span class="text-base font-bold text-white mt-1 block">{{ $certificate->user?->name ?? 'Colaborador' }}</span>
+                            <span class="text-base font-bold text-white mt-1 block">{{ $certificate->student_name }}</span>
                         </div>
 
                         <div class="p-4 rounded-xl bg-gray-950/60 border border-white/5">
                             <span class="text-gray-500 uppercase tracking-wider block font-semibold">Empresa Contratante</span>
-                            <span class="text-base font-bold text-white mt-1 block">{{ $certificate->company?->name ?? 'Empresa Cliente' }}</span>
+                            <span class="text-base font-bold text-white mt-1 block">{{ $certificate->company_name }}</span>
                         </div>
 
                         <div class="p-4 rounded-xl bg-gray-950/60 border border-white/5 sm:col-span-2">
                             <span class="text-gray-500 uppercase tracking-wider block font-semibold">Curso Concluído</span>
-                            <span class="text-base font-bold text-indigo-400 mt-1 block">{{ $certificate->course?->title ?? 'Curso Concluído' }}</span>
+                            <span class="text-base font-bold text-indigo-400 mt-1 block">{{ $certificate->course_title }}</span>
                         </div>
 
                         <div class="p-4 rounded-xl bg-gray-950/60 border border-white/5">

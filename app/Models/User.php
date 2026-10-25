@@ -53,6 +53,20 @@ class User extends Authenticatable
     }
 
     /**
+     * Boot model events.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::deleting(function (User $user) {
+            if ($user->certificates()->exists()) {
+                throw new \DomainException("Não é possível excluir o usuário '{$user->name}' pois ele possui certificados emitidos.");
+            }
+        });
+    }
+
+    /**
      * Get the company that owns the user (D-02: 1 user belongs strictly to 1 company).
      */
     public function company(): BelongsTo

@@ -16,6 +16,7 @@ class CertificateConcurrencyTest extends TestCase
     protected ?int $companyId = null;
     protected ?int $studentId = null;
     protected ?int $courseId = null;
+    protected ?string $barrierDir = null;
 
     /**
      * Valida a integridade transacional contra condições de corrida reais com múltiplos processos paralelos.
@@ -69,38 +70,112 @@ class CertificateConcurrencyTest extends TestCase
             'completed_at' => now(),
         ]);
 
-        // Script independente executado em processos paralelos do sistema operacional
+        // Diretório da barreira de sincronização entre processos
+        $this->barrierDir = storage_path('framework/testing/barrier_' . uniqid());
+        if (!is_dir($this->barrierDir)) {
+            mkdir($this->barrierDir, 0777, true);
+        }
+
         $basePath = addslashes(base_path());
-        $script = sprintf(
-            'require "%s/vendor/autoload.php"; ' .
-            '$app = require_once "%s/bootstrap/app.php"; ' .
-            '$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap(); ' .
-            '$user = App\Models\User::find(%d); ' .
-            '$course = App\Models\Course::find(%d); ' .
-            '$cert = app(App\Services\CertificateService::class)->getOrCreateCertificate($user, $course); ' .
-            'echo json_encode(["status" => "ok", "certificate_id" => $cert->id, "validation_code" => $cert->validation_code]);',
-            $basePath,
-            $basePath,
-            $student->id,
-            $course->id
-        );
+        $startSignalPath = addslashes($this->barrierDir . '/start.signal');
 
         $numProcesses = 5;
         $processes = [];
         $pipes = [];
 
-        // Dispara todos os 5 processos simultaneamente
+        $dbConfig = DB::connection()->getConfig();
+        $dbDriver = $dbConfig['driver'] ?? 'mysql';
+        $dbHost = $dbConfig['host'] ?? '127.0.0.1';
+        $dbPort = (string) ($dbConfig['port'] ?? 3306);
+        $dbDatabase = $dbConfig['database'] ?? 'alvora_testing';
+        $dbUsername = $dbConfig['username'] ?? 'alvora';
+        $dbPassword = $dbConfig['password'] ?? 'secret';
+
+        $envSetup = sprintf(
+            'putenv("DB_CONNECTION=%s"); $_ENV["DB_CONNECTION"]="%s"; ' .
+            'putenv("DB_HOST=%s"); $_ENV["DB_HOST"]="%s"; ' .
+            'putenv("DB_PORT=%s"); $_ENV["DB_PORT"]="%s"; ' .
+            'putenv("DB_DATABASE=%s"); $_ENV["DB_DATABASE"]="%s"; ' .
+            'putenv("DB_USERNAME=%s"); $_ENV["DB_USERNAME"]="%s"; ' .
+            'putenv("DB_PASSWORD=%s"); $_ENV["DB_PASSWORD"]="%s"; ',
+            $dbDriver, $dbDriver,
+            $dbHost, $dbHost,
+            $dbPort, $dbPort,
+            $dbDatabase, $dbDatabase,
+            $dbUsername, $dbUsername,
+            $dbPassword, $dbPassword
+        );
+
+        $procEnv = [];
+        foreach (array_merge($_SERVER, $_ENV) as $k => $v) {
+            if (is_scalar($v)) {
+                $procEnv[(string) $k] = (string) $v;
+            }
+        }
+        $procEnv['APP_ENV'] = 'testing';
+        $procEnv['DB_CONNECTION'] = $dbDriver;
+        $procEnv['DB_HOST'] = $dbHost;
+        $procEnv['DB_PORT'] = $dbPort;
+        $procEnv['DB_DATABASE'] = $dbDatabase;
+        $procEnv['DB_USERNAME'] = $dbUsername;
+        $procEnv['DB_PASSWORD'] = $dbPassword;
+
+        // Inicializa os 5 subprocessos independentes com barreira de largada sincronizada
         for ($i = 0; $i < $numProcesses; $i++) {
+            $readySignalPath = addslashes($this->barrierDir . "/ready_{$i}.signal");
+
+            // O subprocesso:
+            // 1. Inicializa o framework e conexão com a mesma base MySQL
+            // 2. Pré-carrega instâncias (aquecendo cache/classes)
+            // 3. Sinaliza que está pronto criando ready_{i}.signal
+            // 4. Aguarda em loop rápido até a criação de start.signal (coordenação de largada)
+            // 5. Executa getOrCreateCertificate simultaneamente com os demais processos
+            $script = sprintf(
+                '%s ' .
+                'require "%s/vendor/autoload.php"; ' .
+                '$app = require_once "%s/bootstrap/app.php"; ' .
+                '$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap(); ' .
+                '$user = App\Models\User::find(%d); ' .
+                '$course = App\Models\Course::find(%d); ' .
+                'touch("%s"); ' .
+                'while (!file_exists("%s")) { usleep(200); } ' .
+                '$cert = app(App\Services\CertificateService::class)->getOrCreateCertificate($user, $course); ' .
+                'echo json_encode(["status" => "ok", "certificate_id" => $cert->id, "validation_code" => $cert->validation_code]);',
+                $envSetup,
+                $basePath,
+                $basePath,
+                $student->id,
+                $course->id,
+                $readySignalPath,
+                $startSignalPath
+            );
+
             $descriptors = [
                 0 => ['pipe', 'r'],
                 1 => ['pipe', 'w'],
                 2 => ['pipe', 'w'],
             ];
-            $cmd = PHP_BINARY . ' -r ' . escapeshellarg($script);
-            $proc = proc_open($cmd, $descriptors, $pipes[$i]);
+            $cmd = [PHP_BINARY, '-r', $script];
+            $proc = proc_open($cmd, $descriptors, $pipes[$i], base_path(), $procEnv);
             $this->assertIsResource($proc, "Falha ao iniciar processo concorrente {$i}");
             $processes[$i] = $proc;
         }
+
+        // Aguarda todos os 5 processos sinalizarem prontidão (barreira montada)
+        $timeout = microtime(true) + 15;
+        while (count(glob($this->barrierDir . '/ready_*.signal')) < $numProcesses) {
+            if (microtime(true) > $timeout) {
+                $stderrLogs = [];
+                foreach ($pipes as $idx => $p) {
+                    $stderrLogs[$idx] = stream_get_contents($p[2]);
+                }
+                $this->fail("Subprocessos concorrentes não atingiram a barreira a tempo. STDERR: " . json_encode($stderrLogs));
+            }
+            usleep(1000);
+        }
+
+        // Dispara a largada simultânea para todos os processos concorrentes
+        touch($this->barrierDir . '/start.signal');
 
         $outputs = [];
         $errors = [];
@@ -149,6 +224,14 @@ class CertificateConcurrencyTest extends TestCase
 
     protected function tearDown(): void
     {
+        // Limpeza dos artefatos da barreira
+        if ($this->barrierDir && is_dir($this->barrierDir)) {
+            foreach (glob($this->barrierDir . '/*') as $file) {
+                @unlink($file);
+            }
+            @rmdir($this->barrierDir);
+        }
+
         if ($this->courseId) {
             DB::table('certificates')->where('course_id', $this->courseId)->delete();
             DB::table('enrollments')->where('course_id', $this->courseId)->delete();

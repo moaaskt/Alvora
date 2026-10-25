@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Certificado de Conclusão — {{ $certificate->user->name }}</title>
+    <title>Certificado de Conclusão — {{ $certificate->student_name }}</title>
     <style>
         @page {
             size: a4 landscape;
@@ -114,16 +114,16 @@
     <div class="border-outer">
         <div class="border-inner">
             <div class="brand-logo">ALVORA</div>
-            <div class="brand-sub">Treinamento Corporativo com Inteligência Artificial &bull; {{ $certificate->company->name ?? 'Empresa Cliente' }}</div>
+            <div class="brand-sub">Treinamento Corporativo com Inteligência Artificial &bull; {{ $certificate->company_name }}</div>
 
             <div class="title">Certificado de Capacitação</div>
             <div class="certifies">Certificamos com distinção que</div>
 
-            <div class="student-name">{{ $certificate->user->name }}</div>
+            <div class="student-name">{{ $certificate->student_name }}</div>
 
             <div class="description">
                 Concluiu com aproveitamento integral o curso corporativo
-                <span class="course-title">"{{ $certificate->course->title }}"</span>,
+                <span class="course-title">"{{ $certificate->course_title }}"</span>,
                 cumprindo satisfatoriamente toda a grade curricular e obtendo aprovação nas avaliações pedagógicas exigidas,
                 totalizando uma carga horária estimada de <strong class="badge">{{ $certificate->formattedWorkload() }}</strong>.
             </div>
@@ -142,7 +142,7 @@
                     </td>
                     <td>
                         <div class="signature-line"></div>
-                        <strong>{{ $certificate->company->name ?? 'Diretoria Corporativa' }}</strong><br>
+                        <strong>{{ $certificate->company_name }}</strong><br>
                         Recursos Humanos
                     </td>
                 </tr>

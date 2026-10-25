@@ -436,24 +436,31 @@ class CertificateTest extends TestCase
         // Para exercitar deterministicamente o bloco catch durante o Certificate::create(),
         // registramos um listener que insere o registro vencedor exatamente no momento do creating,
         // simulando outra transacao paralela que completou o INSERT entre o SELECT inicial e o INSERT desta thread.
-        $insertedWinner = null;
+        $insertedWinnerId = null;
         $hookTriggered = false;
 
-        $listener = function () use ($student, $course, $company, &$insertedWinner, &$hookTriggered) {
+        $listener = function () use ($student, $course, $company, &$insertedWinnerId, &$hookTriggered) {
             if (!$hookTriggered) {
                 $hookTriggered = true;
-                // Insere registro diretamente no banco sem re-disparar o mesmo hook
-                $insertedWinner = Certificate::withoutEvents(function () use ($student, $course, $company) {
-                    return Certificate::create([
-                        'uuid' => (string) \Illuminate\Support\Str::uuid(),
-                        'company_id' => $company->id,
-                        'user_id' => $student->id,
-                        'course_id' => $course->id,
-                        'validation_code' => 'ALV-2026-RACEWINNER',
-                        'total_hours_minutes' => 60,
-                        'issued_at' => now(),
-                    ]);
-                });
+                // Executa uma operacao SQL independente diretamente no banco,
+                // inserindo o registro vencedor milissegundos antes da instrucao INSERT do Eloquent
+                $uuid = (string) \Illuminate\Support\Str::uuid();
+                DB::table('certificates')->insert([
+                    'uuid' => $uuid,
+                    'company_id' => $company->id,
+                    'user_id' => $student->id,
+                    'course_id' => $course->id,
+                    'validation_code' => 'ALV-2026-RACEWINNER',
+                    'total_hours_minutes' => 60,
+                    'issued_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                $insertedWinnerId = DB::table('certificates')
+                    ->where('user_id', $student->id)
+                    ->where('course_id', $course->id)
+                    ->value('id');
             }
         };
 
@@ -469,8 +476,8 @@ class CertificateTest extends TestCase
             $certificate = $service->getOrCreateCertificate($student, $course);
 
             $this->assertTrue($hookTriggered, 'O hook de colisao deveria ter sido acionado durante o create.');
-            $this->assertNotNull($insertedWinner, 'O registro concorrente deveria ter sido persistido.');
-            $this->assertEquals($insertedWinner->id, $certificate->id, 'Deve retornar o registro vencedor recuperado no catch.');
+            $this->assertNotNull($insertedWinnerId, 'O registro concorrente deveria ter sido persistido.');
+            $this->assertEquals($insertedWinnerId, $certificate->id, 'Deve retornar o registro vencedor recuperado no catch.');
             $this->assertEquals('ALV-2026-RACEWINNER', $certificate->validation_code);
             $this->assertEquals(1, Certificate::where('user_id', $student->id)->where('course_id', $course->id)->count());
         } finally {
@@ -548,5 +555,523 @@ class CertificateTest extends TestCase
         // A 61ª requisicao no mesmo minuto deve ser bloqueada por rate limiting (HTTP 429)
         $response = $this->get(route('certificates.verify', $code));
         $response->assertStatus(429);
+    }
+
+    public function test_new_certificate_emission_captures_complete_original_snapshot(): void
+    {
+        $company = Company::create(['name' => 'TechCorp Treinamentos', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Prof. Carlos',
+            'email' => 'carlos@techcorp.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Juliana Mendes',
+            'email' => 'juliana@techcorp.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Engenharia de Prompt Corporativa',
+            'slug' => 'engenharia-de-prompt-corporativa',
+            'status' => 'published',
+        ]);
+
+        $module = Module::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'title' => 'Módulo 1',
+            'order' => 1,
+        ]);
+
+        Lesson::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'module_id' => $module->id,
+            'title' => 'Aula Fundamentos',
+            'duration_minutes' => 90,
+            'order' => 1,
+        ]);
+
+        Enrollment::create([
+            'company_id' => $company->id,
+            'user_id' => $student->id,
+            'course_id' => $course->id,
+            'status' => 'completed',
+            'progress_percent' => 100,
+            'completed_at' => now(),
+        ]);
+
+        /** @var \App\Services\CertificateService $service */
+        $service = app(\App\Services\CertificateService::class);
+        $certificate = $service->getOrCreateCertificate($student, $course);
+
+        $this->assertNotNull($certificate->snapshot);
+        $this->assertTrue($certificate->hasOriginalSnapshot());
+        $this->assertFalse($certificate->isLegacyWithoutSnapshot());
+        $this->assertFalse($certificate->isReconstructed());
+
+        $this->assertEquals('original', $certificate->snapshot['mode']);
+        $this->assertEquals('Juliana Mendes', $certificate->snapshot['student_name']);
+        $this->assertEquals('Engenharia de Prompt Corporativa', $certificate->snapshot['course_title']);
+        $this->assertEquals('TechCorp Treinamentos', $certificate->snapshot['company_name']);
+        $this->assertEquals(90, $certificate->snapshot['workload_minutes']);
+        $this->assertNotEmpty($certificate->snapshot['captured_at']);
+
+        // Accessors devem retornar exatamente os valores do snapshot
+        $this->assertEquals('Juliana Mendes', $certificate->student_name);
+        $this->assertEquals('Engenharia de Prompt Corporativa', $certificate->course_title);
+        $this->assertEquals('TechCorp Treinamentos', $certificate->company_name);
+        $this->assertEquals('1h 30min', $certificate->formattedWorkload());
+    }
+
+    public function test_subsequent_changes_to_user_course_and_company_do_not_mutate_snapshot_or_effective_attributes(): void
+    {
+        $company = Company::create(['name' => 'Empresa Original S/A', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Original',
+            'email' => 'original.inst@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Aluno Nome Antigo',
+            'email' => 'aluno.antigo@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Curso de Liderança 2026',
+            'slug' => 'curso-de-lideranca-2026',
+            'status' => 'published',
+        ]);
+
+        $module = Module::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'title' => 'Módulo 1',
+            'order' => 1,
+        ]);
+
+        Lesson::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'module_id' => $module->id,
+            'title' => 'Aula 1',
+            'duration_minutes' => 60,
+            'order' => 1,
+        ]);
+
+        Enrollment::create([
+            'company_id' => $company->id,
+            'user_id' => $student->id,
+            'course_id' => $course->id,
+            'status' => 'completed',
+            'progress_percent' => 100,
+            'completed_at' => now(),
+        ]);
+
+        /** @var \App\Services\CertificateService $service */
+        $service = app(\App\Services\CertificateService::class);
+        $certificate = $service->getOrCreateCertificate($student, $course);
+
+        // Modifica registros vigentes posteriores
+        $student->update(['name' => 'Aluno Nome Completamente Novo']);
+        $course->update(['title' => 'Curso Renomeado para Versao 2.0']);
+        $company->update(['name' => 'Empresa Fusao Holding Nova']);
+
+        // Recarrega o certificado do banco
+        $certificate = $certificate->fresh();
+
+        // O snapshot e os atributos efetivos NÃO devem ser alterados
+        $this->assertEquals('Aluno Nome Antigo', $certificate->snapshot['student_name']);
+        $this->assertEquals('Curso de Liderança 2026', $certificate->snapshot['course_title']);
+        $this->assertEquals('Empresa Original S/A', $certificate->snapshot['company_name']);
+
+        $this->assertEquals('Aluno Nome Antigo', $certificate->student_name);
+        $this->assertEquals('Curso de Liderança 2026', $certificate->course_title);
+        $this->assertEquals('Empresa Original S/A', $certificate->company_name);
+    }
+
+    public function test_pdf_and_public_verification_render_historical_snapshot_values(): void
+    {
+        $company = Company::create(['name' => 'Inovacao Corp', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Prof. Paulo',
+            'email' => 'paulo@inovacao.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Beatriz Lima',
+            'email' => 'beatriz@inovacao.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Gestão de Projetos Ágeis',
+            'slug' => 'gestao-de-projetos-ageis',
+            'status' => 'published',
+        ]);
+
+        $module = Module::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'title' => 'Módulo 1',
+            'order' => 1,
+        ]);
+
+        Lesson::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'module_id' => $module->id,
+            'title' => 'Scrum Master',
+            'duration_minutes' => 120,
+            'order' => 1,
+        ]);
+
+        Enrollment::create([
+            'company_id' => $company->id,
+            'user_id' => $student->id,
+            'course_id' => $course->id,
+            'status' => 'completed',
+            'progress_percent' => 100,
+            'completed_at' => now(),
+        ]);
+
+        /** @var \App\Services\CertificateService $service */
+        $service = app(\App\Services\CertificateService::class);
+        $certificate = $service->getOrCreateCertificate($student, $course);
+
+        // Modifica os registros cadastrais atuais
+        $student->update(['name' => 'Beatriz Lima Silva Casada']);
+        $course->update(['title' => 'Design Sprint e Scrum']);
+        $company->update(['name' => 'Inovacao Global Tech']);
+
+        // 1. Validação no PDF
+        $pdf = $service->generatePdf($certificate);
+        $renderedHtml = view('certificates.template', ['certificate' => $certificate])->render();
+
+        $this->assertStringContainsString('Beatriz Lima', $renderedHtml);
+        $this->assertStringNotContainsString('Beatriz Lima Silva Casada', $renderedHtml);
+
+        $this->assertStringContainsString('Gestão de Projetos Ágeis', $renderedHtml);
+        $this->assertStringNotContainsString('Design Sprint e Scrum', $renderedHtml);
+
+        $this->assertStringContainsString('Inovacao Corp', $renderedHtml);
+        $this->assertStringNotContainsString('Inovacao Global Tech', $renderedHtml);
+
+        // 2. Validação na página pública
+        $response = $this->get(route('certificates.verify', $certificate->validation_code));
+        $response->assertStatus(200);
+
+        $response->assertSee('Beatriz Lima');
+        $response->assertDontSee('Beatriz Lima Silva Casada');
+
+        $response->assertSee('Gestão de Projetos Ágeis');
+        $response->assertDontSee('Design Sprint e Scrum');
+
+        $response->assertSee('Inovacao Corp');
+        $response->assertDontSee('Inovacao Global Tech');
+
+        $response->assertSee('Registro Histórico Original: Dados imutáveis preservados desde a emissão.');
+    }
+
+    public function test_legacy_certificates_without_snapshot_fallback_to_current_data_with_honest_notice(): void
+    {
+        $company = Company::create(['name' => 'Empresa Legado Ltda', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Legado',
+            'email' => 'legado.inst@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Colaborador Legado',
+            'email' => 'legado.colab@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Curso Emitido no Sistema Antigo',
+            'slug' => 'curso-emitido-no-sistema-antigo',
+            'status' => 'published',
+        ]);
+
+        // Cria certificado simulando emissão legada antes da Fase 1 (snapshot null)
+        $certificate = Certificate::create([
+            'company_id' => $company->id,
+            'user_id' => $student->id,
+            'course_id' => $course->id,
+            'validation_code' => 'ALV-2025-LEGACY99',
+            'total_hours_minutes' => 60,
+            'snapshot' => null,
+            'issued_at' => now()->subYear(),
+        ]);
+
+        $this->assertTrue($certificate->isLegacyWithoutSnapshot());
+        $this->assertFalse($certificate->hasOriginalSnapshot());
+        $this->assertFalse($certificate->isReconstructed());
+
+        // Deve retornar por fallback os valores cadastrais vigentes
+        $this->assertEquals('Colaborador Legado', $certificate->student_name);
+        $this->assertEquals('Curso Emitido no Sistema Antigo', $certificate->course_title);
+        $this->assertEquals('Empresa Legado Ltda', $certificate->company_name);
+
+        // Verificação pública deve exibir aviso honesto
+        $response = $this->get(route('certificates.verify', 'ALV-2025-LEGACY99'));
+        $response->assertStatus(200);
+        $response->assertSee('Registro Histórico Legado: Documento emitido no formato anterior (dados cadastrais vigentes).');
+        $response->assertDontSee('Registro Histórico Original: Dados imutáveis preservados desde a emissão.');
+
+        // Se o aluno mudar de nome, no legado reflete a mudança atual com transparência
+        $student->update(['name' => 'Colaborador Legado Atualizado']);
+        $certificate = $certificate->fresh();
+        $this->assertEquals('Colaborador Legado Atualizado', $certificate->student_name);
+    }
+
+    public function test_reconstructed_certificates_render_reconstructed_notice(): void
+    {
+        $company = Company::create(['name' => 'Empresa Recon S/A', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Recon',
+            'email' => 'recon.inst@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Aluno Recon',
+            'email' => 'recon.aluno@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Curso para Reconstrucao',
+            'slug' => 'curso-para-reconstrucao',
+            'status' => 'published',
+        ]);
+
+        $certificate = Certificate::create([
+            'company_id' => $company->id,
+            'user_id' => $student->id,
+            'course_id' => $course->id,
+            'validation_code' => 'ALV-2026-RECON01',
+            'total_hours_minutes' => 90,
+            'snapshot' => [
+                'mode' => 'reconstructed',
+                'student_name' => 'Aluno Nome Histórico Reconstruído',
+                'course_title' => 'Curso Histórico Reconstruído',
+                'company_name' => 'Empresa Histórica Reconstruída',
+                'workload_minutes' => 90,
+                'reconstructed_at' => now()->toIso8601String(),
+                'reason' => 'Recomposição administrativa de registro pré-migração',
+            ],
+            'issued_at' => now()->subMonths(6),
+        ]);
+
+        $this->assertTrue($certificate->isReconstructed());
+        $this->assertFalse($certificate->hasOriginalSnapshot());
+        $this->assertFalse($certificate->isLegacyWithoutSnapshot());
+
+        $this->assertEquals('Aluno Nome Histórico Reconstruído', $certificate->student_name);
+        $this->assertEquals('Curso Histórico Reconstruído', $certificate->course_title);
+        $this->assertEquals('Empresa Histórica Reconstruída', $certificate->company_name);
+
+        $response = $this->get(route('certificates.verify', 'ALV-2026-RECON01'));
+        $response->assertStatus(200);
+        $response->assertSee('Registro Histórico Reconstruído: Snapshot recomposto retroativamente.');
+    }
+
+    public function test_course_and_user_with_issued_certificates_cannot_be_deleted(): void
+    {
+        $company = Company::create(['name' => 'Empresa Integridade', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Integro',
+            'email' => 'integro.inst@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Aluno Protegido',
+            'email' => 'protegido.aluno@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Curso com Certificado Ativo',
+            'slug' => 'curso-com-certificado-ativo',
+            'status' => 'published',
+        ]);
+
+        Certificate::create([
+            'company_id' => $company->id,
+            'user_id' => $student->id,
+            'course_id' => $course->id,
+            'validation_code' => 'ALV-2026-NODELETE',
+            'total_hours_minutes' => 60,
+            'issued_at' => now(),
+        ]);
+
+        // 1. Tentar excluir o curso deve disparar DomainException e ser impedido
+        try {
+            $course->delete();
+            $this->fail('Deveria ter lançado DomainException ao tentar excluir curso com certificados.');
+        } catch (\DomainException $e) {
+            $this->assertStringContainsString('possui certificados emitidos', $e->getMessage());
+        }
+
+        $this->assertDatabaseHas('courses', ['id' => $course->id]);
+        $this->assertDatabaseHas('certificates', ['validation_code' => 'ALV-2026-NODELETE']);
+
+        // 2. Tentar excluir o aluno deve disparar DomainException e ser impedido
+        try {
+            $student->delete();
+            $this->fail('Deveria ter lançado DomainException ao tentar excluir aluno com certificados.');
+        } catch (\DomainException $e) {
+            $this->assertStringContainsString('possui certificados emitidos', $e->getMessage());
+        }
+
+        $this->assertDatabaseHas('users', ['id' => $student->id]);
+        $this->assertDatabaseHas('certificates', ['validation_code' => 'ALV-2026-NODELETE']);
+    }
+
+    public function test_course_list_component_prevents_deletion_of_course_with_certificates(): void
+    {
+        $company = Company::create(['name' => 'Empresa Componente', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Componente',
+            'email' => 'comp.inst@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Aluno Componente',
+            'email' => 'comp.aluno@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Curso Componente Protegido',
+            'slug' => 'curso-componente-protegido',
+            'status' => 'published',
+        ]);
+
+        Certificate::create([
+            'company_id' => $company->id,
+            'user_id' => $student->id,
+            'course_id' => $course->id,
+            'validation_code' => 'ALV-2026-COMPDEL',
+            'total_hours_minutes' => 60,
+            'issued_at' => now(),
+        ]);
+
+        $this->actingAs($instructor);
+
+        \Livewire\Livewire::test(\App\Livewire\Instructor\CourseList::class)
+            ->call('deleteCourse', $course->id)
+            ->assertDispatched('toast', message: "Não é possível excluir o curso '{$course->title}' pois ele possui certificados emitidos.", type: 'error');
+
+        $this->assertDatabaseHas('courses', ['id' => $course->id]);
+        $this->assertDatabaseHas('certificates', ['validation_code' => 'ALV-2026-COMPDEL']);
+    }
+
+    public function test_json_snapshot_persistence_and_integrity_in_database(): void
+    {
+        $company = Company::create(['name' => 'Empresa JSON Test', 'status' => 'active']);
+
+        $user = User::create([
+            'name' => 'Aluno JSON',
+            'email' => 'json@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $user->id,
+            'title' => 'Curso JSON Integrity',
+            'slug' => 'curso-json-integrity',
+            'status' => 'published',
+        ]);
+
+        $snapshotData = [
+            'mode' => 'original',
+            'student_name' => 'Aluno JSON Teste',
+            'course_title' => 'Curso JSON Integrity',
+            'company_name' => 'Empresa JSON Test',
+            'workload_minutes' => 180,
+            'captured_at' => '2026-10-25T19:30:00+00:00',
+        ];
+
+        $certificate = Certificate::create([
+            'company_id' => $company->id,
+            'user_id' => $user->id,
+            'course_id' => $course->id,
+            'validation_code' => 'ALV-2026-JSON01',
+            'total_hours_minutes' => 180,
+            'snapshot' => $snapshotData,
+            'issued_at' => now(),
+        ]);
+
+        // Lê diretamente via DB query bruta para comprovar persistência no formato JSON do banco
+        $rawRow = DB::table('certificates')->where('id', $certificate->id)->first();
+        $this->assertNotNull($rawRow->snapshot);
+
+        $decoded = json_decode($rawRow->snapshot, true);
+        $this->assertIsArray($decoded);
+        $this->assertEquals('original', $decoded['mode']);
+        $this->assertEquals('Aluno JSON Teste', $decoded['student_name']);
+        $this->assertEquals(180, $decoded['workload_minutes']);
     }
 }

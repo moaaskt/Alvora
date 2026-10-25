@@ -57,12 +57,22 @@ class CertificateService
         // Calculate total workload in minutes from all lessons of the course
         $totalMinutes = (int) $course->lessons()->sum('duration_minutes');
 
+        $snapshot = [
+            'mode' => 'original',
+            'student_name' => $user->name,
+            'course_title' => $course->title,
+            'company_name' => $course->company?->name ?? $user->company?->name ?? 'Empresa Cliente',
+            'workload_minutes' => $totalMinutes,
+            'captured_at' => now()->toIso8601String(),
+        ];
+
         try {
             return Certificate::create([
                 'company_id' => $user->company_id,
                 'user_id' => $user->id,
                 'course_id' => $course->id,
                 'total_hours_minutes' => $totalMinutes,
+                'snapshot' => $snapshot,
                 'issued_at' => now(),
             ]);
         } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {

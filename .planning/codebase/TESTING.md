@@ -73,19 +73,24 @@ Queue::assertPushed(CalculateEvasionRiskJob::class, fn ($job) => $job->userId ==
 
 ## 🚀 Como Executar os Testes
 
-### Execução via Docker (Ambiente Completo)
+### Ambientes de Banco de Dados nos Testes
+* **Testes Rápidos Locais (Host):** Utilizam `SQLite` em memória ou arquivo (`database/testing.sqlite` conforme `phpunit.xml`) para feedback ágil durante o desenvolvimento.
+* **Testes Críticos de Concorrência e Integridade:** Testes que validam condições de corrida (ex: emissões simultâneas de certificados), índices únicos sob concorrência e comportamento de chaves estrangeiras (`restrict`/`cascade`) **devem rodar também em MySQL 8** (via Docker Compose ou pipeline de CI).
+* **Atenção:** Nunca presumir que testes passando no SQLite comprovam ausência de concorrência no MySQL, visto que o SQLite serializa operações de escrita.
+
+### Execução via Docker (Ambiente Completo com MySQL)
 ```bash
 docker compose exec app php artisan test
 ```
 
-### Execução Direta no Host
+### Execução Direta no Host (SQLite)
 ```bash
 php artisan test
 ```
 
 ### Execução de Suíte Específica
 ```bash
-php artisan test --filter=EvasionRiskCalculationTest
+php artisan test --filter=CertificateTest
 ```
 
 ### Com Paralelismo e Verificação de Cobertura
