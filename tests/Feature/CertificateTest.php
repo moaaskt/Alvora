@@ -436,24 +436,31 @@ class CertificateTest extends TestCase
         // Para exercitar deterministicamente o bloco catch durante o Certificate::create(),
         // registramos um listener que insere o registro vencedor exatamente no momento do creating,
         // simulando outra transacao paralela que completou o INSERT entre o SELECT inicial e o INSERT desta thread.
-        $insertedWinner = null;
+        $insertedWinnerId = null;
         $hookTriggered = false;
 
-        $listener = function () use ($student, $course, $company, &$insertedWinner, &$hookTriggered) {
+        $listener = function () use ($student, $course, $company, &$insertedWinnerId, &$hookTriggered) {
             if (!$hookTriggered) {
                 $hookTriggered = true;
-                // Insere registro diretamente no banco sem re-disparar o mesmo hook
-                $insertedWinner = Certificate::withoutEvents(function () use ($student, $course, $company) {
-                    return Certificate::create([
-                        'uuid' => (string) \Illuminate\Support\Str::uuid(),
-                        'company_id' => $company->id,
-                        'user_id' => $student->id,
-                        'course_id' => $course->id,
-                        'validation_code' => 'ALV-2026-RACEWINNER',
-                        'total_hours_minutes' => 60,
-                        'issued_at' => now(),
-                    ]);
-                });
+                // Executa uma operacao SQL independente diretamente no banco,
+                // inserindo o registro vencedor milissegundos antes da instrucao INSERT do Eloquent
+                $uuid = (string) \Illuminate\Support\Str::uuid();
+                DB::table('certificates')->insert([
+                    'uuid' => $uuid,
+                    'company_id' => $company->id,
+                    'user_id' => $student->id,
+                    'course_id' => $course->id,
+                    'validation_code' => 'ALV-2026-RACEWINNER',
+                    'total_hours_minutes' => 60,
+                    'issued_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                $insertedWinnerId = DB::table('certificates')
+                    ->where('user_id', $student->id)
+                    ->where('course_id', $course->id)
+                    ->value('id');
             }
         };
 
@@ -469,8 +476,8 @@ class CertificateTest extends TestCase
             $certificate = $service->getOrCreateCertificate($student, $course);
 
             $this->assertTrue($hookTriggered, 'O hook de colisao deveria ter sido acionado durante o create.');
-            $this->assertNotNull($insertedWinner, 'O registro concorrente deveria ter sido persistido.');
-            $this->assertEquals($insertedWinner->id, $certificate->id, 'Deve retornar o registro vencedor recuperado no catch.');
+            $this->assertNotNull($insertedWinnerId, 'O registro concorrente deveria ter sido persistido.');
+            $this->assertEquals($insertedWinnerId, $certificate->id, 'Deve retornar o registro vencedor recuperado no catch.');
             $this->assertEquals('ALV-2026-RACEWINNER', $certificate->validation_code);
             $this->assertEquals(1, Certificate::where('user_id', $student->id)->where('course_id', $course->id)->count());
         } finally {
