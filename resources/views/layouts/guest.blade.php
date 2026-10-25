@@ -9,6 +9,12 @@
     <title>{{ $title ?? 'ALVORA — Plataforma de Treinamento Corporativo B2B com IA' }}</title>
     <meta name="description" content="Reduza a evasão em treinamentos corporativos com o cálculo preditivo do Score de Risco de Evasão e intervenção ativa por inteligência artificial.">
 
+    <!-- Favicon & System Icons -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,12 +34,10 @@
                     <!-- Brand / Identidade -->
                     <div class="flex items-center space-x-3">
                         <a href="{{ url('/') }}" class="flex items-center space-x-3 group focus:outline-none focus:ring-2 focus:ring-blue-500/40 rounded-lg p-1">
-                            <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg tracking-tight shadow-sm shadow-blue-500/25 group-hover:bg-blue-700 transition-colors duration-200">
-                                A
-                            </div>
-                            <div class="flex flex-col">
-                                <span class="font-bold text-xl tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">ALVORA</span>
-                                <span class="text-[9px] uppercase tracking-[0.18em] text-slate-500 font-semibold -mt-1">Corporate EdTech</span>
+                            <img src="{{ asset('images/logo-symbol.png') }}" alt="ALVORA" class="h-8 w-auto shrink-0 transition-transform duration-200 group-hover:scale-105">
+                            <div class="flex flex-col justify-center">
+                                <span class="font-bold text-xl tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors leading-none">ALVORA</span>
+                                <span class="text-[9px] uppercase tracking-[0.18em] text-slate-500 font-semibold mt-0.5">Corporate EdTech</span>
                             </div>
                         </a>
                     </div>
@@ -100,15 +104,11 @@
                 <div class="flex items-center justify-between h-20">
                     <!-- Brand / Logo -->
                     <div class="flex items-center space-x-3">
-                        <a href="{{ url('/') }}" class="flex items-center space-x-3 group">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 p-[2px] shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-300">
-                                <div class="w-full h-full bg-[#090D16] rounded-[10px] flex items-center justify-center">
-                                    <span class="font-extrabold text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">A</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col">
-                                <span class="text-xl font-bold tracking-tight text-white group-hover:text-indigo-300 transition-colors">ALVORA</span>
-                                <span class="text-[10px] uppercase tracking-widest text-emerald-400 font-semibold -mt-1">IA Corporativa</span>
+                        <a href="{{ url('/') }}" class="flex items-center space-x-3 group py-1">
+                            <img src="{{ asset('images/logo-symbol.png') }}" alt="ALVORA" class="h-8 w-auto shrink-0 transition-transform duration-200 group-hover:scale-105">
+                            <div class="flex flex-col justify-center">
+                                <span class="text-xl font-bold tracking-tight text-white group-hover:text-indigo-300 transition-colors leading-none">ALVORA</span>
+                                <span class="text-[10px] uppercase tracking-widest text-emerald-400 font-semibold mt-0.5">IA Corporativa</span>
                             </div>
                         </a>
                     </div>
@@ -153,7 +153,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-10 mb-12">
                     <div class="space-y-4 md:col-span-5">
                         <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-base">A</div>
+                            <img src="{{ asset('images/logo-symbol.png') }}" alt="ALVORA" class="h-7 w-auto shrink-0">
                             <span class="font-bold text-xl text-slate-900 tracking-tight">ALVORA</span>
                         </div>
                         <p class="text-xs text-slate-500 leading-relaxed max-w-sm">
@@ -207,7 +207,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
                     <div class="space-y-4 md:col-span-1">
                         <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white">A</div>
+                            <img src="{{ asset('images/logo-symbol.png') }}" alt="ALVORA" class="h-7 w-auto shrink-0">
                             <span class="text-lg font-bold text-white tracking-wide">ALVORA</span>
                         </div>
                         <p class="text-xs text-slate-400 leading-relaxed">
