@@ -71,7 +71,9 @@ Route::get('/planos', function () {
 })->name('pricing');
 
 // Validação pública de autenticidade de certificados (sem login)
-Route::get('/validar-certificado/{code}', [CertificateController::class, 'verify'])->name('certificates.verify');
+Route::get('/validar-certificado/{code}', [CertificateController::class, 'verify'])
+    ->middleware('throttle:60,1')
+    ->name('certificates.verify');
 
 Route::middleware(['auth', 'subscription.active'])->group(function () {
     Route::get('/dashboard', function () {
