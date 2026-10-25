@@ -41,14 +41,24 @@
                 </div>
 
                 @if ($progressPercent >= 100)
-                    <a
-                        href="{{ route('student.certificate', $course->slug) }}"
-                        target="_blank"
-                        class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 transition shadow-lg shadow-emerald-500/20"
-                    >
-                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        Baixar Certificado 🎓
-                    </a>
+                    @if ($this->isEligibleForCertificate())
+                        <a
+                            href="{{ route('student.certificate', $course->slug) }}"
+                            target="_blank"
+                            class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 transition shadow-lg shadow-emerald-500/20"
+                        >
+                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            Baixar Certificado 🎓
+                        </a>
+                    @else
+                        <span
+                            title="Você precisa ser aprovado em todos os quizzes do curso para liberar o certificado"
+                            class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-amber-500/10 text-amber-300/80 border border-amber-500/30 cursor-not-allowed"
+                        >
+                            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                            Quizzes Pendentes 🎓
+                        </span>
+                    @endif
                 @endif
             </div>
         </div>
@@ -65,6 +75,34 @@
                     <span>{{ session('success') }}</span>
                 </div>
                 <button type="button" @click="$el.parentElement.remove()" class="text-emerald-400/60 hover:text-emerald-300">✕</button>
+            </div>
+        </div>
+    @endif
+
+    @if (session('warning'))
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs sm:text-sm flex items-center justify-between animate-fade-in">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>{{ session('warning') }}</span>
+                </div>
+                <button type="button" @click="$el.parentElement.remove()" class="text-amber-400/60 hover:text-amber-300">✕</button>
+            </div>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs sm:text-sm flex items-center justify-between animate-fade-in">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-rose-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{{ session('error') }}</span>
+                </div>
+                <button type="button" @click="$el.parentElement.remove()" class="text-rose-400/60 hover:text-rose-300">✕</button>
             </div>
         </div>
     @endif
