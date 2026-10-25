@@ -83,17 +83,55 @@ class CertificateConcurrencyTest extends TestCase
         $processes = [];
         $pipes = [];
 
+        $dbConfig = DB::connection()->getConfig();
+        $dbDriver = $dbConfig['driver'] ?? 'mysql';
+        $dbHost = $dbConfig['host'] ?? '127.0.0.1';
+        $dbPort = (string) ($dbConfig['port'] ?? 3306);
+        $dbDatabase = $dbConfig['database'] ?? 'alvora_testing';
+        $dbUsername = $dbConfig['username'] ?? 'alvora';
+        $dbPassword = $dbConfig['password'] ?? 'secret';
+
+        $envSetup = sprintf(
+            'putenv("DB_CONNECTION=%s"); $_ENV["DB_CONNECTION"]="%s"; ' .
+            'putenv("DB_HOST=%s"); $_ENV["DB_HOST"]="%s"; ' .
+            'putenv("DB_PORT=%s"); $_ENV["DB_PORT"]="%s"; ' .
+            'putenv("DB_DATABASE=%s"); $_ENV["DB_DATABASE"]="%s"; ' .
+            'putenv("DB_USERNAME=%s"); $_ENV["DB_USERNAME"]="%s"; ' .
+            'putenv("DB_PASSWORD=%s"); $_ENV["DB_PASSWORD"]="%s"; ',
+            $dbDriver, $dbDriver,
+            $dbHost, $dbHost,
+            $dbPort, $dbPort,
+            $dbDatabase, $dbDatabase,
+            $dbUsername, $dbUsername,
+            $dbPassword, $dbPassword
+        );
+
+        $procEnv = [];
+        foreach (array_merge($_SERVER, $_ENV) as $k => $v) {
+            if (is_scalar($v)) {
+                $procEnv[(string) $k] = (string) $v;
+            }
+        }
+        $procEnv['APP_ENV'] = 'testing';
+        $procEnv['DB_CONNECTION'] = $dbDriver;
+        $procEnv['DB_HOST'] = $dbHost;
+        $procEnv['DB_PORT'] = $dbPort;
+        $procEnv['DB_DATABASE'] = $dbDatabase;
+        $procEnv['DB_USERNAME'] = $dbUsername;
+        $procEnv['DB_PASSWORD'] = $dbPassword;
+
         // Inicializa os 5 subprocessos independentes com barreira de largada sincronizada
         for ($i = 0; $i < $numProcesses; $i++) {
             $readySignalPath = addslashes($this->barrierDir . "/ready_{$i}.signal");
 
             // O subprocesso:
-            // 1. Inicializa o framework e conexão com a mesma base
+            // 1. Inicializa o framework e conexão com a mesma base MySQL
             // 2. Pré-carrega instâncias (aquecendo cache/classes)
             // 3. Sinaliza que está pronto criando ready_{i}.signal
             // 4. Aguarda em loop rápido até a criação de start.signal (coordenação de largada)
             // 5. Executa getOrCreateCertificate simultaneamente com os demais processos
             $script = sprintf(
+                '%s ' .
                 'require "%s/vendor/autoload.php"; ' .
                 '$app = require_once "%s/bootstrap/app.php"; ' .
                 '$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap(); ' .
@@ -103,6 +141,7 @@ class CertificateConcurrencyTest extends TestCase
                 'while (!file_exists("%s")) { usleep(200); } ' .
                 '$cert = app(App\Services\CertificateService::class)->getOrCreateCertificate($user, $course); ' .
                 'echo json_encode(["status" => "ok", "certificate_id" => $cert->id, "validation_code" => $cert->validation_code]);',
+                $envSetup,
                 $basePath,
                 $basePath,
                 $student->id,
@@ -116,8 +155,8 @@ class CertificateConcurrencyTest extends TestCase
                 1 => ['pipe', 'w'],
                 2 => ['pipe', 'w'],
             ];
-            $cmd = PHP_BINARY . ' -r ' . escapeshellarg($script);
-            $proc = proc_open($cmd, $descriptors, $pipes[$i]);
+            $cmd = [PHP_BINARY, '-r', $script];
+            $proc = proc_open($cmd, $descriptors, $pipes[$i], base_path(), $procEnv);
             $this->assertIsResource($proc, "Falha ao iniciar processo concorrente {$i}");
             $processes[$i] = $proc;
         }
