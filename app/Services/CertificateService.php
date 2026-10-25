@@ -8,6 +8,7 @@ use App\Models\Enrollment;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use DomainException;
+use Illuminate\Support\Facades\DB;
 
 class CertificateService
 {
@@ -41,6 +42,16 @@ class CertificateService
      */
     public function getOrCreateCertificate(User $user, Course $course): Certificate
     {
+        // Garante leitura de dados vigentes atualizados do banco (evita stale models)
+        if ($user->exists) {
+            $user->refresh();
+        }
+        if ($course->exists) {
+            $course->refresh();
+        }
+        $course->loadMissing('company');
+        $user->loadMissing('company');
+
         $existing = Certificate::where('user_id', $user->id)
             ->where('course_id', $course->id)
             ->where('company_id', $user->company_id)
@@ -57,13 +68,19 @@ class CertificateService
         // Calculate total workload in minutes from all lessons of the course
         $totalMinutes = (int) $course->lessons()->sum('duration_minutes');
 
+        // Consistência temporal estrita: unifica o instante de emissão e de captura do snapshot
+        $issuedAt = now();
+
+        // Nome da empresa estritamente comprovável (sem fallback fictício 'Empresa Cliente')
+        $companyName = $course->company?->name ?? $user->company?->name ?? null;
+
         $snapshot = [
             'mode' => 'original',
             'student_name' => $user->name,
             'course_title' => $course->title,
-            'company_name' => $course->company?->name ?? $user->company?->name ?? 'Empresa Cliente',
+            'company_name' => $companyName,
             'workload_minutes' => $totalMinutes,
-            'captured_at' => now()->toIso8601String(),
+            'captured_at' => $issuedAt->toIso8601String(),
         ];
 
         try {
@@ -73,7 +90,7 @@ class CertificateService
                 'course_id' => $course->id,
                 'total_hours_minutes' => $totalMinutes,
                 'snapshot' => $snapshot,
-                'issued_at' => now(),
+                'issued_at' => $issuedAt,
             ]);
         } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
             return $this->resolveConcurrentCertificate($user, $course, $e);
