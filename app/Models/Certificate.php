@@ -21,6 +21,7 @@ class Certificate extends Model
         'company_id',
         'user_id',
         'course_id',
+        'template_version_id',
         'uuid',
         'validation_code',
         'total_hours_minutes',
@@ -36,6 +37,7 @@ class Certificate extends Model
     protected function casts(): array
     {
         return [
+            'template_version_id' => 'integer',
             'total_hours_minutes' => 'integer',
             'snapshot' => 'array',
             'issued_at' => 'datetime',
@@ -100,6 +102,14 @@ class Certificate extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    /**
+     * Template version used to format this certificate (if versioned).
+     */
+    public function templateVersion(): BelongsTo
+    {
+        return $this->belongsTo(CertificateTemplateVersion::class, 'template_version_id');
     }
 
     /**
