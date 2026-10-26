@@ -47,6 +47,14 @@ class Company extends Model
     }
 
     /**
+     * Get all certificate templates owned by this company.
+     */
+    public function certificateTemplates(): HasMany
+    {
+        return $this->hasMany(CertificateTemplate::class);
+    }
+
+    /**
      * Get all users directly associated with this company.
      */
     public function users(): HasMany
