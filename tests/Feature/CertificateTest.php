@@ -1074,4 +1074,240 @@ class CertificateTest extends TestCase
         $this->assertEquals('Aluno JSON Teste', $decoded['student_name']);
         $this->assertEquals(180, $decoded['workload_minutes']);
     }
+
+    public function test_company_with_issued_certificates_cannot_be_deleted(): void
+    {
+        $company = Company::create(['name' => 'Empresa Protegida Contra Exclusao', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Protegido',
+            'email' => 'comp.prot.inst@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Aluno Protegido Company',
+            'email' => 'comp.prot.aluno@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Curso de Blindagem',
+            'slug' => 'curso-de-blindagem',
+            'status' => 'published',
+        ]);
+
+        Certificate::create([
+            'company_id' => $company->id,
+            'user_id' => $student->id,
+            'course_id' => $course->id,
+            'validation_code' => 'ALV-2026-COMPBLOCK',
+            'total_hours_minutes' => 60,
+            'issued_at' => now(),
+        ]);
+
+        try {
+            $company->delete();
+            $this->fail('Deveria ter lançado DomainException ao tentar excluir empresa com certificados.');
+        } catch (\DomainException $e) {
+            $this->assertStringContainsString('possui certificados emitidos', $e->getMessage());
+        }
+
+        $this->assertDatabaseHas('companies', ['id' => $company->id]);
+        $this->assertDatabaseHas('certificates', ['validation_code' => 'ALV-2026-COMPBLOCK']);
+    }
+
+    public function test_absence_of_company_does_not_generate_fictional_name_in_snapshot_or_views(): void
+    {
+        $company = Company::create(['name' => 'Empresa Base', 'status' => 'active']);
+
+        $certificate = Certificate::create([
+            'company_id' => $company->id,
+            'user_id' => User::create([
+                'name' => 'Aluno Sem Empresa',
+                'email' => 'sem.empresa.aluno@alvora.com',
+                'password' => bcrypt('password'),
+                'company_id' => $company->id,
+                'role' => UserRole::STUDENT,
+            ])->id,
+            'course_id' => Course::create([
+                'company_id' => $company->id,
+                'instructor_id' => User::create([
+                    'name' => 'Instrutor Base',
+                    'email' => 'inst.base@alvora.com',
+                    'password' => bcrypt('password'),
+                    'company_id' => $company->id,
+                    'role' => UserRole::INSTRUCTOR,
+                ])->id,
+                'title' => 'Curso Aberto ALVORA',
+                'slug' => 'curso-aberto-alvora',
+                'status' => 'published',
+            ])->id,
+            'validation_code' => 'ALV-2026-NOCOMPANY',
+            'total_hours_minutes' => 45,
+            'snapshot' => [
+                'mode' => 'original',
+                'student_name' => 'Aluno Sem Empresa',
+                'course_title' => 'Curso Aberto ALVORA',
+                'company_name' => null, // ausência explícita comprovável
+                'workload_minutes' => 45,
+                'captured_at' => now()->toIso8601String(),
+            ],
+            'issued_at' => now(),
+        ]);
+
+        $this->assertNull($certificate->snapshot['company_name']);
+        $this->assertNull($certificate->company_name);
+
+        // 1. Renderiza o PDF
+        $renderedPdfHtml = view('certificates.template', ['certificate' => $certificate])->render();
+        $this->assertStringNotContainsString('Empresa Cliente', $renderedPdfHtml);
+        $this->assertStringNotContainsString('&bull; </div>', $renderedPdfHtml);
+        $this->assertStringContainsString('Registro Corporativo', $renderedPdfHtml);
+
+        // 2. Renderiza a validação pública
+        $response = $this->get(route('certificates.verify', 'ALV-2026-NOCOMPANY'));
+        $response->assertStatus(200);
+        $response->assertDontSee('Empresa Cliente');
+        $response->assertSee('Não informada');
+    }
+
+    public function test_issuance_and_snapshot_capture_share_strictly_consistent_timestamp(): void
+    {
+        $company = Company::create(['name' => 'Empresa Timestamp Test', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Time',
+            'email' => 'time.inst@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Aluno Time',
+            'email' => 'time.aluno@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Curso Timestamp Check',
+            'slug' => 'curso-timestamp-check',
+            'status' => 'published',
+        ]);
+
+        $module = Module::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'title' => 'Módulo 1',
+            'order' => 1,
+        ]);
+
+        Lesson::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'module_id' => $module->id,
+            'title' => 'Aula 1',
+            'duration_minutes' => 60,
+            'order' => 1,
+        ]);
+
+        Enrollment::create([
+            'company_id' => $company->id,
+            'user_id' => $student->id,
+            'course_id' => $course->id,
+            'status' => 'completed',
+            'progress_percent' => 100,
+            'completed_at' => now(),
+        ]);
+
+        /** @var \App\Services\CertificateService $service */
+        $service = app(\App\Services\CertificateService::class);
+        $certificate = $service->getOrCreateCertificate($student, $course);
+
+        // Verifica consistência temporal absoluta: o captured_at do snapshot reflete exatamente o mesmo instante do issued_at
+        $this->assertEquals(
+            $certificate->issued_at->toIso8601String(),
+            $certificate->snapshot['captured_at'],
+            'O timestamp captured_at deve ser idêntico ao issued_at para evitar divergências artificiais.'
+        );
+    }
+
+    public function test_service_refreshes_stale_models_before_snapshot_capture(): void
+    {
+        $company = Company::create(['name' => 'Empresa Stale Test', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Stale',
+            'email' => 'stale.inst@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Nome Antigo Na Memória',
+            'email' => 'stale.aluno@empresa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Título Antigo Na Memória',
+            'slug' => 'titulo-antigo-na-memoria',
+            'status' => 'published',
+        ]);
+
+        $module = Module::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'title' => 'Módulo 1',
+            'order' => 1,
+        ]);
+
+        Lesson::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'module_id' => $module->id,
+            'title' => 'Aula 1',
+            'duration_minutes' => 60,
+            'order' => 1,
+        ]);
+
+        Enrollment::create([
+            'company_id' => $company->id,
+            'user_id' => $student->id,
+            'course_id' => $course->id,
+            'status' => 'completed',
+            'progress_percent' => 100,
+            'completed_at' => now(),
+        ]);
+
+        // Atualiza os registros diretamente no banco sem atualizar os objetos em memória $student e $course
+        User::where('id', $student->id)->update(['name' => 'Nome Fresco Atualizado no Banco']);
+        Course::where('id', $course->id)->update(['title' => 'Título Fresco Atualizado no Banco']);
+
+        /** @var \App\Services\CertificateService $service */
+        $service = app(\App\Services\CertificateService::class);
+
+        // Passa as instâncias em memória desatualizadas ("stale") para o serviço
+        $certificate = $service->getOrCreateCertificate($student, $course);
+
+        // O snapshot deve capturar os valores frescos persistidos no banco
+        $this->assertEquals('Nome Fresco Atualizado no Banco', $certificate->snapshot['student_name']);
+        $this->assertEquals('Título Fresco Atualizado no Banco', $certificate->snapshot['course_title']);
+    }
 }

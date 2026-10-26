@@ -25,6 +25,28 @@ class Company extends Model
     ];
 
     /**
+     * Boot model events.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::deleting(function (Company $company) {
+            if ($company->certificates()->exists()) {
+                throw new \DomainException("Não é possível excluir a empresa '{$company->name}' pois ela possui certificados emitidos.");
+            }
+        });
+    }
+
+    /**
+     * Get all certificates issued for this company.
+     */
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class);
+    }
+
+    /**
      * Get all users directly associated with this company.
      */
     public function users(): HasMany

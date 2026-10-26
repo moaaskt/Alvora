@@ -114,16 +114,16 @@
     <div class="border-outer">
         <div class="border-inner">
             <div class="brand-logo">ALVORA</div>
-            <div class="brand-sub">Treinamento Corporativo com Inteligência Artificial &bull; {{ $certificate->company_name }}</div>
+            <div class="brand-sub">Treinamento Corporativo com Inteligência Artificial{{ !empty($certificate->company_name) ? ' • ' . $certificate->company_name : '' }}</div>
 
             <div class="title">Certificado de Capacitação</div>
             <div class="certifies">Certificamos com distinção que</div>
 
-            <div class="student-name">{{ $certificate->student_name }}</div>
+            <div class="student-name">{{ $certificate->student_name ?? 'Colaborador' }}</div>
 
             <div class="description">
                 Concluiu com aproveitamento integral o curso corporativo
-                <span class="course-title">"{{ $certificate->course_title }}"</span>,
+                <span class="course-title">"{{ $certificate->course_title ?? 'Curso Concluído' }}"</span>,
                 cumprindo satisfatoriamente toda a grade curricular e obtendo aprovação nas avaliações pedagógicas exigidas,
                 totalizando uma carga horária estimada de <strong class="badge">{{ $certificate->formattedWorkload() }}</strong>.
             </div>
@@ -142,8 +142,8 @@
                     </td>
                     <td>
                         <div class="signature-line"></div>
-                        <strong>{{ $certificate->company_name }}</strong><br>
-                        Recursos Humanos
+                        <strong>{{ $certificate->company_name ?? 'Registro Corporativo' }}</strong><br>
+                        {{ !empty($certificate->company_name) ? 'Recursos Humanos' : 'Plataforma ALVORA' }}
                     </td>
                 </tr>
             </table>
