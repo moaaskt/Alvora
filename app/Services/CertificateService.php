@@ -83,11 +83,16 @@ class CertificateService
             'captured_at' => $issuedAt->toIso8601String(),
         ];
 
+        // Resolução hierárquica do template ativo (tenant -> global padrão)
+        $activeVersion = app(CertificateTemplateResolver::class)->resolveActiveTemplate($user->company_id);
+        $templateVersionId = $activeVersion?->id;
+
         try {
             return Certificate::create([
                 'company_id' => $user->company_id,
                 'user_id' => $user->id,
                 'course_id' => $course->id,
+                'template_version_id' => $templateVersionId,
                 'total_hours_minutes' => $totalMinutes,
                 'snapshot' => $snapshot,
                 'issued_at' => $issuedAt,
@@ -150,10 +155,16 @@ class CertificateService
 
     /**
      * Generate DomPDF instance for download or stream.
+     * Single dispatch point: routes to versioned renderer if template_version_id is set,
+     * or fallback to legacy blade template for older certificates.
      */
     public function generatePdf(Certificate $certificate)
     {
-        $certificate->loadMissing(['user', 'course', 'company']);
+        $certificate->loadMissing(['user', 'course', 'company', 'templateVersion']);
+
+        if ($certificate->template_version_id && $certificate->templateVersion) {
+            return app(VersionedCertificateRenderer::class)->render($certificate, $certificate->templateVersion);
+        }
 
         return Pdf::loadView('certificates.template', [
             'certificate' => $certificate,
