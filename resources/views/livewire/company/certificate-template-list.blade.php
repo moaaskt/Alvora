@@ -249,14 +249,15 @@
                         <!-- CARD FOOTER / AÇÕES -->
                         <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
                             <div class="flex items-center gap-1.5">
-                                <!-- BOTÃO INDICADOR DO EDITOR VISUAL (FASE 3.3) -->
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 bg-slate-100 border border-slate-200 cursor-not-allowed" 
-                                      title="O editor visual com canvas A4 será disponibilizado na próxima etapa (Tarefa 03-03)">
+                                <!-- BOTÃO DO EDITOR VISUAL (FASE 3.3) -->
+                                <a href="{{ route('instructor.certificate-templates.edit', $template->id) }}"
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 hover:border-blue-600 transition-all shadow-2xs"
+                                   title="Abrir Editor Visual com Canvas A4">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"></path>
                                     </svg>
-                                    <span>Editar (Fase 03-03)</span>
-                                </span>
+                                    <span>Abrir Editor Visual</span>
+                                </a>
                             </div>
 
                             <div class="flex items-center gap-1.5">
