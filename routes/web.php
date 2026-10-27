@@ -181,6 +181,7 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
     Route::redirect('/empresa/faturamento/erro', '/instrutor/faturamento/erro');
     Route::redirect('/empresa/sala-de-situacao', '/instrutor/sala-de-situacao');
     Route::redirect('/empresa/insights-executivos', '/instrutor/insights-executivos');
+    Route::redirect('/empresa/certificados/templates', '/instrutor/certificados/templates');
 
     // Super Admin Alvora - Faturamento Global B2B
     Route::get('/admin/faturamento', AdminBilling::class)
@@ -200,6 +201,7 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
 
     // Gestão e Backend do Editor de Templates de Certificados
     Route::middleware('role:instructor,company_admin')->prefix('instrutor/certificados/templates')->name('instructor.certificate-templates.')->group(function () {
+        Route::get('/', \App\Livewire\Company\CertificateTemplateList::class)->name('index');
         Route::post('/preview', [\App\Http\Controllers\Company\CertificateTemplateController::class, 'preview'])
             ->middleware('throttle:60,1')
             ->name('preview');
