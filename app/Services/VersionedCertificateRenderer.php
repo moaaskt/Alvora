@@ -32,6 +32,37 @@ class VersionedCertificateRenderer
     }
 
     /**
+     * Render an in-memory preview of a template schema with demo data (no database persistence).
+     *
+     * @param array<string, mixed> $schema
+     * @param string|null $companyName
+     * @return DomPdfWrapper
+     */
+    public function renderPreview(array $schema, ?string $companyName = null): DomPdfWrapper
+    {
+        $dummyCertificate = new Certificate([
+            'total_hours_minutes' => 120,
+            'validation_code' => 'ALV-PREVIEW-DEMO',
+            'issued_at' => now(),
+            'snapshot' => [
+                'mode' => 'preview',
+                'student_name' => 'Colaborador de Exemplo',
+                'course_title' => 'Treinamento Corporativo Avançado',
+                'company_name' => $companyName ?? 'Empresa Demonstração',
+                'workload_minutes' => 120,
+            ],
+        ]);
+
+        $dummyVersion = new CertificateTemplateVersion([
+            'version' => 0,
+            'schema_json' => $schema,
+            'status' => 'preview',
+        ]);
+
+        return $this->render($dummyCertificate, $dummyVersion);
+    }
+
+    /**
      * Compile schema elements with interpolated certificate snapshot data and CSS styles.
      *
      * @param array<string, mixed> $schema

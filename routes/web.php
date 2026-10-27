@@ -197,6 +197,19 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
         Route::get('/cursos/{course}/quizzes/{quiz}/editar', QuizEditor::class)->name('courses.quizzes.edit');
         Route::get('/quizzes/{quiz}/editar', QuizEditor::class)->name('quizzes.edit');
     });
+
+    // Gestão e Backend do Editor de Templates de Certificados
+    Route::middleware('role:instructor,company_admin')->prefix('instrutor/certificados/templates')->name('instructor.certificate-templates.')->group(function () {
+        Route::post('/preview', [\App\Http\Controllers\Company\CertificateTemplateController::class, 'preview'])
+            ->middleware('throttle:60,1')
+            ->name('preview');
+        Route::post('/{template}/drafts', [\App\Http\Controllers\Company\CertificateTemplateController::class, 'createDraftVersion'])
+            ->name('drafts.create');
+        Route::put('/{template}/drafts/{version}', [\App\Http\Controllers\Company\CertificateTemplateController::class, 'saveDraft'])
+            ->name('drafts.update');
+        Route::post('/{template}/versions/{version}/publish', [\App\Http\Controllers\Company\CertificateTemplateController::class, 'publish'])
+            ->name('versions.publish');
+    });
 });
 
 require __DIR__.'/auth.php';
