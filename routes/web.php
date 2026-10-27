@@ -202,6 +202,7 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
     // Gestão e Backend do Editor de Templates de Certificados
     Route::middleware('role:instructor,company_admin')->prefix('instrutor/certificados/templates')->name('instructor.certificate-templates.')->group(function () {
         Route::get('/', \App\Livewire\Company\CertificateTemplateList::class)->name('index');
+        Route::get('/{template}/editar/{version?}', \App\Livewire\Company\CertificateTemplateEditor::class)->name('edit');
         Route::post('/preview', [\App\Http\Controllers\Company\CertificateTemplateController::class, 'preview'])
             ->middleware('throttle:60,1')
             ->name('preview');
