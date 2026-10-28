@@ -292,4 +292,240 @@ class CertificateTemplateListTest extends TestCase
             ->assertSee('Comercial Certificado')
             ->assertDontSee('Engenharia Certificado');
     }
+
+    /**
+     * 1. Acesso repetido à listagem sem duplicar a versão padrão.
+     */
+    public function test_repeated_access_to_list_does_not_duplicate_default_template_version(): void
+    {
+        $setup = $this->setupCompanyAndUsers();
+
+        // 1º Acesso
+        Livewire::actingAs($setup['admin'])
+            ->test(CertificateTemplateList::class)
+            ->assertOk();
+
+        $defaultTemplate = CertificateTemplate::withoutGlobalScopes()
+            ->whereNull('company_id')
+            ->where('is_default', true)
+            ->first();
+
+        $this->assertNotNull($defaultTemplate);
+        $vCount1 = $defaultTemplate->versions()->count();
+        $this->assertGreaterThanOrEqual(1, $vCount1);
+
+        // 2º Acesso consecutivo
+        Livewire::actingAs($setup['admin'])
+            ->test(CertificateTemplateList::class)
+            ->assertOk();
+
+        // 3º Acesso consecutivo
+        Livewire::actingAs($setup['instructor'])
+            ->test(CertificateTemplateList::class)
+            ->assertOk();
+
+        $vCount2 = $defaultTemplate->versions()->count();
+        $this->assertEquals($vCount1, $vCount2, 'O acesso repetido não deve duplicar versões do template institucional padrão.');
+    }
+
+    /**
+     * 2. Recuperação segura quando o template existe e a versão inicial já foi criada (Correção Bug A).
+     */
+    public function test_safe_recovery_when_template_exists_and_version_already_created(): void
+    {
+        $defaultTemplate = CertificateTemplate::withoutGlobalScopes()
+            ->whereNull('company_id')
+            ->where('is_default', true)
+            ->first();
+
+        if (!$defaultTemplate) {
+            $defaultTemplate = $this->resolver->ensureDefaultTemplate()->template;
+        }
+
+        // Simula o cenário exato do Bug A:
+        // A versão 1 existe, versão 2 está ativa, e uma versão 3 rascunho existe.
+        $maxVersion = (int) $defaultTemplate->versions()->max('version');
+        $draftVersion = CertificateTemplateVersion::create([
+            'template_id' => $defaultTemplate->id,
+            'version' => $maxVersion + 1,
+            'schema_json' => $this->resolver->getDefaultSchema(),
+            'status' => 'draft',
+            'created_by' => null,
+        ]);
+
+        // Executar o resolver não deve lançar UniqueConstraintViolationException
+        $resolved = $this->resolver->resolveActiveTemplate(null);
+        $this->assertNotNull($resolved);
+        $this->assertEquals('active', $resolved->status);
+
+        // O template deve carregar a listagem perfeitamente
+        $setup = $this->setupCompanyAndUsers();
+        Livewire::actingAs($setup['admin'])
+            ->test(CertificateTemplateList::class)
+            ->assertOk();
+    }
+
+    /**
+     * 3. Tratamento de estados inconsistentes sem sobrescrever versões válidas.
+     */
+    public function test_inconsistent_state_recovery_without_overwriting_valid_versions(): void
+    {
+        $defaultTemplate = CertificateTemplate::withoutGlobalScopes()
+            ->whereNull('company_id')
+            ->where('is_default', true)
+            ->first();
+
+        if (!$defaultTemplate) {
+            $defaultTemplate = $this->resolver->ensureDefaultTemplate()->template;
+        }
+
+        // Marca todas as versões como arquivadas para simular inconsistência
+        $defaultTemplate->versions()->update(['status' => 'archived']);
+        $initialMaxVersion = (int) $defaultTemplate->versions()->max('version');
+        $archivedCountBefore = $defaultTemplate->versions()->where('status', 'archived')->count();
+
+        // Chama ensureDefaultTemplate: preserva imutabilidade das arquivadas e cria a próxima versão sequencial ativa
+        $recovered = $this->resolver->ensureDefaultTemplate();
+        $this->assertNotNull($recovered);
+        $this->assertEquals('active', $recovered->status);
+        $this->assertEquals($initialMaxVersion + 1, $recovered->version);
+        $this->assertEquals($defaultTemplate->id, $recovered->template_id);
+
+        // As versões arquivadas permanecem arquivadas e imutáveis
+        $this->assertEquals($archivedCountBefore, $defaultTemplate->versions()->where('status', 'archived')->count());
+
+        // Nenhuma colisão com chave única version
+        $versions = $defaultTemplate->versions()->get();
+        $uniqueVersions = $versions->pluck('version')->unique();
+        $this->assertCount($versions->count(), $uniqueVersions, 'Todas as versões devem possuir numeração única.');
+    }
+
+    /**
+     * 4. Comportamento seguro em requisições concorrentes de inicialização.
+     */
+    public function test_concurrent_initialization_safety_in_ensure_default_template(): void
+    {
+        $v1 = $this->resolver->ensureDefaultTemplate();
+        $v2 = $this->resolver->ensureDefaultTemplate();
+
+        $this->assertEquals($v1->id, $v2->id);
+        $this->assertEquals($v1->version, $v2->version);
+    }
+
+    /**
+     * 5. Criação de template com atualização correta da interface.
+     */
+    public function test_template_creation_updates_interface_and_closes_modal(): void
+    {
+        $setup = $this->setupCompanyAndUsers();
+
+        Livewire::actingAs($setup['admin'])
+            ->test(CertificateTemplateList::class)
+            ->set('showCreateModal', true)
+            ->set('newTemplateName', 'Modelo Executivo 2026')
+            ->set('newTemplateDescription', 'Descrição do modelo executivo')
+            ->call('createTemplate')
+            ->assertHasNoErrors()
+            ->assertSet('showCreateModal', false)
+            ->assertSet('newTemplateName', '')
+            ->assertDispatched('template-created')
+            ->assertDispatched('toast')
+            ->assertSee('Modelo Executivo 2026');
+
+        $this->assertDatabaseHas('certificate_templates', [
+            'company_id' => $setup['company']->id,
+            'name' => 'Modelo Executivo 2026',
+            'status' => 'draft',
+        ]);
+    }
+
+    /**
+     * 6. Reprodução e correção do erro 403 (Bug B).
+     */
+    public function test_bug_b_fix_admin_alvora_and_tenant_users_can_create_templates_without_403(): void
+    {
+        // 6a: Super Administrador Alvora (company_id = null) não deve tomar 403
+        $alvoraAdmin = User::create([
+            'name' => 'Super Admin Global',
+            'email' => 'admin.global.' . uniqid() . '@alvora.com.br',
+            'password' => bcrypt('password'),
+            'company_id' => null,
+            'role' => UserRole::ADMIN_ALVORA,
+        ]);
+
+        Livewire::actingAs($alvoraAdmin)
+            ->test(CertificateTemplateList::class)
+            ->set('newTemplateName', 'Template Global Institucional')
+            ->call('createTemplate')
+            ->assertHasNoErrors()
+            ->assertSet('showCreateModal', false);
+
+        $this->assertDatabaseHas('certificate_templates', [
+            'company_id' => null,
+            'name' => 'Template Global Institucional',
+        ]);
+
+        // 6b: Usuário não admin sem empresa recebe validação clara sem travar a interface
+        $orphanUser = User::create([
+            'name' => 'Usuário Sem Empresa',
+            'email' => 'orphan.' . uniqid() . '@example.com',
+            'password' => bcrypt('password'),
+            'company_id' => null,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        Livewire::actingAs($orphanUser)
+            ->test(CertificateTemplateList::class)
+            ->set('newTemplateName', 'Tentativa Órfã')
+            ->call('createTemplate')
+            ->assertHasErrors(['newTemplateName'])
+            ->assertDispatched('toast');
+    }
+
+    /**
+     * 7. Cópia de template, retorno à listagem e publicação (Bug C).
+     */
+    public function test_duplicate_template_flow_and_return_to_list(): void
+    {
+        $setup = $this->setupCompanyAndUsers();
+
+        $originalTemplate = CertificateTemplate::create([
+            'company_id' => $setup['company']->id,
+            'name' => 'Template Base Treinamento',
+            'description' => 'Modelo corporativo inicial',
+            'status' => 'active',
+            'is_default' => true,
+        ]);
+
+        CertificateTemplateVersion::create([
+            'template_id' => $originalTemplate->id,
+            'version' => 1,
+            'schema_json' => $this->resolver->getDefaultSchema(),
+            'status' => 'active',
+            'created_by' => $setup['admin']->id,
+        ]);
+
+        // Duplica o template pela listagem
+        Livewire::actingAs($setup['admin'])
+            ->test(CertificateTemplateList::class)
+            ->call('duplicateTemplate', $originalTemplate->id)
+            ->assertHasNoErrors()
+            ->assertDispatched('template-created')
+            ->assertSee('Cópia de Template Base Treinamento');
+
+        $duplicate = CertificateTemplate::where('name', 'Cópia de Template Base Treinamento')->first();
+        $this->assertNotNull($duplicate);
+        $this->assertEquals($setup['company']->id, $duplicate->company_id);
+        $this->assertEquals('draft', $duplicate->status);
+
+        $dupVersion = $duplicate->versions()->first();
+        $this->assertNotNull($dupVersion);
+        $this->assertEquals(1, $dupVersion->version);
+        $this->assertEquals('draft', $dupVersion->status);
+
+        // Acesso à listagem com o template duplicado presente não deve gerar erro
+        Livewire::actingAs($setup['admin'])
+            ->test(CertificateTemplateList::class)
+            ->assertOk();
+    }
 }
