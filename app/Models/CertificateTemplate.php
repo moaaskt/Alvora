@@ -69,8 +69,9 @@ class CertificateTemplate extends Model
     public function activeVersion(): HasOne
     {
         return $this->hasOne(CertificateTemplateVersion::class, 'template_id')
-            ->where('status', 'active')
-            ->latestOfMany('version');
+            ->ofMany(['version' => 'max'], function ($query) {
+                $query->where('status', 'active');
+            });
     }
 
     /**
