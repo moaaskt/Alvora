@@ -70,7 +70,8 @@ class CertificateTemplateVersion extends Model
      */
     public function template(): BelongsTo
     {
-        return $this->belongsTo(CertificateTemplate::class, 'template_id');
+        return $this->belongsTo(CertificateTemplate::class, 'template_id')
+            ->withoutGlobalScope(\App\Models\Scopes\TenantScope::class);
     }
 
     /**
