@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\UserRole;
+use App\Livewire\Student\Catalog as StudentCatalog;
 use App\Livewire\Student\Dashboard as StudentDashboard;
 use App\Models\Company;
 use App\Models\Course;
@@ -38,7 +39,7 @@ class StudentDashboardTest extends TestCase
         $response->assertSee('Meu Aprendizado');
         $response->assertSee('Olá, Aluno João');
         $response->assertSee('Continuar Aprendendo');
-        $response->assertSee('Cursos Disponíveis da Sua Empresa');
+        $response->assertSee('Explore o catálogo da sua empresa');
     }
 
     public function test_student_dashboard_redirects_from_generic_dashboard(): void
@@ -89,7 +90,7 @@ class StudentDashboardTest extends TestCase
 
         $this->actingAs($student);
 
-        Livewire::test(StudentDashboard::class)
+        Livewire::test(StudentCatalog::class)
             ->call('enroll', $course->id)
             ->assertSee('Matrícula realizada com sucesso no curso Segurança da Informação B2B!');
 
@@ -134,7 +135,7 @@ class StudentDashboardTest extends TestCase
         $this->actingAs($studentA);
 
         try {
-            Livewire::test(StudentDashboard::class)
+            Livewire::test(StudentCatalog::class)
                 ->call('enroll', $courseB->id);
         } catch (\Throwable $e) {
             // Se o Livewire não capturar, a exceção é pega aqui
@@ -220,13 +221,13 @@ class StudentDashboardTest extends TestCase
         $this->actingAs($student);
 
         Livewire::test(StudentDashboard::class)
-            ->assertSee('Progresso')
+            ->assertSee('Progresso Geral')
             ->assertSee('50%')
             ->assertSee('Introdução à IA Corporativa')
             ->assertSee('Continuar Aula');
     }
 
-    public function test_student_dashboard_search_and_empty_states(): void
+    public function test_student_dashboard_empty_states_and_catalog_search(): void
     {
         $company = Company::create(['name' => 'Tech Corp', 'status' => 'active']);
 
@@ -248,12 +249,12 @@ class StudentDashboardTest extends TestCase
 
         $this->actingAs($student);
 
-        // Sem matrículas e sem cursos publicados no catálogo
+        // Dashboard sem cursos em andamento exibe mensagem de estado vazio
         Livewire::test(StudentDashboard::class)
-            ->assertSee('Você ainda não está matriculado em nenhum curso')
-            ->assertSee('Nenhum novo curso disponível encontrado no momento.');
+            ->assertSee('Nenhum curso em andamento no momento.')
+            ->assertSee('Explorar o catálogo');
 
-        // Cria um curso publicado para testar busca
+        // Cria um curso publicado para testar busca no catálogo
         Course::create([
             'company_id' => $company->id,
             'instructor_id' => $instructor->id,
@@ -263,7 +264,7 @@ class StudentDashboardTest extends TestCase
             'status' => 'published',
         ]);
 
-        Livewire::test(StudentDashboard::class)
+        Livewire::test(StudentCatalog::class)
             ->assertSee('Arquitetura Cloud Corporativa')
             ->set('search', 'InexistenteXYZ')
             ->assertDontSee('Arquitetura Cloud Corporativa')

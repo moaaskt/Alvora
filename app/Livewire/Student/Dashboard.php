@@ -4,7 +4,6 @@ namespace App\Livewire\Student;
 
 use App\Models\Course;
 use App\Models\Enrollment;
-use App\Models\Lesson;
 use App\Models\LessonProgress;
 use App\Models\TrackEnrollment;
 use Illuminate\Contracts\View\View;
@@ -12,41 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('layouts.student')]
+#[Layout('layouts.student', ['bandHeight' => 340, 'active' => 'dashboard', 'title' => 'Alvora — Meu Aprendizado'])]
 class Dashboard extends Component
 {
-    public string $search = '';
-
-    /**
-     * Enroll authenticated student in a published course.
-     */
-    public function enroll(int $courseId): void
-    {
-        $user = Auth::user();
-        if (!$user) {
-            return;
-        }
-
-        $course = Course::where('id', $courseId)
-            ->where('status', 'published')
-            ->firstOrFail();
-
-        Enrollment::firstOrCreate(
-            [
-                'company_id' => $user->company_id,
-                'user_id' => $user->id,
-                'course_id' => $course->id,
-            ],
-            [
-                'status' => 'active',
-                'progress_percent' => 0,
-                'enrolled_at' => now(),
-            ]
-        );
-
-        session()->flash('success', "Matrícula realizada com sucesso no curso {$course->title}!");
-    }
-
     /**
      * Find next pending lesson or first lesson to continue learning.
      */
@@ -72,12 +39,8 @@ class Dashboard extends Component
             ->toArray();
 
         // First lesson not yet completed
-        $nextLesson = $orderedLessons->first(fn ($l) => !in_array($l->id, $completedLessonIds));
-
-        // Fallback to first lesson if all completed
-        if (!$nextLesson) {
-            $nextLesson = $orderedLessons->first();
-        }
+        $nextLesson = $orderedLessons->first(fn ($l) => !in_array($l->id, $completedLessonIds))
+            ?? $orderedLessons->first();
 
         return redirect()->route('student.player', [
             'course' => $course->slug,
@@ -92,8 +55,14 @@ class Dashboard extends Component
     {
         $user = Auth::user();
 
-        // Active and completed enrollments for student
-        $enrollments = Enrollment::with(['course.modules.lessons'])
+        // Active and completed enrollments for student (ordered by updated_at descending)
+        $enrollments = Enrollment::with([
+                'course' => fn ($q) => $q->withCount([
+                    'lessons',
+                    'quizzes' => fn ($sq) => $sq->has('questions'),
+                ])->withSum('lessons as total_minutes', 'duration_minutes')
+                  ->with('modules.lessons')
+            ])
             ->where('user_id', $user->id)
             ->latest('updated_at')
             ->get();
@@ -103,32 +72,37 @@ class Dashboard extends Component
         // Key stats computed over ALL enrollments
         $totalEnrolled = $enrollments->count();
         $completedCount = $enrollments->where('status', 'completed')->count();
-        $inProgressCount = $enrollments->where('status', 'active')->count();
+        $inProgressCount = $enrollments->where('status', 'active')->where('progress_percent', '<', 100)->count();
         $averageProgress = $totalEnrolled > 0
             ? (int) round($enrollments->avg('progress_percent'))
             : 0;
 
-        // Available courses from same tenant not yet enrolled
-        $availableCourses = Course::where('status', 'published')
-            ->whereNotIn('id', $enrolledCourseIds)
-            ->when($this->search, fn ($q) => $q->where('title', 'like', "%{$this->search}%"))
-            ->withCount('lessons')
-            ->latest()
-            ->get();
+        // Continuar Aprendendo: at most 3 non-completed courses ordered by updated_at desc
+        $inProgressEnrollments = $enrollments
+            ->filter(fn ($e) => $e->status !== 'completed' && $e->progress_percent < 100)
+            ->take(3);
 
-        // Corporate Learning Tracks for this student (read-only, no write on render)
+        // Real number of published courses the student is NOT yet enrolled in
+        $availableCoursesCount = Course::where('company_id', $user->company_id)
+            ->where('status', 'published')
+            ->whereNotIn('id', $enrolledCourseIds)
+            ->count();
+
+        // Corporate Learning Tracks for this student (at most 2 on dashboard)
         $trackEnrollments = TrackEnrollment::with(['track.publishedCourses'])
             ->where('user_id', $user->id)
+            ->latest('id')
             ->get();
 
         return view('livewire.student.dashboard', [
             'enrollments' => $enrollments,
+            'inProgressEnrollments' => $inProgressEnrollments,
             'trackEnrollments' => $trackEnrollments,
             'totalEnrolled' => $totalEnrolled,
             'completedCount' => $completedCount,
             'inProgressCount' => $inProgressCount,
             'averageProgress' => $averageProgress,
-            'availableCourses' => $availableCourses,
+            'availableCoursesCount' => $availableCoursesCount,
         ]);
     }
 }
