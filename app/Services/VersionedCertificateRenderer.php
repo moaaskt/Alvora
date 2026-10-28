@@ -75,13 +75,15 @@ class VersionedCertificateRenderer
 
         $imagePath = $schema['background']['image_path'] ?? null;
         $imageAbsolutePath = null;
-        $imageUrl = null;
 
         if (!empty($imagePath)) {
-            $disk = Storage::disk('public');
-            if ($disk->exists($imagePath)) {
-                $imageAbsolutePath = $disk->path($imagePath);
-                $imageUrl = $disk->url($imagePath);
+            // 1. Prioriza o disco local privado ('local' = storage/app/private)
+            $diskLocal = Storage::disk('local');
+            if ($diskLocal->exists($imagePath)) {
+                $imageAbsolutePath = $diskLocal->path($imagePath);
+            } elseif (Storage::disk('public')->exists($imagePath)) {
+                // 2. Fallback retrocompatível transparente para imagens legadas no disco público
+                $imageAbsolutePath = Storage::disk('public')->path($imagePath);
             }
         }
 
@@ -89,7 +91,6 @@ class VersionedCertificateRenderer
             'color' => $this->sanitizeColor($schema['background']['color'] ?? '#0b0f19'),
             'image_path' => $imagePath,
             'image_absolute_path' => $imageAbsolutePath,
-            'image_url' => $imageUrl,
         ];
 
         $border = [
