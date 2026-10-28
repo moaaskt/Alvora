@@ -6,6 +6,7 @@ use App\Models\Certificate;
 use App\Models\CertificateTemplateVersion;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Barryvdh\DomPDF\PDF as DomPdfWrapper;
+use Illuminate\Support\Facades\Storage;
 
 class VersionedCertificateRenderer
 {
@@ -72,8 +73,23 @@ class VersionedCertificateRenderer
     {
         $placeholders = $this->buildPlaceholdersMap($certificate);
 
+        $imagePath = $schema['background']['image_path'] ?? null;
+        $imageAbsolutePath = null;
+        $imageUrl = null;
+
+        if (!empty($imagePath)) {
+            $disk = Storage::disk('public');
+            if ($disk->exists($imagePath)) {
+                $imageAbsolutePath = $disk->path($imagePath);
+                $imageUrl = $disk->url($imagePath);
+            }
+        }
+
         $background = [
             'color' => $this->sanitizeColor($schema['background']['color'] ?? '#0b0f19'),
+            'image_path' => $imagePath,
+            'image_absolute_path' => $imageAbsolutePath,
+            'image_url' => $imageUrl,
         ];
 
         $border = [
