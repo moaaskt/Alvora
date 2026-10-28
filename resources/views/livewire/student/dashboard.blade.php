@@ -1,194 +1,227 @@
-<div class="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
-    {{-- Header de Boas-vindas --}}
-    <div class="bg-gradient-to-r from-gray-900 via-gray-900 to-indigo-950/40 border border-white/10 rounded-2xl p-6 sm:p-8 backdrop-blur-md shadow-2xl relative overflow-hidden">
-        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-3">
-                    <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    Painel do Aluno
-                </span>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                    Olá, {{ auth()->user()->name }} 👋
-                </h1>
-                <p class="text-gray-400 mt-1 text-sm sm:text-base max-w-2xl">
-                    Acompanhe seus cursos corporativos, continue suas aulas onde parou e aprimore suas competências profissionais.
-                </p>
+<div class="flex flex-col lg:flex-row items-start gap-6 lg:gap-8">
+    <!-- LEFT STICKY SIDEBAR (280px on desktop, compact stacked card below lg) -->
+    <aside class="w-full lg:w-[280px] shrink-0 lg:sticky lg:top-28">
+        <div class="bg-edtech-surface border-2 border-edtech-blue rounded-[20px] p-5 lg:p-6 shadow-sidebar flex flex-col">
+            <!-- Student Profile Info -->
+            <div class="flex flex-row lg:flex-col items-center lg:text-center gap-4 lg:gap-0 pb-4 lg:pb-6 border-b border-edtech-border">
+                <div class="w-16 h-16 lg:w-[112px] lg:h-[112px] rounded-full bg-gradient-to-br from-edtech-blue to-edtech-blue-dark text-white flex items-center justify-center font-semibold text-2xl lg:text-[36px] lg:mb-4 shadow-[0_0_0_4px_#FFFFFF] shrink-0">
+                    {{ strtoupper(substr(auth()->user()->name ?? 'AL', 0, 2)) }}
+                </div>
+                <div class="min-w-0">
+                    <h2 class="font-semibold text-edtech-text text-[18px] lg:text-[20px] leading-tight truncate">
+                        {{ auth()->user()->name }}
+                    </h2>
+                    @if(auth()->user()->company)
+                        <p class="text-[14px] text-edtech-muted mt-1 truncate">
+                            {{ auth()->user()->company->name }}
+                        </p>
+                    @endif
+                </div>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="#catalogo" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                    Explorar Catálogo
+
+            <!-- Navigation Menu -->
+            <nav aria-label="Menu do Aluno" class="mt-3 lg:mt-4 flex flex-col">
+                <!-- Item 1: Meu Aprendizado (Active) -->
+                <a href="#meu-aprendizado"
+                   class="flex items-center gap-3 px-3.5 h-[48px] rounded-r-xl text-[15px] font-semibold text-edtech-blue bg-edtech-blue-light border-l-[3px] border-edtech-blue transition-colors">
+                    <x-icon name="book-open" class="w-5 h-5 text-edtech-blue shrink-0" />
+                    <span>Meu Aprendizado</span>
                 </a>
-            </div>
-        </div>
-    </div>
 
-    {{-- Flash Messages --}}
-    @if (session('success'))
-        <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm flex items-center justify-between animate-fade-in">
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{{ session('success') }}</span>
-            </div>
-            <button type="button" @click="$el.parentElement.remove()" class="text-emerald-400/60 hover:text-emerald-300">✕</button>
-        </div>
-    @endif
+                @if ($trackEnrollments->isNotEmpty())
+                    <div class="h-px bg-edtech-border my-1"></div>
+                    <!-- Item 2: Minhas Trilhas (only when student has tracks) -->
+                    <a href="#minhas-trilhas"
+                       class="flex items-center gap-3 px-3.5 h-[48px] rounded-xl text-[15px] font-medium text-edtech-muted hover:text-edtech-text hover:bg-edtech-border-light transition-colors">
+                        <x-icon name="map" class="w-5 h-5 text-edtech-muted shrink-0" />
+                        <span>Minhas Trilhas</span>
+                    </a>
+                @endif
 
-    @if (session('warning'))
-        <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <span>{{ session('warning') }}</span>
-            </div>
-            <button type="button" @click="$el.parentElement.remove()" class="text-amber-400/60 hover:text-amber-300">✕</button>
-        </div>
-    @endif
+                <div class="h-px bg-edtech-border my-1"></div>
+                <!-- Item 3: Catálogo de Cursos -->
+                <a href="#catalogo"
+                   class="flex items-center gap-3 px-3.5 h-[48px] rounded-xl text-[15px] font-medium text-edtech-muted hover:text-edtech-text hover:bg-edtech-border-light transition-colors">
+                    <x-icon name="layout-grid" class="w-5 h-5 text-edtech-muted shrink-0" />
+                    <span>Catálogo de Cursos</span>
+                </a>
 
-    {{-- Cards de Métricas do Aluno --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-gray-900/60 border border-white/5 rounded-2xl p-5 hover:border-white/10 transition">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-medium text-gray-400">Total Matriculado</span>
-                <span class="p-2 rounded-xl bg-blue-500/10 text-blue-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                </span>
-            </div>
-            <p class="text-2xl font-bold text-white mt-3">{{ $totalEnrolled }}</p>
-            <p class="text-xs text-gray-500 mt-1">Cursos no seu plano</p>
+                <div class="h-px bg-edtech-border my-1"></div>
+                <!-- Item 4: Sair (POST Form with @csrf) -->
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    @csrf
+                    <button type="submit"
+                            title="Sair da Plataforma"
+                            class="w-full flex items-center gap-3 px-3.5 h-[48px] rounded-xl text-[15px] font-medium text-edtech-muted hover:text-rose-600 hover:bg-rose-50/60 transition-colors cursor-pointer text-left">
+                        <x-icon name="log-out" class="w-5 h-5 text-edtech-muted shrink-0" />
+                        <span>Sair</span>
+                    </button>
+                </form>
+            </nav>
         </div>
+    </aside>
 
-        <div class="bg-gray-900/60 border border-white/5 rounded-2xl p-5 hover:border-white/10 transition">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-medium text-gray-400">Em Andamento</span>
-                <span class="p-2 rounded-xl bg-amber-500/10 text-amber-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </span>
-            </div>
-            <p class="text-2xl font-bold text-amber-400 mt-3">{{ $inProgressCount }}</p>
-            <p class="text-xs text-gray-500 mt-1">Aulas a concluir</p>
+    <!-- RIGHT MAIN CONTENT COLUMN -->
+    <section id="meu-aprendizado" class="flex-1 min-w-0 w-full flex flex-col gap-10 scroll-mt-28">
+        <!-- 1. GREETING HEADING (Strictly without emoji or pill badge) -->
+        <div>
+            <h1 class="font-bold text-[28px] sm:text-[32px] text-edtech-text tracking-tight leading-tight">
+                Olá, {{ auth()->user()->name }}
+            </h1>
+            <p class="text-[15px] text-edtech-navy-soft font-medium mt-2 max-w-3xl leading-relaxed">
+                Acompanhe seus cursos corporativos, continue suas aulas onde parou e aprimore suas competências profissionais.
+            </p>
         </div>
 
-        <div class="bg-gray-900/60 border border-white/5 rounded-2xl p-5 hover:border-white/10 transition">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-medium text-gray-400">Concluídos</span>
-                <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </span>
+        <!-- FLASH MESSAGES (Dismissible) -->
+        @if (session('success'))
+            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-2.5">
+                    <x-icon name="check-circle" class="w-5 h-5 text-alvora-emerald shrink-0" />
+                    <span class="font-medium">{{ session('success') }}</span>
+                </div>
+                <button type="button" @click="$el.parentElement.remove()" aria-label="Fechar mensagem" class="p-1 text-emerald-700 hover:text-emerald-950 rounded-lg transition-colors cursor-pointer">
+                    <x-icon name="x" class="w-4 h-4" />
+                </button>
             </div>
-            <p class="text-2xl font-bold text-emerald-400 mt-3">{{ $completedCount }}</p>
-            <p class="text-xs text-gray-500 mt-1">Cursos finalizados</p>
+        @endif
+
+        @if (session('warning'))
+            <div class="p-4 rounded-2xl bg-edtech-amber-light/60 border border-edtech-amber/40 text-amber-900 text-sm flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-2.5">
+                    <x-icon name="alert-triangle" class="w-5 h-5 text-edtech-amber-dark shrink-0" />
+                    <span class="font-medium">{{ session('warning') }}</span>
+                </div>
+                <button type="button" @click="$el.parentElement.remove()" aria-label="Fechar aviso" class="p-1 text-amber-800 hover:text-amber-950 rounded-lg transition-colors cursor-pointer">
+                    <x-icon name="x" class="w-4 h-4" />
+                </button>
+            </div>
+        @endif
+
+        <!-- 2. FOUR COMPACT STAT CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Stat 1: Total Matriculado -->
+            <div class="bg-edtech-surface border border-edtech-border rounded-[16px] p-5 shadow-card flex flex-col">
+                <div class="mb-3">
+                    <x-icon name="book-open" class="w-[22px] h-[22px] text-edtech-blue" />
+                </div>
+                <span class="text-[14px] font-medium text-edtech-muted block">Total Matriculado</span>
+                <span class="font-bold text-[36px] text-edtech-text tabular-nums block mt-1 leading-none">{{ $totalEnrolled }}</span>
+                <span class="text-[13px] text-edtech-muted block mt-2">Cursos no seu plano</span>
+            </div>
+
+            <!-- Stat 2: Em Andamento -->
+            <div class="bg-edtech-surface border border-edtech-border rounded-[16px] p-5 shadow-card flex flex-col">
+                <div class="mb-3">
+                    <x-icon name="clock" class="w-[22px] h-[22px] text-edtech-blue" />
+                </div>
+                <span class="text-[14px] font-medium text-edtech-muted block">Em Andamento</span>
+                <span class="font-bold text-[36px] text-edtech-text tabular-nums block mt-1 leading-none">{{ $inProgressCount }}</span>
+                <span class="text-[13px] text-edtech-muted block mt-2">Cursos a concluir</span>
+            </div>
+
+            <!-- Stat 3: Concluídos -->
+            <div class="bg-edtech-surface border border-edtech-border rounded-[16px] p-5 shadow-card flex flex-col">
+                <div class="mb-3">
+                    <x-icon name="check-circle" class="w-[22px] h-[22px] text-edtech-blue" />
+                </div>
+                <span class="text-[14px] font-medium text-edtech-muted block">Concluídos</span>
+                <span class="font-bold text-[36px] text-edtech-text tabular-nums block mt-1 leading-none">{{ $completedCount }}</span>
+                <span class="text-[13px] text-edtech-muted block mt-2">Cursos finalizados</span>
+            </div>
+
+            <!-- Stat 4: Progresso Geral -->
+            <div class="bg-edtech-surface border border-edtech-border rounded-[16px] p-5 shadow-card flex flex-col">
+                <div class="mb-3">
+                    <x-icon name="bar-chart" class="w-[22px] h-[22px] text-edtech-blue" />
+                </div>
+                <span class="text-[14px] font-medium text-edtech-muted block">Progresso Geral</span>
+                <span class="font-bold text-[36px] text-edtech-blue tabular-nums block mt-1 leading-none">{{ $averageProgress }}%</span>
+                <span class="text-[13px] text-edtech-muted block mt-2">Média de conclusão</span>
+            </div>
         </div>
 
-        <div class="bg-gray-900/60 border border-white/5 rounded-2xl p-5 hover:border-white/10 transition">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-medium text-gray-400">Progresso Geral</span>
-                <span class="p-2 rounded-xl bg-purple-500/10 text-purple-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                </span>
-            </div>
-            <p class="text-2xl font-bold text-purple-400 mt-3">{{ $averageProgress }}%</p>
-            <p class="text-xs text-gray-500 mt-1">Média de conclusão</p>
-        </div>
-    </div>
+        <!-- 3. MINHAS TRILHAS CORPORATIVAS (Only rendered if student has tracks; no empty state) -->
+        @if ($trackEnrollments->isNotEmpty())
+            <div id="minhas-trilhas" class="flex flex-col gap-4 scroll-mt-28">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-semibold text-xl text-edtech-text">Minhas Trilhas Corporativas</h2>
+                    <span class="text-sm text-edtech-muted font-medium">{{ $trackEnrollments->count() }} trilha(s) atribuída(s)</span>
+                </div>
 
-    {{-- Seção: Minhas Trilhas Corporativas (EVAL-04) --}}
-    @if ($trackEnrollments->isNotEmpty())
-        <div class="space-y-4">
-            <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    Minhas Trilhas Corporativas
-                </h2>
-                <span class="text-xs text-gray-400">{{ $trackEnrollments->count() }} trilha(s) atribuída(s)</span>
-            </div>
+                <div class="grid grid-cols-1 {{ $trackEnrollments->count() > 1 ? 'lg:grid-cols-2' : '' }} gap-6">
+                    @foreach ($trackEnrollments as $trackEnrollment)
+                        @php $track = $trackEnrollment->track; @endphp
+                        <div class="bg-edtech-surface border border-edtech-border rounded-2xl p-6 shadow-card flex flex-col gap-5">
+                            <!-- Track Header Metadata (plain colored text, no pill badges) -->
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-1.5">
+                                    <span class="text-[13px] text-edtech-muted font-medium">
+                                        {{ $track->department }}
+                                    </span>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                @foreach ($trackEnrollments as $trackEnrollment)
-                    @php $track = $trackEnrollment->track; @endphp
-                    <div class="bg-gray-900/60 border border-white/5 rounded-2xl p-6 hover:border-white/10 transition flex flex-col justify-between space-y-4 shadow-xl relative overflow-hidden">
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between gap-2">
-                                <div class="flex items-center gap-2">
-                                    @if ($track->department)
-                                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                                            {{ $track->department }}
+                                    @if ($track->is_mandatory)
+                                        <span class="text-[13px] font-semibold text-edtech-amber flex items-center gap-1">
+                                            <x-icon name="alert-triangle" class="w-3.5 h-3.5 text-edtech-amber shrink-0" />
+                                            Obrigatória
+                                        </span>
+                                    @else
+                                        <span class="text-[13px] font-medium text-edtech-muted">
+                                            Opcional
                                         </span>
                                     @endif
                                 </div>
 
-                                @if ($track->is_mandatory)
-                                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20 flex items-center gap-1">
-                                        <svg class="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                                        Obrigatória
-                                    </span>
-                                @else
-                                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-slate-800 text-slate-400">
-                                        Opcional
-                                    </span>
-                                @endif
-                            </div>
-
-                            <div>
-                                <h3 class="text-lg font-bold text-white tracking-tight">{{ $track->title }}</h3>
+                                <h3 class="font-bold text-lg text-edtech-text">{{ $track->title }}</h3>
                                 @if ($track->description)
-                                    <p class="text-xs text-gray-400 mt-1 line-clamp-2">{{ $track->description }}</p>
+                                    <p class="text-sm text-edtech-muted mt-1 line-clamp-2 leading-relaxed">
+                                        {{ $track->description }}
+                                    </p>
                                 @endif
                             </div>
 
-                            {{-- Barra de Progresso Consolidado da Trilha --}}
-                            <div class="pt-1">
-                                <div class="flex justify-between text-xs text-gray-400 mb-1.5">
-                                    <span class="font-medium text-slate-300">Progresso Consolidado da Trilha</span>
-                                    <span class="font-bold {{ $trackEnrollment->progress_percent >= 100 ? 'text-emerald-400' : 'text-indigo-400' }}">
+                            <!-- Consolidated Progress Bar (10px tall with gradient) -->
+                            <div>
+                                <div class="flex items-center justify-between text-[13px] mb-1.5">
+                                    <span class="text-edtech-muted font-medium">Progresso Consolidado da Trilha</span>
+                                    <span class="font-semibold tabular-nums {{ $trackEnrollment->progress_percent >= 100 ? 'text-alvora-emerald' : 'text-edtech-text' }}">
                                         {{ $trackEnrollment->progress_percent }}%
                                     </span>
                                 </div>
-                                <div class="w-full bg-gray-800 rounded-full h-2.5 overflow-hidden">
-                                    <div class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-2.5 rounded-full transition-all duration-500" style="width: {{ $trackEnrollment->progress_percent }}%"></div>
+                                <div class="w-full h-[10px] bg-edtech-border rounded-full overflow-hidden">
+                                    @if ($trackEnrollment->progress_percent >= 100)
+                                        <div class="h-full bg-alvora-emerald rounded-full transition-all duration-500" style="width: 100%;"></div>
+                                    @else
+                                        <div class="h-full bg-gradient-to-r from-edtech-blue to-edtech-blue-dark rounded-full transition-all duration-500" style="width: {{ $trackEnrollment->progress_percent }}%;"></div>
+                                    @endif
                                 </div>
                             </div>
 
-                            {{-- Sequência de Cursos da Trilha --}}
-                            <div class="pt-2">
-                                <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cursos da Trilha ({{ $track->courses->count() }}):</span>
-                                <div class="mt-2 space-y-1.5">
+                            <!-- Courses of the track -->
+                            <div class="border-t border-edtech-border pt-4">
+                                <span class="text-[14px] font-semibold text-edtech-text block mb-2">
+                                    Cursos da trilha ({{ $track->courses->count() }})
+                                </span>
+                                <div class="flex flex-col divide-y divide-edtech-border">
                                     @foreach ($track->courses as $course)
                                         @php
                                             $courseEnrollment = $enrollments->firstWhere('course_id', $course->id);
                                             $coursePercent = $courseEnrollment?->progress_percent ?? 0;
                                             $isCompleted = $courseEnrollment && $courseEnrollment->status === 'completed';
                                         @endphp
-                                        <div class="flex items-center justify-between text-xs p-2 rounded-lg bg-gray-950/60 border border-white/5">
-                                            <div class="flex items-center gap-2 truncate">
-                                                <span class="w-4 h-4 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center text-[10px] font-bold">
-                                                    {{ $loop->iteration }}
-                                                </span>
-                                                <span class="truncate font-medium text-slate-200">{{ $course->title }}</span>
+                                        <div class="py-[14px] flex items-center justify-between gap-3 text-[15px]">
+                                            <div class="flex items-center gap-2.5 min-w-0">
+                                                <span class="text-[13px] font-medium text-edtech-muted w-5 shrink-0 tabular-nums">{{ $loop->iteration }}.</span>
+                                                <span class="text-edtech-text font-medium truncate">{{ $course->title }}</span>
                                             </div>
-                                            <div class="flex items-center gap-2">
+                                            <div class="shrink-0">
                                                 @if ($isCompleted)
-                                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                                        Concluído ✓
+                                                    <span class="text-[13px] font-semibold text-alvora-emerald flex items-center gap-1">
+                                                        <x-icon name="check-circle" class="w-4 h-4 text-alvora-emerald shrink-0" />
+                                                        Concluído
                                                     </span>
                                                 @else
-                                                    <span class="text-[11px] font-semibold text-slate-400">{{ $coursePercent }}%</span>
+                                                    <span class="text-[13px] font-semibold text-edtech-muted tabular-nums">{{ $coursePercent }}%</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -196,181 +229,178 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    @endif
-
-    {{-- Seção: Meus Cursos em Andamento --}}
-    <div class="space-y-4">
-        <div class="flex items-center justify-between">
-            <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                Continuar Aprendendo
-            </h2>
-            <span class="text-xs text-gray-400">{{ $enrollments->count() }} curso(s) matriculado(s)</span>
-        </div>
-
-        @if ($enrollments->isEmpty())
-            <div class="bg-gray-900/40 border border-white/5 rounded-2xl p-8 text-center space-y-3">
-                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 mx-auto flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
+                    @endforeach
                 </div>
-                <h3 class="text-base font-semibold text-white">Você ainda não está matriculado em nenhum curso</h3>
-                <p class="text-sm text-gray-400 max-w-md mx-auto">
-                    Navegue pelo catálogo corporativo abaixo e inscreva-se para começar seu aprendizado.
-                </p>
             </div>
-        @else
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach ($enrollments as $enrollment)
-                    <div class="bg-gray-900/60 border border-white/5 rounded-2xl overflow-hidden hover:border-white/10 transition flex flex-col group">
-                        <div class="relative h-44 bg-gray-800 overflow-hidden">
-                            @if ($enrollment->course->thumbnail)
-                                <img src="{{ $enrollment->course->thumbnail }}" alt="{{ $enrollment->course->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-950/60 to-gray-900 text-indigo-400">
-                                    <svg class="w-12 h-12 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                            @endif
+        @endif
 
-                            <div class="absolute top-3 right-3">
-                                @if ($enrollment->status === 'completed')
-                                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 backdrop-blur-md">
-                                        Concluído ✓
-                                    </span>
-                                @else
-                                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 backdrop-blur-md">
-                                        {{ $enrollment->progress_percent }}% Concluído
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
+        <!-- 4. CONTINUAR APRENDENDO -->
+        <div class="flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+                <h2 class="font-semibold text-xl text-edtech-text">Continuar Aprendendo</h2>
+                <span class="text-sm text-edtech-muted font-medium">{{ $enrollments->count() }} curso(s) matriculado(s)</span>
+            </div>
 
-                        <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            @if ($enrollments->isEmpty())
+                <div class="bg-edtech-surface border border-edtech-border rounded-2xl p-8 text-center space-y-3 shadow-card">
+                    <div class="w-12 h-12 rounded-2xl bg-edtech-blue-light text-edtech-blue mx-auto flex items-center justify-center">
+                        <x-icon name="book-open" class="w-6 h-6" />
+                    </div>
+                    <h3 class="text-base font-semibold text-edtech-text">Você ainda não está matriculado em nenhum curso</h3>
+                    <p class="text-sm text-edtech-muted max-w-md mx-auto">
+                        Navegue pelo catálogo corporativo abaixo e inscreva-se para começar seu aprendizado.
+                    </p>
+                </div>
+            @else
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach ($enrollments as $enrollment)
+                        @php
+                            $isCourseCompleted = $enrollment->status === 'completed' || $enrollment->progress_percent >= 100;
+                        @endphp
+                        <div class="bg-edtech-surface border border-edtech-border rounded-2xl p-4 shadow-card hover:shadow-card-hover motion-safe:hover:-translate-y-1.5 transition-all duration-200 ease-out flex flex-col justify-between group">
                             <div>
-                                <h3 class="font-bold text-white text-base line-clamp-1 group-hover:text-indigo-400 transition">
+                                <!-- Cover Image (16:10, 12px radius, zoom 1.05 on hover) -->
+                                <div class="w-full aspect-[16/10] rounded-[12px] overflow-hidden bg-edtech-border-light mb-4 border border-edtech-border/60 relative">
+                                    @if ($enrollment->course->thumbnail)
+                                        <img src="{{ $enrollment->course->thumbnail }}"
+                                             alt="{{ $enrollment->course->title }}"
+                                             loading="lazy"
+                                             class="w-full h-full object-cover motion-safe:group-hover:scale-105 transition-transform duration-200 ease-out">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-edtech-navy to-edtech-blue-dark text-white motion-safe:group-hover:scale-105 transition-transform duration-200 ease-out">
+                                            <x-icon name="book-open" class="w-10 h-10 text-white/85" />
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- Title (1 line truncated) -->
+                                <h3 class="font-semibold text-[18px] text-edtech-text truncate" title="{{ $enrollment->course->title }}">
                                     {{ $enrollment->course->title }}
                                 </h3>
-                                <p class="text-xs text-gray-400 mt-1 line-clamp-2">
-                                    {{ $enrollment->course->description ?? 'Sem descrição informada.' }}
+
+                                <!-- Description (max 2 lines) -->
+                                <p class="text-[14px] text-edtech-muted mt-1.5 line-clamp-2 leading-[1.6]">
+                                    {{ $enrollment->course->description ?: 'Sem descrição informada.' }}
                                 </p>
                             </div>
 
-                            <div class="space-y-3 pt-2">
-                                {{-- Barra de Progresso --}}
+                            <div class="mt-6 flex flex-col gap-3">
+                                <!-- Progress Block (8px tall bar) -->
                                 <div>
-                                    <div class="flex justify-between text-xs text-gray-400 mb-1">
-                                        <span>Progresso</span>
-                                        <span class="font-semibold text-white">{{ $enrollment->progress_percent }}%</span>
+                                    <div class="flex items-center justify-between text-[13px] mb-1">
+                                        @if ($isCourseCompleted)
+                                            <span class="font-semibold text-alvora-emerald flex items-center gap-1">
+                                                <x-icon name="check-circle" class="w-3.5 h-3.5 text-alvora-emerald shrink-0" />
+                                                Concluído
+                                            </span>
+                                            <span class="font-semibold text-alvora-emerald tabular-nums">100%</span>
+                                        @else
+                                            <span class="text-edtech-muted font-medium">Progresso</span>
+                                            <span class="font-semibold text-edtech-text tabular-nums">{{ $enrollment->progress_percent }}%</span>
+                                        @endif
                                     </div>
-                                    <div class="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-                                        <div class="bg-gradient-to-r from-indigo-500 to-emerald-400 h-2 rounded-full transition-all duration-500" style="width: {{ $enrollment->progress_percent }}%"></div>
+                                    <div class="w-full h-[8px] bg-edtech-border rounded-full overflow-hidden">
+                                        @if ($isCourseCompleted)
+                                            <div class="h-full bg-alvora-emerald rounded-full transition-all duration-300" style="width: 100%;"></div>
+                                        @else
+                                            <div class="h-full bg-gradient-to-r from-edtech-blue to-edtech-blue-dark rounded-full transition-all duration-300" style="width: {{ $enrollment->progress_percent }}%;"></div>
+                                        @endif
                                     </div>
                                 </div>
 
-                                {{-- Ação de Continuar --}}
-                                <button
-                                    wire:click="continueCourse({{ $enrollment->course->id }})"
-                                    class="w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20"
-                                >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                    </svg>
-                                    @if ($enrollment->status === 'completed')
+                                <!-- Action Button (44px tall) -->
+                                @if ($enrollment->status === 'completed')
+                                    <button type="button"
+                                            wire:click="continueCourse({{ $enrollment->course->id }})"
+                                            class="w-full h-[44px] px-4 rounded-xl border border-edtech-blue text-edtech-blue font-semibold text-sm hover:bg-edtech-blue-light transition-colors cursor-pointer">
                                         Rever Aulas
-                                    @else
+                                    </button>
+                                @else
+                                    <button type="button"
+                                            wire:click="continueCourse({{ $enrollment->course->id }})"
+                                            class="w-full h-[44px] px-4 rounded-xl bg-edtech-blue hover:bg-edtech-blue-hover text-white font-semibold text-sm transition-colors cursor-pointer">
                                         Continuar Aula
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
+        <!-- 5. CURSOS DISPONÍVEIS DA SUA EMPRESA (CATÁLOGO) -->
+        <div id="catalogo" class="flex flex-col gap-4 scroll-mt-28">
+            <!-- Section Header with Search Input -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h2 class="font-semibold text-xl text-edtech-text">Cursos Disponíveis da Sua Empresa</h2>
+                    <p class="text-sm text-edtech-muted mt-0.5">Explore novos temas e desenvolva novas habilidades</p>
+                </div>
+
+                <!-- Search input on the right -->
+                <div class="w-full md:w-72 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <x-icon name="search" class="w-4 h-4 text-edtech-muted" />
+                    </div>
+                    <input type="text"
+                           wire:model.live.debounce.300ms="search"
+                           placeholder="Buscar por curso..."
+                           aria-label="Buscar por curso"
+                           class="w-full pl-10 pr-4 py-2 bg-edtech-surface border border-edtech-border rounded-xl text-sm text-edtech-text placeholder-edtech-muted focus:outline-none focus:border-edtech-blue focus:ring-1 focus:ring-edtech-blue transition-colors">
+                </div>
+            </div>
+
+            <!-- Catalog Cards Grid or Separate Empty States -->
+            @if ($availableCourses->isEmpty())
+                <div class="bg-edtech-surface border border-edtech-border rounded-2xl p-8 text-center text-edtech-muted text-sm shadow-card">
+                    @if (trim($search) !== '')
+                        Nenhum curso encontrado para a sua busca.
+                    @else
+                        Nenhum novo curso disponível encontrado no momento.
+                    @endif
+                </div>
+            @else
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach ($availableCourses as $course)
+                        <div class="bg-edtech-surface border border-edtech-border rounded-2xl p-4 shadow-card hover:shadow-card-hover motion-safe:hover:-translate-y-1.5 transition-all duration-200 ease-out flex flex-col justify-between group">
+                            <div>
+                                <!-- Cover Image (16:10, 12px radius, zoom 1.05 on hover) -->
+                                <div class="w-full aspect-[16/10] rounded-[12px] overflow-hidden bg-edtech-border-light mb-4 border border-edtech-border/60 relative">
+                                    @if ($course->thumbnail)
+                                        <img src="{{ $course->thumbnail }}"
+                                             alt="{{ $course->title }}"
+                                             loading="lazy"
+                                             class="w-full h-full object-cover motion-safe:group-hover:scale-105 transition-transform duration-200 ease-out">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-edtech-navy to-edtech-blue-dark text-white motion-safe:group-hover:scale-105 transition-transform duration-200 ease-out">
+                                            <x-icon name="book-open" class="w-10 h-10 text-white/85" />
+                                        </div>
                                     @endif
+                                </div>
+
+                                <span class="text-[13px] text-edtech-muted font-medium block mb-1 tabular-nums">
+                                    {{ $course->lessons_count }} aulas
+                                </span>
+                                <h3 class="font-semibold text-[18px] text-edtech-text truncate" title="{{ $course->title }}">
+                                    {{ $course->title }}
+                                </h3>
+                                <p class="text-[14px] text-edtech-muted mt-1.5 line-clamp-2 leading-[1.6]">
+                                    {{ $course->description ?: 'Sem descrição detalhada cadastrada para este curso.' }}
+                                </p>
+                            </div>
+
+                            <div class="mt-6">
+                                <button type="button"
+                                        wire:click="enroll({{ $course->id }})"
+                                        class="w-full h-[44px] px-4 rounded-xl bg-edtech-blue hover:bg-edtech-blue-hover text-white font-semibold text-sm transition-colors shadow-xs cursor-pointer">
+                                    Matricular-se Gratuitamente
                                 </button>
                             </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
-        @endif
-    </div>
-
-    {{-- Seção: Catálogo Corporativo de Cursos Disponíveis --}}
-    <div id="catalogo" class="space-y-4 pt-6 border-t border-white/5">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-                <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    Cursos Disponíveis da Sua Empresa
-                </h2>
-                <p class="text-xs text-gray-400 mt-0.5">Explore novos temas e desenvolva novas habilidades</p>
-            </div>
-
-            <div class="w-full sm:w-72">
-                <div class="relative">
-                    <input
-                        type="text"
-                        wire:model.live.debounce.300ms="search"
-                        placeholder="Buscar por curso..."
-                        class="w-full px-4 py-2 pl-9 bg-gray-900/80 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                    >
-                    <svg class="w-4 h-4 text-gray-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                    @endforeach
                 </div>
-            </div>
+            @endif
         </div>
-
-        @if ($availableCourses->isEmpty())
-            <div class="bg-gray-900/40 border border-white/5 rounded-2xl p-8 text-center text-gray-400 text-sm">
-                Nenhum novo curso disponível encontrado no momento.
-            </div>
-        @else
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach ($availableCourses as $course)
-                    <div class="bg-gray-900/60 border border-white/5 rounded-2xl overflow-hidden hover:border-white/10 transition flex flex-col justify-between group">
-                        <div>
-                            <div class="relative h-40 bg-gray-800 overflow-hidden">
-                                @if ($course->thumbnail)
-                                    <img src="{{ $course->thumbnail }}" alt="{{ $course->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-950/40 to-gray-900 text-indigo-400">
-                                        <svg class="w-10 h-10 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                        </svg>
-                                    </div>
-                                @endif
-                                <span class="absolute bottom-3 left-3 px-2 py-0.5 rounded-lg text-xs font-medium bg-black/60 backdrop-blur-md text-gray-300 border border-white/10">
-                                    {{ $course->lessons_count }} aulas
-                                </span>
-                            </div>
-
-                            <div class="p-5 space-y-2">
-                                <h3 class="font-bold text-white text-base line-clamp-1 group-hover:text-indigo-400 transition">
-                                    {{ $course->title }}
-                                </h3>
-                                <p class="text-xs text-gray-400 line-clamp-2">
-                                    {{ $course->description ?? 'Sem descrição detalhada cadastrada para este curso.' }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="p-5 pt-0">
-                            <button
-                                wire:click="enroll({{ $course->id }})"
-                                class="w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-indigo-600/90 hover:bg-indigo-600 border border-indigo-500/30 transition flex items-center justify-center gap-2"
-                            >
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                </svg>
-                                Matricular-se Gratuitamente
-                            </button>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        @endif
-    </div>
+    </section>
 </div>
