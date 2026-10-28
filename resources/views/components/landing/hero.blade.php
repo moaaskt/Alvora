@@ -1,19 +1,19 @@
 @php
-    // Caminho único para troca da foto principal do Hero
-    $heroImagePath = asset('images/landing/hero.webp');
+    // Caminho único para a foto principal do Hero
+    $heroImagePath = asset('images/landing/hero2.jpg');
 @endphp
 
 <section aria-labelledby="hero-heading" class="reveal-section relative pt-10 sm:pt-12 lg:pt-16 pb-20 lg:pb-28 overflow-visible bg-edtech-bg" style="--reveal-delay: 0ms;">
     <div class="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-16">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
 
-            <!-- LEFT COLUMN: Content -->
-            <div class="lg:col-span-7 flex flex-col items-start pr-0 lg:pr-6">
-                <h1 id="hero-heading" class="text-3xl sm:text-5xl lg:text-[58px] leading-[1.14] lg:leading-[1.12] font-bold text-edtech-text tracking-tight mb-6">
+            <!-- LEFT COLUMN: Content (left aligned) -->
+            <div class="lg:col-span-7 flex flex-col items-start pr-0 lg:pr-6 text-left">
+                <h1 id="hero-heading" class="text-3xl sm:text-5xl lg:text-[58px] leading-[1.14] lg:leading-[1.12] font-bold text-edtech-text tracking-tight mb-6 text-left">
                     Capacitação corporativa de alto impacto com <span class="text-edtech-blue">previsão ativa</span> de retenção.
                 </h1>
 
-                <p class="text-base sm:text-lg text-edtech-muted leading-relaxed mb-8 max-w-2xl font-normal">
+                <p class="text-base sm:text-lg text-edtech-muted leading-relaxed mb-8 max-w-2xl font-normal text-left">
                     O Alvora calcula continuamente o Score de Risco de Evasão de cada colaborador e dispara intervenções pedagógicas automatizadas antes que a desistência aconteça.
                 </p>
 
@@ -76,13 +76,13 @@
                         </svg>
                     </div>
 
-                    <!-- Corporate Person Photo (single defined raster path) -->
+                    <!-- Corporate Person Photo (using girl-hero.jpg) -->
                     <img src="{{ $heroImagePath }}"
-                         width="920"
-                         height="1104"
+                         width="2774"
+                         height="1536"
                          fetchpriority="high"
-                         alt="Colaboradora corporativa usando Alvora com laptop"
-                         class="relative z-10 w-full h-full object-cover rounded-[32px] transform scale-[1.02] -translate-y-1">
+                         alt="Alvora"
+                         class="relative z-10 w-full h-full object-cover object-center rounded-[32px] transform scale-[1.02] -translate-y-1">
 
                     <!-- Overlapping plain floating UI card 1: Score de Risco -->
                     <div class="hero-float-1 absolute -top-4 -left-2 sm:-top-5 sm:-left-6 z-20 bg-edtech-surface/95 backdrop-blur-md border border-edtech-border shadow-xl p-3.5 sm:p-4 rounded-2xl w-[185px] sm:w-[210px]">
@@ -138,4 +138,3 @@
         </div>
     </div>
 </section>
-

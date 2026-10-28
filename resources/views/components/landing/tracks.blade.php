@@ -1,21 +1,29 @@
 @props(['featuredTracks' => collect()])
 
 @if(isset($featuredTracks) && $featuredTracks->isNotEmpty())
+@php
+    $count = $featuredTracks->count();
+    $gridClasses = $count < 3
+        ? 'flex flex-col md:flex-row justify-center items-stretch gap-5 sm:gap-6 max-w-4xl mx-auto'
+        : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6';
+@endphp
+
 <section id="trilhas" aria-labelledby="tracks-heading" class="reveal-section py-16 sm:py-20 bg-edtech-bg border-t border-edtech-border" style="--reveal-delay: 220ms;">
     <div class="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-16">
 
-        <div class="max-w-2xl mb-10 sm:mb-12">
-            <h2 id="tracks-heading" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-edtech-text tracking-tight">
+        <!-- Section Header (left-aligned) -->
+        <div class="max-w-2xl mb-10 sm:mb-12 text-left">
+            <h2 id="tracks-heading" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-edtech-text tracking-tight text-left">
                 Caminhos de Carreira por Departamento
             </h2>
-            <p class="text-sm sm:text-base text-edtech-muted mt-2 leading-relaxed">
+            <p class="text-base sm:text-lg text-edtech-muted mt-2 leading-relaxed text-left">
                 Sequências pedagógicas organizadas para acelerar o desenvolvimento de competências específicas da sua empresa.
             </p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+        <div class="{{ $gridClasses }}">
             @foreach($featuredTracks as $track)
-                <div class="group p-6 rounded-2xl bg-edtech-surface border border-edtech-border flex flex-col justify-between hover:border-edtech-blue-border hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300">
+                <div class="group p-6 rounded-2xl bg-edtech-surface border border-edtech-border flex flex-col justify-between hover:border-edtech-blue-border hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 w-full {{ $count < 3 ? 'max-w-md' : '' }}">
                     <div>
                         @if($track->department)
                             <p class="text-xs font-semibold text-edtech-blue mb-2">
@@ -38,4 +46,3 @@
     </div>
 </section>
 @endif
-

@@ -3,13 +3,13 @@
 <section id="cursos" aria-labelledby="courses-heading" class="reveal-section py-16 sm:py-24 bg-edtech-bg" style="--reveal-delay: 160ms;">
     <div class="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-16">
 
-        <!-- Section Header with Link (plain text, no eyebrow pill) -->
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 gap-4">
-            <div class="max-w-2xl">
-                <h2 id="courses-heading" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-edtech-text tracking-tight">
+        <!-- Section Header with Link (left-aligned, plain text, no eyebrow pill) -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 gap-4 text-left">
+            <div class="max-w-2xl text-left">
+                <h2 id="courses-heading" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-edtech-text tracking-tight text-left">
                     Catálogo de Cursos &amp; Programas Executivos
                 </h2>
-                <p class="text-sm sm:text-base text-edtech-muted mt-2">
+                <p class="text-base sm:text-lg text-edtech-muted mt-2 text-left">
                     Cursos estruturados com acompanhamento analítico em tempo real e certificação oficial para equipes de alta performance.
                 </p>
             </div>
@@ -23,30 +23,50 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                 @foreach($showcaseCourses as $index => $course)
                     @php
+                        // Gradients navy-to-blue variados e áreas correspondentes
                         $coverThemes = [
-                            ['category' => 'Programa Executivo', 'area' => 'Liderança & Estratégia'],
-                            ['category' => 'Certificação Avançada', 'area' => 'Inteligência & Analytics'],
-                            ['category' => 'Formação de Gestores', 'area' => 'Gestão de Pessoas & Cultura'],
+                            [
+                                'category' => 'Liderança & Estratégia',
+                                'gradient' => 'from-[#0B1528] via-[#102A56] to-[#1D4ED8]',
+                                'accent' => '#93C5FD',
+                            ],
+                            [
+                                'category' => 'Inteligência & Analytics',
+                                'gradient' => 'from-[#0A192F] via-[#133E7C] to-[#2563EB]',
+                                'accent' => '#60A5FA',
+                            ],
+                            [
+                                'category' => 'Gestão de Pessoas & Cultura',
+                                'gradient' => 'from-[#081734] via-[#1E3A8A] to-[#1E40AF]',
+                                'accent' => '#BFDBFE',
+                            ],
+                            [
+                                'category' => 'Inovação & Eficiência',
+                                'gradient' => 'from-[#0F172A] via-[#1B355A] to-[#2563EB]',
+                                'accent' => '#93C5FD',
+                            ],
                         ];
                         $meta = $coverThemes[$index % count($coverThemes)];
                     @endphp
 
                     <article class="group bg-edtech-surface rounded-[16px] border border-edtech-border shadow-sm hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between">
                         <div>
-                            <!-- Banner / Cover Top with overflow-hidden and zoom 1.05 on hover -->
+                            <!-- Banner / Cover Top with distinct gradient, overflow-hidden and zoom 1.05 on hover -->
                             <div class="h-44 overflow-hidden relative bg-edtech-navy">
-                                <div class="w-full h-full bg-gradient-to-br from-edtech-navy via-edtech-navy-soft to-edtech-navy p-5 flex flex-col justify-between text-white transition-transform duration-300 group-hover:scale-105">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-xs font-medium text-slate-300">{{ $meta['category'] }}</span>
+                                <div class="w-full h-full bg-gradient-to-br {{ $meta['gradient'] }} p-6 flex flex-col justify-between text-white transition-transform duration-300 group-hover:scale-105">
+                                    <div class="flex justify-between items-start">
+                                        <!-- Plain category text above title (no badge/pill) -->
+                                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-200">
+                                            {{ $meta['category'] }}
+                                        </p>
                                         <img src="{{ asset('images/logo-symbol.png') }}"
                                              width="24"
                                              height="19"
                                              loading="lazy"
                                              alt="Alvora"
-                                             class="h-4 w-auto opacity-85 shrink-0">
+                                             class="h-4 w-auto opacity-75 shrink-0">
                                     </div>
                                     <div>
-                                        <p class="text-xs text-edtech-blue-border font-medium mb-1">{{ $meta['area'] }}</p>
                                         <h3 class="text-lg font-bold text-white leading-tight line-clamp-2">{{ $course->title }}</h3>
                                     </div>
                                 </div>
@@ -56,14 +76,15 @@
                             <div class="p-6">
                                 <!-- Instructor Avatar & Name -->
                                 @if($course->instructor)
+                                    @php
+                                        $initials = collect(explode(' ', $course->instructor->name))
+                                            ->map(fn($part) => mb_substr($part, 0, 1))
+                                            ->take(2)
+                                            ->join('');
+                                    @endphp
                                     <div class="flex items-center gap-3 mb-4 pb-4 border-b border-edtech-border-light">
-                                        <div class="w-10 h-10 rounded-full overflow-hidden border border-edtech-border bg-edtech-surface shrink-0 flex items-center justify-center">
-                                            <img src="{{ asset('images/logo-symbol-avatar.png') }}"
-                                                 width="40"
-                                                 height="40"
-                                                 loading="lazy"
-                                                 alt="Alvora"
-                                                 class="w-full h-full object-cover">
+                                        <div class="w-10 h-10 rounded-full overflow-hidden bg-edtech-navy text-white font-bold text-xs shrink-0 flex items-center justify-center border border-edtech-navy-soft shadow-xs" title="{{ $course->instructor->name }}">
+                                            <span>{{ $initials ?: 'AV' }}</span>
                                         </div>
                                         <div class="min-w-0">
                                             <div class="text-sm font-bold text-edtech-text truncate">{{ $course->instructor->name }}</div>
@@ -114,4 +135,3 @@
 
     </div>
 </section>
-
