@@ -479,10 +479,11 @@ class CertificateTemplateVisualEditorTest extends TestCase
      */
     public function test_valid_background_image_upload_and_rejection_of_invalid_files(): void
     {
+        Storage::fake('local');
         Storage::fake('public');
         $ctx = $this->setupTenantWithDraftTemplate();
 
-        // 8a.1: Upload de imagem válida (PNG 1200x800)
+        // 8a.1: Upload de imagem válida (PNG 1200x800) para disco privado local
         $validImage = UploadedFile::fake()->image('arte_certificado.png', 1200, 800);
 
         $component = Livewire::actingAs($ctx['admin'])
@@ -496,7 +497,7 @@ class CertificateTemplateVisualEditorTest extends TestCase
         $savedPath = $component->get('schema.background.image_path');
         $this->assertNotNull($savedPath);
         $this->assertStringStartsWith("certificate-backgrounds/tenant-{$ctx['company']->id}/", $savedPath);
-        Storage::disk('public')->assertExists($savedPath);
+        Storage::disk('local')->assertExists($savedPath);
 
         // Ao salvar o rascunho, o schema atualizado com a imagem é persistido no banco
         $component->call('saveDraft')->assertHasNoErrors();
