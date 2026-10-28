@@ -7,6 +7,7 @@ use App\Models\CertificateTemplateVersion;
 use App\Services\CertificateTemplateResolver;
 use DomainException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class CertificateTemplateList extends Component
@@ -51,38 +52,110 @@ class CertificateTemplateList extends Component
         $this->validate();
 
         $user = Auth::user();
-        if (!$user || empty($user->company_id)) {
-            abort(403, 'Apenas usuários vinculados a uma empresa corporativa podem criar templates.');
+        if (!$user) {
+            $this->addError('newTemplateName', 'Usuário não autenticado.');
+            return;
         }
 
-        // Obtém o schema inicial a partir do padrão institucional da ALVORA
-        $initialSchema = $resolver->getDefaultSchema();
-        $initialSchema['name'] = $this->newTemplateName;
+        $companyId = $user->company_id;
+        if (empty($companyId) && !$user->isAlvoraAdmin()) {
+            $this->addError('newTemplateName', 'Apenas usuários vinculados a uma empresa corporativa podem criar templates.');
+            $this->dispatch('toast', message: 'Usuário sem vínculo corporativo ativo.', type: 'error');
+            return;
+        }
 
-        // Cria o template sob o TenantScope (injetando automaticamente company_id)
-        $template = CertificateTemplate::create([
-            'company_id' => $user->company_id,
-            'name' => $this->newTemplateName,
-            'description' => $this->newTemplateDescription ?: null,
-            'status' => 'draft',
-            'is_default' => false,
-        ]);
+        try {
+            $template = DB::transaction(function () use ($user, $companyId, $resolver) {
+                // Obtém o schema inicial a partir do padrão institucional da ALVORA
+                $initialSchema = $resolver->getDefaultSchema();
+                $initialSchema['name'] = $this->newTemplateName;
 
-        // Cria a versão 1 em estado draft
-        CertificateTemplateVersion::create([
-            'template_id' => $template->id,
-            'version' => 1,
-            'schema_json' => $initialSchema,
-            'status' => 'draft',
-            'created_by' => $user->id,
-        ]);
+                // Cria o template sob o TenantScope (injetando automaticamente company_id)
+                $template = CertificateTemplate::create([
+                    'company_id' => $companyId,
+                    'name' => $this->newTemplateName,
+                    'description' => $this->newTemplateDescription ?: null,
+                    'status' => 'draft',
+                    'is_default' => false,
+                ]);
 
-        $this->showCreateModal = false;
-        $this->reset(['newTemplateName', 'newTemplateDescription']);
+                // Cria a versão 1 em estado draft
+                CertificateTemplateVersion::create([
+                    'template_id' => $template->id,
+                    'version' => 1,
+                    'schema_json' => $initialSchema,
+                    'status' => 'draft',
+                    'created_by' => $user->id,
+                ]);
 
-        session()->flash('success', "Template '{$template->name}' criado com sucesso em modo rascunho.");
-        $this->dispatch('template-created', templateId: $template->id);
-        $this->dispatch('toast', message: 'Template corporativo criado com sucesso.', type: 'success');
+                return $template;
+            });
+
+            $this->showCreateModal = false;
+            $this->reset(['newTemplateName', 'newTemplateDescription']);
+
+            session()->flash('success', "Template '{$template->name}' criado com sucesso em modo rascunho.");
+            $this->dispatch('template-created', templateId: $template->id);
+            $this->dispatch('toast', message: "Template corporativo '{$template->name}' criado com sucesso.", type: 'success');
+        } catch (\Throwable $e) {
+            $this->addError('newTemplateName', 'Falha ao salvar template: ' . $e->getMessage());
+            $this->dispatch('toast', message: 'Erro ao criar template.', type: 'error');
+        }
+    }
+
+    /**
+     * Duplicate an existing corporate template as a new independent draft template.
+     */
+    public function duplicateTemplate(int $templateId): void
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return;
+        }
+
+        $sourceTemplate = CertificateTemplate::findOrFail($templateId);
+
+        // Autoriza acesso de tenant
+        if (!$user->isAlvoraAdmin() && $sourceTemplate->company_id !== $user->company_id) {
+            $this->dispatch('toast', message: 'Acesso não autorizado.', type: 'error');
+            return;
+        }
+
+        // Obtém o schema da versão ativa ou da versão mais recente
+        $sourceVersion = $sourceTemplate->activeVersion
+            ?? $sourceTemplate->versions()->orderByDesc('version')->first();
+
+        $schema = $sourceVersion ? $sourceVersion->schema_json : app(CertificateTemplateResolver::class)->getDefaultSchema();
+        $newName = "Cópia de " . $sourceTemplate->name;
+        $schema['name'] = $newName;
+
+        try {
+            $newTemplate = DB::transaction(function () use ($user, $sourceTemplate, $newName, $schema) {
+                $newTemplate = CertificateTemplate::create([
+                    'company_id' => $sourceTemplate->company_id,
+                    'name' => $newName,
+                    'description' => $sourceTemplate->description ? "{$sourceTemplate->description} (Duplicado)" : null,
+                    'status' => 'draft',
+                    'is_default' => false,
+                ]);
+
+                CertificateTemplateVersion::create([
+                    'template_id' => $newTemplate->id,
+                    'version' => 1,
+                    'schema_json' => $schema,
+                    'status' => 'draft',
+                    'created_by' => $user->id,
+                ]);
+
+                return $newTemplate;
+            });
+
+            session()->flash('success', "Template duplicado com sucesso como '{$newTemplate->name}'.");
+            $this->dispatch('template-created', templateId: $newTemplate->id);
+            $this->dispatch('toast', message: "Template duplicado com sucesso.", type: 'success');
+        } catch (\Throwable $e) {
+            $this->dispatch('toast', message: 'Erro ao duplicar template: ' . $e->getMessage(), type: 'error');
+        }
     }
 
     /**
