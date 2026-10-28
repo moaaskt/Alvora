@@ -542,7 +542,7 @@ class CertificateTemplateEditor extends Component
 
         $tenantFolder = $template->company_id ? "tenant-{$template->company_id}" : "platform";
         $fileName = "bg_{$template->id}_" . Str::random(16) . ".{$ext}";
-        $storedPath = $this->backgroundImage->storeAs("certificate-backgrounds/{$tenantFolder}", $fileName, 'public');
+        $storedPath = $this->backgroundImage->storeAs("certificate-backgrounds/{$tenantFolder}", $fileName, 'local');
 
         if (!$storedPath) {
             $this->validationError = 'Falha ao salvar a imagem no armazenamento do servidor.';
@@ -757,8 +757,13 @@ class CertificateTemplateEditor extends Component
 
         $backgroundImagePath = $this->schema['background']['image_path'] ?? null;
         $backgroundImageUrl = null;
-        if (!empty($backgroundImagePath) && Storage::disk('public')->exists($backgroundImagePath)) {
-            $backgroundImageUrl = Storage::disk('public')->url($backgroundImagePath);
+        if (!empty($backgroundImagePath)) {
+            if (Storage::disk('local')->exists($backgroundImagePath) || Storage::disk('public')->exists($backgroundImagePath)) {
+                $backgroundImageUrl = route('instructor.certificate-templates.background', [
+                    'template' => $template->id,
+                    'v' => $currentVersion->id,
+                ]);
+            }
         }
 
         $demoReplacements = [

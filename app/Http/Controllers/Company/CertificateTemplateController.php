@@ -14,6 +14,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CertificateTemplateController extends Controller
 {
@@ -137,5 +139,89 @@ class CertificateTemplateController extends Controller
                 'message' => 'Template ou versão não encontrado.',
             ], 404);
         }
+    }
+
+    /**
+     * Serve the background artwork securely with tenant authorization.
+     */
+    public function background(
+        Request $request,
+        CertificateTemplate $template,
+        ?CertificateTemplateVersion $version,
+        CertificateTemplatePublishingService $service,
+        CertificateSchemaValidator $validator
+    ): BinaryFileResponse|JsonResponse {
+        $user = Auth::user();
+
+        try {
+            $service->authorizeTemplateAccess($template, $user);
+        } catch (ModelNotFoundException) {
+            abort(404, 'Template não encontrado.');
+        } catch (\Illuminate\Auth\Access\AuthorizationException) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        // Se uma versão foi passada explicitamente via rota
+        if ($version && $version->exists) {
+            $targetVersion = $template->versions()->where('id', $version->id)->first();
+            if (!$targetVersion) {
+                abort(404, 'Versão não encontrada neste template.');
+            }
+        } else {
+            // Busca versão informada por query param ?v= ou a versão ativa/mais recente
+            $requestedVersionId = $request->query('v');
+            if ($requestedVersionId) {
+                $targetVersion = $template->versions()->where('id', (int) $requestedVersionId)->first();
+            } else {
+                $targetVersion = $template->activeVersion
+                    ?? $template->versions()->where('status', 'draft')->latest('version')->first()
+                    ?? $template->versions()->latest('version')->first();
+            }
+        }
+
+        if (!$targetVersion) {
+            abort(404, 'Nenhuma versão disponível para este template.');
+        }
+
+        $imagePath = $targetVersion->schema_json['background']['image_path'] ?? null;
+        if (empty($imagePath)) {
+            abort(404, 'Este template não possui imagem de fundo vinculada.');
+        }
+
+        // Valida o caminho contra path traversal e URLs remotas
+        try {
+            $validator->validateImagePath($imagePath);
+        } catch (DomainException) {
+            abort(400, 'Caminho de imagem inválido.');
+        }
+
+        // 1. Procura no disco local privado ('local' = storage/app/private)
+        $disk = Storage::disk('local');
+        $absolutePath = null;
+
+        if ($disk->exists($imagePath)) {
+            $absolutePath = $disk->path($imagePath);
+        } elseif (Storage::disk('public')->exists($imagePath)) {
+            // 2. Fallback transparente para imagens legadas no disco público
+            $absolutePath = Storage::disk('public')->path($imagePath);
+        }
+
+        if (!$absolutePath || !file_exists($absolutePath)) {
+            abort(404, 'Arquivo de imagem não encontrado no servidor.');
+        }
+
+        $extension = strtolower(pathinfo($absolutePath, PATHINFO_EXTENSION));
+        $mime = match ($extension) {
+            'png' => 'image/png',
+            'jpg', 'jpeg' => 'image/jpeg',
+            'webp' => 'image/webp',
+            default => 'application/octet-stream',
+        };
+
+        return response()->file($absolutePath, [
+            'Content-Type' => $mime,
+            'Cache-Control' => 'private, no-cache, must-revalidate',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 }
