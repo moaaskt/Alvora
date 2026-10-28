@@ -134,12 +134,15 @@ class CertificateSchemaValidator
             }
             $bg = $schema['background'];
             foreach (array_keys($bg) as $bgKey) {
-                if (!in_array($bgKey, ['color', 'border_color', 'opacity'], true)) {
+                if (!in_array($bgKey, ['color', 'border_color', 'opacity', 'image_path'], true)) {
                     throw new DomainException("Propriedade desconhecida em 'background': '{$bgKey}'. Recursos externos ou imagens remotas não são permitidos.");
                 }
             }
             if (isset($bg['color'])) {
                 $this->validateColor($bg['color'], 'background.color');
+            }
+            if (isset($bg['image_path'])) {
+                $this->validateImagePath($bg['image_path']);
             }
         }
 
@@ -313,5 +316,35 @@ class CertificateSchemaValidator
         }
 
         throw new DomainException("Formato de cor inválido em '{$context}': '{$color}'. Use hexadecimal ou rgba().");
+    }
+
+    /**
+     * Validate stored local image path for background artwork.
+     * Prevents SSRF, remote URLs, data URIs, and directory traversal.
+     *
+     * @param mixed $path
+     * @throws DomainException
+     */
+    public function validateImagePath(mixed $path): void
+    {
+        if (!is_string($path) || trim($path) === '') {
+            throw new DomainException("O caminho da imagem de fundo ('background.image_path') deve ser uma string não vazia.");
+        }
+
+        // Bloqueia tentativas de URLs remotas e esquemas arbitrários
+        if (preg_match('/^(https?|ftp|file|php|data):/i', $path)) {
+            throw new DomainException("Recursos externos ou URLs remotas não são permitidos para arte de fundo.");
+        }
+
+        // Bloqueia tentativas de Directory Traversal
+        if (str_contains($path, '..') || str_contains($path, '\\') || str_contains($path, "\0")) {
+            throw new DomainException("Tentativa de travessia de diretório detectada no caminho da imagem de fundo.");
+        }
+
+        // Valida que o caminho respeita o prefixo e extensões permitidas no storage local da aplicação
+        // Formato esperado: certificate-backgrounds/{company_id_or_global}/{filename}.(png|jpg|jpeg|webp)
+        if (!preg_match('/^certificate-backgrounds\/[0-9a-zA-Z_\-\/]+\.(png|jpg|jpeg|webp)$/i', $path)) {
+            throw new DomainException("Caminho ou formato de arquivo inválido para a arte de fundo. Aceito apenas PNG, JPG/JPEG e WebP em storage controlado.");
+        }
     }
 }

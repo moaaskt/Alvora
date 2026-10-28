@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.student')]
 class Dashboard extends Component
 {
     public string $search = '';

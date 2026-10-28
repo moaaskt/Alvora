@@ -25,6 +25,7 @@ class CertificateTemplateResolver
         if (!empty($companyId)) {
             $companyTemplate = CertificateTemplate::where('company_id', $companyId)
                 ->where('status', 'active')
+                ->whereHas('activeVersion')
                 ->orderByDesc('is_default')
                 ->first();
 
@@ -37,6 +38,7 @@ class CertificateTemplateResolver
         $globalTemplate = CertificateTemplate::withoutGlobalScope(TenantScope::class)
             ->whereNull('company_id')
             ->where('status', 'active')
+            ->whereHas('activeVersion')
             ->where('is_default', true)
             ->first();
 
@@ -49,41 +51,85 @@ class CertificateTemplateResolver
     }
 
     /**
-     * Ensure the default global platform template and its version 1 exist in the database.
+     * Ensure the default global platform template and an active version exist in the database.
+     * Concurrency-safe and idempotent under multiple simultaneous requests.
      */
     public function ensureDefaultTemplate(): CertificateTemplateVersion
     {
-        $template = CertificateTemplate::withoutGlobalScope(TenantScope::class)
-            ->whereNull('company_id')
-            ->where('is_default', true)
-            ->first();
+        return DB::transaction(function () {
+            // 1. Localiza ou cria o template padrão institucional sob lock
+            $template = CertificateTemplate::withoutGlobalScope(TenantScope::class)
+                ->whereNull('company_id')
+                ->where('is_default', true)
+                ->lockForUpdate()
+                ->first();
 
-        if (!$template) {
-            $template = CertificateTemplate::withoutGlobalScope(TenantScope::class)->create([
-                'company_id' => null,
-                'name' => 'Template Padrão Institucional ALVORA',
-                'description' => 'Layout oficial corporativo em tema escuro com suporte dinâmico a Dompdf.',
-                'is_default' => true,
-                'status' => 'active',
-            ]);
-        }
+            if (!$template) {
+                $template = CertificateTemplate::withoutGlobalScope(TenantScope::class)
+                    ->whereNull('company_id')
+                    ->where('name', 'Template Padrão Institucional ALVORA')
+                    ->lockForUpdate()
+                    ->first();
+            }
 
-        $activeVersion = $template->activeVersion;
+            if (!$template) {
+                $template = CertificateTemplate::withoutGlobalScope(TenantScope::class)->create([
+                    'company_id' => null,
+                    'name' => 'Template Padrão Institucional ALVORA',
+                    'description' => 'Layout oficial corporativo em tema escuro com suporte dinâmico a Dompdf.',
+                    'is_default' => true,
+                    'status' => 'active',
+                ]);
+            } else {
+                if ($template->status !== 'active' || !$template->is_default) {
+                    $template->update([
+                        'status' => 'active',
+                        'is_default' => true,
+                    ]);
+                }
+            }
 
-        if (!$activeVersion) {
+            // 2. Busca versão ativa existente do template sob lock
+            $activeVersion = $template->versions()
+                ->where('status', 'active')
+                ->orderByDesc('version')
+                ->lockForUpdate()
+                ->first();
+
+            if ($activeVersion) {
+                return $activeVersion;
+            }
+
+            // 3. Tratamento seguro quando não há versão ativa
+            $existingVersionsCount = $template->versions()->count();
+
+            if ($existingVersionsCount === 0) {
+                $schema = $this->getDefaultSchema();
+                $this->validator->validate($schema);
+
+                return CertificateTemplateVersion::create([
+                    'template_id' => $template->id,
+                    'version' => 1,
+                    'schema_json' => $schema,
+                    'status' => 'active',
+                    'created_by' => null,
+                ]);
+            }
+
+            // Se existirem versões mas nenhuma ativa, preserva a imutabilidade das versões arquivadas
+            // e cria a próxima versão numérica sequencial sem violar a chave única
+            $nextVersionNumber = ((int) $template->versions()->max('version')) + 1;
             $schema = $this->getDefaultSchema();
             $this->validator->validate($schema);
 
-            $activeVersion = CertificateTemplateVersion::create([
+            return CertificateTemplateVersion::create([
                 'template_id' => $template->id,
-                'version' => 1,
+                'version' => $nextVersionNumber,
                 'schema_json' => $schema,
                 'status' => 'active',
                 'created_by' => null,
             ]);
-        }
-
-        return $activeVersion;
+        });
     }
 
     /**

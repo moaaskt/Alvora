@@ -14,10 +14,9 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
 
-    <!-- Google Fonts & Material Symbols -->
+    <!-- Material Symbols -->
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 
     <style>
@@ -116,18 +115,18 @@
                         "margin": "2rem"
                     },
                     fontFamily: {
-                        "body-sm": ["Inter", "sans-serif"],
-                        "display-lg": ["Plus Jakarta Sans", "sans-serif"],
-                        "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
-                        "stat-value": ["Plus Jakarta Sans", "sans-serif"],
-                        "body-md": ["Inter", "sans-serif"],
-                        "display-lg-mobile": ["Plus Jakarta Sans", "sans-serif"],
-                        "label-sm": ["Inter", "sans-serif"],
-                        "headline-md": ["Plus Jakarta Sans", "sans-serif"],
-                        "label-md": ["Inter", "sans-serif"],
-                        "body-lg": ["Inter", "sans-serif"],
-                        "table-header": ["Inter", "sans-serif"],
-                        "headline-sm": ["Plus Jakarta Sans", "sans-serif"]
+                        "body-sm": ["Geist Variable", "system-ui", "sans-serif"],
+                        "display-lg": ["Geist Variable", "system-ui", "sans-serif"],
+                        "headline-lg": ["Geist Variable", "system-ui", "sans-serif"],
+                        "stat-value": ["Geist Variable", "system-ui", "sans-serif"],
+                        "body-md": ["Geist Variable", "system-ui", "sans-serif"],
+                        "display-lg-mobile": ["Geist Variable", "system-ui", "sans-serif"],
+                        "label-sm": ["Geist Variable", "system-ui", "sans-serif"],
+                        "headline-md": ["Geist Variable", "system-ui", "sans-serif"],
+                        "label-md": ["Geist Variable", "system-ui", "sans-serif"],
+                        "body-lg": ["Geist Variable", "system-ui", "sans-serif"],
+                        "table-header": ["Geist Variable", "system-ui", "sans-serif"],
+                        "headline-sm": ["Geist Variable", "system-ui", "sans-serif"]
                     },
                     fontSize: {
                         "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
@@ -151,7 +150,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="bg-background font-body-md text-on-surface antialiased" style="font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11'; color: rgb(15, 23, 42); letter-spacing: -0.01em;">
+<body class="bg-background font-body-md text-on-surface antialiased" style="font-family: 'Geist Variable', system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11'; color: rgb(15, 23, 42); letter-spacing: -0.01em;">
 
     <!-- Left Sidebar: Fixed Clean Enterprise Navigation -->
     <aside class="fixed left-0 top-0 h-screen w-72 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-r border-slate-200/60">

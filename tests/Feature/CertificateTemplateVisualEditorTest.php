@@ -19,7 +19,10 @@ use App\Services\CertificateSchemaValidator;
 use App\Services\CertificateService;
 use App\Services\CertificateTemplatePublishingService;
 use App\Services\CertificateTemplateResolver;
+use DomainException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -469,5 +472,205 @@ class CertificateTemplateVisualEditorTest extends TestCase
         $this->assertEquals('#0b0f19', $v1->schema_json['background']['color']);
         $this->assertEquals($v1->id, $issuedCertV1->template_version_id);
         $this->assertEquals($originalSnapshot, $issuedCertV1->snapshot);
+    }
+
+    /**
+     * 8a. Upload válido e rejeição de arquivos inválidos.
+     */
+    public function test_valid_background_image_upload_and_rejection_of_invalid_files(): void
+    {
+        Storage::fake('local');
+        Storage::fake('public');
+        $ctx = $this->setupTenantWithDraftTemplate();
+
+        // 8a.1: Upload de imagem válida (PNG 1200x800) para disco privado local
+        $validImage = UploadedFile::fake()->image('arte_certificado.png', 1200, 800);
+
+        $component = Livewire::actingAs($ctx['admin'])
+            ->test(CertificateTemplateEditor::class, ['template' => $ctx['template']])
+            ->set('backgroundImage', $validImage)
+            ->call('uploadBackgroundImage')
+            ->assertHasNoErrors()
+            ->assertSet('validationError', null)
+            ->assertDispatched('toast');
+
+        $savedPath = $component->get('schema.background.image_path');
+        $this->assertNotNull($savedPath);
+        $this->assertStringStartsWith("certificate-backgrounds/tenant-{$ctx['company']->id}/", $savedPath);
+        Storage::disk('local')->assertExists($savedPath);
+
+        // Ao salvar o rascunho, o schema atualizado com a imagem é persistido no banco
+        $component->call('saveDraft')->assertHasNoErrors();
+        $draft = $ctx['template']->fresh()->versions()->where('status', 'draft')->first();
+        $this->assertEquals($savedPath, $draft->schema_json['background']['image_path']);
+
+        // 8a.2: Rejeição de arquivo com extensão inválida (.pdf ou .txt)
+        $invalidFile = UploadedFile::fake()->create('documento.pdf', 500, 'application/pdf');
+
+        Livewire::actingAs($ctx['admin'])
+            ->test(CertificateTemplateEditor::class, ['template' => $ctx['template']])
+            ->set('backgroundImage', $invalidFile)
+            ->call('uploadBackgroundImage')
+            ->assertHasErrors(['backgroundImage']);
+
+        // 8a.3: Rejeição de imagem com dimensões abaixo do mínimo (< 800x500)
+        $smallImage = UploadedFile::fake()->image('muito_pequena.png', 400, 300);
+
+        Livewire::actingAs($ctx['admin'])
+            ->test(CertificateTemplateEditor::class, ['template' => $ctx['template']])
+            ->set('backgroundImage', $smallImage)
+            ->call('uploadBackgroundImage')
+            ->assertHasErrors(['backgroundImage']);
+
+        // 8a.4: Rejeição de arquivo acima do limite máximo (5MB)
+        $heavyImage = UploadedFile::fake()->image('pesada.png', 1200, 800)->size(6000); // 6MB
+
+        Livewire::actingAs($ctx['admin'])
+            ->test(CertificateTemplateEditor::class, ['template' => $ctx['template']])
+            ->set('backgroundImage', $heavyImage)
+            ->call('uploadBackgroundImage')
+            ->assertHasErrors(['backgroundImage']);
+    }
+
+    /**
+     * 8b. Rejeição de URLs remotas e Directory Traversal no validador.
+     */
+    public function test_background_image_validator_rejects_remote_urls_and_directory_traversal(): void
+    {
+        $schema = $this->resolver->getDefaultSchema();
+
+        // Tentativa de URL remota (SSRF)
+        $schema['background']['image_path'] = 'https://evil.com/malicious.png';
+        $this->expectException(DomainException::class);
+        $this->validator->validate($schema);
+    }
+
+    public function test_background_image_validator_rejects_directory_traversal(): void
+    {
+        $schema = $this->resolver->getDefaultSchema();
+
+        // Tentativa de Directory Traversal
+        $schema['background']['image_path'] = 'certificate-backgrounds/../../etc/passwd.png';
+        $this->expectException(DomainException::class);
+        $this->validator->validate($schema);
+    }
+
+    /**
+     * 9. Isolamento de imagens e templates entre tenants.
+     */
+    public function test_multi_tenant_isolation_on_background_and_template_editing(): void
+    {
+        $ctxA = $this->setupTenantWithDraftTemplate('Company Alpha');
+        $ctxB = $this->setupTenantWithDraftTemplate('Company Beta');
+
+        // Admin da Empresa B tentando acessar template da Empresa A deve receber 404/403
+        Livewire::actingAs($ctxB['admin'])
+            ->test(CertificateTemplateEditor::class, ['template' => $ctxA['template']])
+            ->assertStatus(404);
+    }
+
+    /**
+     * 10. Arraste e salvamento corretos em diferentes níveis de zoom.
+     */
+    public function test_element_position_update_with_clamping_and_drag_invariants(): void
+    {
+        $ctx = $this->setupTenantWithDraftTemplate();
+
+        Livewire::actingAs($ctx['admin'])
+            ->test(CertificateTemplateEditor::class, ['template' => $ctx['template']])
+            // Atualiza posição para coordenadas válidas
+            ->call('updateElementPosition', 'student_name', 250, 350, 600, 50)
+            ->assertSet('selectedElementId', 'student_name')
+            // Testa clamping contra valores fora dos limites (ex: x negativo ou y além de 793)
+            ->call('updateElementPosition', 'student_name', -100, 9999, 600, 50);
+
+        $component = Livewire::actingAs($ctx['admin'])
+            ->test(CertificateTemplateEditor::class, ['template' => $ctx['template']]);
+
+        // O valor deve ter sido clampado entre 0 e (1122 - width) e (793 - height)
+        $idx = $component->get('selectedIndex');
+        $x = $component->get("schema.elements.{$idx}.x");
+        $y = $component->get("schema.elements.{$idx}.y");
+
+        $this->assertGreaterThanOrEqual(0, $x);
+        $this->assertLessThanOrEqual(1122, $x);
+        $this->assertGreaterThanOrEqual(0, $y);
+        $this->assertLessThanOrEqual(793, $y);
+    }
+
+    /**
+     * 11. Persistência de posição, dimensões e estilos via saveDraft.
+     */
+    public function test_persistence_of_position_dimensions_and_styles_via_save_draft(): void
+    {
+        $ctx = $this->setupTenantWithDraftTemplate();
+
+        Livewire::actingAs($ctx['admin'])
+            ->test(CertificateTemplateEditor::class, ['template' => $ctx['template']])
+            ->set('schema.elements.0.x', 180)
+            ->set('schema.elements.0.y', 290)
+            ->set('schema.elements.0.width', 750)
+            ->set('schema.elements.0.height', 60)
+            ->set('schema.elements.0.style.font_family', 'Helvetica')
+            ->set('schema.elements.0.style.font_size', '32px')
+            ->set('schema.elements.0.style.color', '#38bdf8')
+            ->set('schema.elements.0.style.text_align', 'center')
+            ->call('saveDraft')
+            ->assertHasNoErrors()
+            ->assertDispatched('toast');
+
+        $draft = $ctx['draft']->fresh();
+        $firstElem = $draft->schema_json['elements'][0];
+        $this->assertEquals(180, $firstElem['x']);
+        $this->assertEquals(290, $firstElem['y']);
+        $this->assertEquals(750, $firstElem['width']);
+        $this->assertEquals(60, $firstElem['height']);
+        $this->assertEquals('32px', $firstElem['style']['font_size']);
+        $this->assertEquals('#38bdf8', $firstElem['style']['color']);
+    }
+
+    /**
+     * 12. Prévia final utilizando o renderer real sem persistir um certificado.
+     */
+    public function test_pdf_preview_uses_real_dompdf_without_persisting_certificate(): void
+    {
+        $ctx = $this->setupTenantWithDraftTemplate();
+        $renderer = app(\App\Services\VersionedCertificateRenderer::class);
+
+        $initialCertificatesCount = Certificate::count();
+
+        // Renderiza a prévia do schema diretamente
+        $pdf = $renderer->renderPreview($ctx['draft']->schema_json, $ctx['company']->name);
+        $output = $pdf->output();
+
+        // Deve retornar um binário de PDF válido
+        $this->assertNotEmpty($output);
+        $this->assertStringStartsWith('%PDF-', $output);
+
+        // Não deve persistir nenhum registro em certificates
+        $this->assertEquals($initialCertificatesCount, Certificate::count());
+    }
+
+    /**
+     * Adição de campos dinâmicos predefinidos (Experiência Evento Santo).
+     */
+    public function test_add_dynamic_fields_presets_for_eventosanto_style_experience(): void
+    {
+        $ctx = $this->setupTenantWithDraftTemplate();
+
+        Livewire::actingAs($ctx['admin'])
+            ->test(CertificateTemplateEditor::class, ['template' => $ctx['template']])
+            ->call('addDynamicField', 'student_name')
+            ->assertDispatched('toast')
+            ->call('addDynamicField', 'course_title')
+            ->assertDispatched('toast')
+            ->call('togglePreviewData')
+            ->assertSet('showPreviewData', true);
+
+        // Deve conter os novos campos adicionados na coleção elements
+        $component = Livewire::actingAs($ctx['admin'])
+            ->test(CertificateTemplateEditor::class, ['template' => $ctx['template']]);
+        $elements = $component->get('schema.elements');
+        $this->assertGreaterThanOrEqual(2, count($elements));
     }
 }

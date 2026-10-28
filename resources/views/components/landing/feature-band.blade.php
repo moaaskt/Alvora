@@ -11,8 +11,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-3 leading-snug">Score Preditivo de Evasão</h3>
-                <p class="text-base text-white/90 leading-relaxed">
+                <!-- Card titles: 18-20px, weight 600 -->
+                <h3 class="text-[19px] font-semibold text-white mb-3 leading-snug">Score Preditivo de Evasão</h3>
+                <p class="text-base text-white/90 leading-[1.6]">
                     Cálculo contínuo baseado em 4 dimensões analíticas antes que o desengajamento aconteça.
                 </p>
             </div>
@@ -25,8 +26,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-3 leading-snug">Intervenção Automatizada</h3>
-                <p class="text-base text-white/90 leading-relaxed">
+                <!-- Card titles: 18-20px, weight 600 -->
+                <h3 class="text-[19px] font-semibold text-white mb-3 leading-snug">Intervenção Automatizada</h3>
+                <p class="text-base text-white/90 leading-[1.6]">
                     Disparo proativo de micro-revisões adaptativas e lembretes amigáveis para colaboradores.
                 </p>
             </div>
@@ -40,8 +42,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.257-5.064 7-9.542 7-4.477 0-8.268-2.743-9.542-7z"></path>
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-3 leading-snug">Sala de Situação do RH</h3>
-                <p class="text-base text-white/90 leading-relaxed">
+                <!-- Card titles: 18-20px, weight 600 -->
+                <h3 class="text-[19px] font-semibold text-white mb-3 leading-snug">Sala de Situação do RH</h3>
+                <p class="text-base text-white/90 leading-[1.6]">
                     Painel executivo com visão holística do engajamento e relatórios acionáveis para gestão de T&amp;D.
                 </p>
             </div>
@@ -54,8 +57,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-3 leading-snug">Tutor IA de Baixa Latência</h3>
-                <p class="text-base text-white/90 leading-relaxed">
+                <!-- Card titles: 18-20px, weight 600 -->
+                <h3 class="text-[19px] font-semibold text-white mb-3 leading-snug">Tutor IA de Baixa Latência</h3>
+                <p class="text-base text-white/90 leading-[1.6]">
                     Assistente integrado ao player tirando dúvidas conceituais diretamente durante o treino (&lt;3s).
                 </p>
             </div>

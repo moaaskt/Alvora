@@ -82,11 +82,17 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
         }
 
         $user = auth()->user();
+        $isGlobalAdmin = $user->isAlvoraAdmin();
         $companyId = $user->company_id;
         $company = $user->company;
 
-        $courses = \App\Models\Course::where('company_id', $companyId)
-            ->with(['instructor'])
+        $coursesQuery = \App\Models\Course::query();
+        if (!$isGlobalAdmin) {
+            $coursesQuery->where('company_id', $companyId);
+        }
+
+        $courses = $coursesQuery
+            ->with(['instructor', 'company'])
             ->withCount(['lessons', 'modules', 'enrollments'])
             ->withSum('lessons as total_duration_minutes', 'duration_minutes')
             ->latest('id')
@@ -97,8 +103,12 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
         $draftCourses = $courses->where('status', 'draft')->count();
         $archivedCourses = $courses->where('status', 'archived')->count();
 
-        $students = \App\Models\User::where('company_id', $companyId)
-            ->where('role', \App\Enums\UserRole::STUDENT)
+        $studentsQuery = \App\Models\User::where('role', \App\Enums\UserRole::STUDENT);
+        if (!$isGlobalAdmin) {
+            $studentsQuery->where('company_id', $companyId);
+        }
+
+        $students = $studentsQuery
             ->with(['latestRiskScore', 'interventions'])
             ->get();
 
@@ -111,13 +121,18 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
             ? round($students->avg(fn($s) => $s->latestRiskScore?->score ?? 0))
             : 0;
 
-        $recentInterventions = \App\Models\AiIntervention::where('company_id', $companyId)
+        $interventionsQuery = \App\Models\AiIntervention::query();
+        if (!$isGlobalAdmin) {
+            $interventionsQuery->where('company_id', $companyId);
+        }
+
+        $recentInterventions = (clone $interventionsQuery)
             ->with(['user', 'recommendedLesson'])
             ->latest('id')
             ->take(5)
             ->get();
 
-        $interventionsCount = \App\Models\AiIntervention::where('company_id', $companyId)->count();
+        $interventionsCount = (clone $interventionsQuery)->count();
 
         return view('dashboard', [
             'user' => $user,
@@ -203,6 +218,7 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
     Route::middleware('role:instructor,company_admin')->prefix('instrutor/certificados/templates')->name('instructor.certificate-templates.')->group(function () {
         Route::get('/', \App\Livewire\Company\CertificateTemplateList::class)->name('index');
         Route::get('/{template}/editar/{version?}', \App\Livewire\Company\CertificateTemplateEditor::class)->name('edit');
+        Route::get('/{template}/background/{version?}', [\App\Http\Controllers\Company\CertificateTemplateController::class, 'background'])->name('background');
         Route::post('/preview', [\App\Http\Controllers\Company\CertificateTemplateController::class, 'preview'])
             ->middleware('throttle:60,1')
             ->name('preview');

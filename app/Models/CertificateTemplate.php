@@ -48,6 +48,13 @@ class CertificateTemplate extends Model
     {
         parent::boot();
 
+        static::creating(function (CertificateTemplate $template) {
+            // Garante que o template padrão institucional da plataforma ALVORA permaneça estritamente global (company_id = null)
+            if ($template->is_default && $template->name === 'Template Padrão Institucional ALVORA') {
+                $template->company_id = null;
+            }
+        });
+
         static::deleting(function (CertificateTemplate $template) {
             if ($template->versions()->whereHas('certificates')->exists()) {
                 throw new DomainException("Não é possível excluir um template que possui versões vinculadas a certificados emitidos.");
@@ -69,8 +76,9 @@ class CertificateTemplate extends Model
     public function activeVersion(): HasOne
     {
         return $this->hasOne(CertificateTemplateVersion::class, 'template_id')
-            ->where('status', 'active')
-            ->latestOfMany('version');
+            ->ofMany(['version' => 'max'], function ($query) {
+                $query->where('status', 'active');
+            });
     }
 
     /**

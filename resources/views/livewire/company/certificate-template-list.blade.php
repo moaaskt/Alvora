@@ -261,6 +261,18 @@
                             </div>
 
                             <div class="flex items-center gap-1.5">
+                                <!-- DUPLICAR TEMPLATE -->
+                                <button type="button"
+                                        wire:click="duplicateTemplate({{ $template->id }})"
+                                        wire:loading.attr="disabled"
+                                        class="p-1.5 text-xs text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
+                                        title="Duplicar este template como um novo modelo">
+                                    <span class="sr-only">Duplicar</span>
+                                    <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"></path>
+                                    </svg>
+                                </button>
+
                                 <!-- DEFINIR COMO PADRÃO -->
                                 @if(!$template->is_default && $hasActiveVersion && $template->status === 'active')
                                     <button type="button"
@@ -317,7 +329,7 @@
                     </button>
                 </div>
 
-                <form wire:submit.prevent="createTemplate" class="p-6 flex flex-col gap-4">
+                <form wire:submit="createTemplate" class="p-6 flex flex-col gap-4">
                     <div>
                         <label for="newTemplateName" class="block text-xs font-semibold text-slate-700 mb-1">
                             Nome do Modelo <span class="text-rose-500">*</span>

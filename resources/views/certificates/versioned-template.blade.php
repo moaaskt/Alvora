@@ -57,13 +57,21 @@
 </head>
 <body>
     <div class="canvas-container">
-        <div class="canvas-border-outer"></div>
-        <div class="canvas-border-inner"></div>
+        @if(!empty($compiled['background']['image_absolute_path']))
+            <img src="{{ $compiled['background']['image_absolute_path'] }}"
+                 style="position: absolute; left: 0; top: 0; width: 1122px; height: 793px; z-index: 1; object-fit: cover;"
+                 alt="Fundo do Certificado" />
+        @endif
+
+        @if(($compiled['border']['width'] ?? 0) > 0 && ($compiled['border']['style'] ?? 'solid') !== 'none')
+            <div class="canvas-border-outer" style="z-index: 5;"></div>
+            <div class="canvas-border-inner" style="z-index: 5;"></div>
+        @endif
 
         @foreach ($compiled['elements'] as $element)
             <div id="elem-{{ $element['id'] }}"
                  class="canvas-element"
-                 style="{{ $element['position_css'] }} {{ $element['style_css'] }}">
+                 style="{{ $element['position_css'] }} z-index: 10; {{ $element['style_css'] }}">
                 {!! $element['content_html'] !!}
             </div>
         @endforeach

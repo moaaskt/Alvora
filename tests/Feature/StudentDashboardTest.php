@@ -35,9 +35,10 @@ class StudentDashboardTest extends TestCase
 
         $response = $this->get(route('student.dashboard'));
         $response->assertStatus(200);
-        $response->assertSee('Painel do Aluno');
-        $response->assertSee('Aluno João');
+        $response->assertSee('Meu Aprendizado');
+        $response->assertSee('Olá, Aluno João');
         $response->assertSee('Continuar Aprendendo');
+        $response->assertSee('Cursos Disponíveis da Sua Empresa');
     }
 
     public function test_student_dashboard_redirects_from_generic_dashboard(): void
@@ -89,7 +90,8 @@ class StudentDashboardTest extends TestCase
         $this->actingAs($student);
 
         Livewire::test(StudentDashboard::class)
-            ->call('enroll', $course->id);
+            ->call('enroll', $course->id)
+            ->assertSee('Matrícula realizada com sucesso no curso Segurança da Informação B2B!');
 
         $this->assertDatabaseHas('enrollments', [
             'company_id' => $company->id,
@@ -218,7 +220,53 @@ class StudentDashboardTest extends TestCase
         $this->actingAs($student);
 
         Livewire::test(StudentDashboard::class)
-            ->assertSee('50% Concluído')
-            ->assertSee('Introdução à IA Corporativa');
+            ->assertSee('Progresso')
+            ->assertSee('50%')
+            ->assertSee('Introdução à IA Corporativa')
+            ->assertSee('Continuar Aula');
+    }
+
+    public function test_student_dashboard_search_and_empty_states(): void
+    {
+        $company = Company::create(['name' => 'Tech Corp', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Carlos',
+            'email' => 'carlos@techcorp.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Aluno João',
+            'email' => 'joao@techcorp.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $this->actingAs($student);
+
+        // Sem matrículas e sem cursos publicados no catálogo
+        Livewire::test(StudentDashboard::class)
+            ->assertSee('Você ainda não está matriculado em nenhum curso')
+            ->assertSee('Nenhum novo curso disponível encontrado no momento.');
+
+        // Cria um curso publicado para testar busca
+        Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Arquitetura Cloud Corporativa',
+            'slug' => 'arquitetura-cloud-corporativa',
+            'category' => 'Infraestrutura',
+            'status' => 'published',
+        ]);
+
+        Livewire::test(StudentDashboard::class)
+            ->assertSee('Arquitetura Cloud Corporativa')
+            ->set('search', 'InexistenteXYZ')
+            ->assertDontSee('Arquitetura Cloud Corporativa')
+            ->assertSee('Nenhum curso encontrado para a sua busca.');
     }
 }

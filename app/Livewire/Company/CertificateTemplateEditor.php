@@ -11,11 +11,16 @@ use DomainException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class CertificateTemplateEditor extends Component
 {
+    use WithFileUploads;
+
     #[Locked]
     public int $templateId;
 
@@ -35,6 +40,12 @@ class CertificateTemplateEditor extends Component
     public ?string $selectedElementId = null;
     public ?string $validationError = null;
     public ?string $successMessage = null;
+
+    /** @var mixed Upload temporário da arte de fundo */
+    public $backgroundImage;
+
+    /** @var bool Alternância de exibição de dados de exemplo no canvas */
+    public bool $showPreviewData = false;
 
     public function mount(
         CertificateTemplate $template,
@@ -494,6 +505,248 @@ class CertificateTemplateEditor extends Component
         $this->successMessage = null;
     }
 
+    /**
+     * Upload a background artwork image for the current template version draft.
+     */
+    public function uploadBackgroundImage(CertificateTemplatePublishingService $publishingService): void
+    {
+        $this->resetMessages();
+        [$template, $version] = $this->resolveAuthorizedContext($publishingService);
+
+        if ($this->versionStatus !== 'draft' || $version->certificates()->exists()) {
+            $this->validationError = 'Não é possível alterar a arte de fundo de uma versão publicada ou vinculada a certificados já emitidos. Crie um novo rascunho.';
+            $this->backgroundImage = null;
+            return;
+        }
+
+        $this->validate([
+            'backgroundImage' => [
+                'required',
+                'image',
+                'mimes:png,jpg,jpeg,webp',
+                'max:5120', // 5MB máx
+                'dimensions:min_width=800,min_height=500,max_width=4000,max_height=4000',
+            ],
+        ], [
+            'backgroundImage.required' => 'Selecione uma imagem de fundo para enviar.',
+            'backgroundImage.image' => 'O arquivo enviado deve ser uma imagem válida.',
+            'backgroundImage.mimes' => 'A arte de fundo deve estar no formato PNG, JPG/JPEG ou WebP.',
+            'backgroundImage.max' => 'O arquivo da imagem de fundo não pode exceder 5MB.',
+            'backgroundImage.dimensions' => 'As dimensões da imagem devem ser de no mínimo 800x500px e no máximo 4000x4000px.',
+        ]);
+
+        $ext = strtolower($this->backgroundImage->getClientOriginalExtension());
+        if (!in_array($ext, ['png', 'jpg', 'jpeg', 'webp'], true)) {
+            $ext = 'png';
+        }
+
+        $tenantFolder = $template->company_id ? "tenant-{$template->company_id}" : "platform";
+        $fileName = "bg_{$template->id}_" . Str::random(16) . ".{$ext}";
+        $storedPath = $this->backgroundImage->storeAs("certificate-backgrounds/{$tenantFolder}", $fileName, 'local');
+
+        if (!$storedPath) {
+            $this->validationError = 'Falha ao salvar a imagem no armazenamento do servidor.';
+            return;
+        }
+
+        // Atualiza o schema com o caminho relativo gerado pelo servidor
+        $this->schema['background']['image_path'] = $storedPath;
+
+        // Ao carregar arte de fundo personalizada, zera a borda CSS padrão para não conflitar com a moldura gráfica
+        if (isset($this->schema['border'])) {
+            $this->schema['border']['style'] = 'none';
+            $this->schema['border']['width'] = 0;
+        }
+
+        $this->backgroundImage = null;
+        $this->successMessage = 'Arte de fundo carregada com sucesso! Posicione as caixas de dados dinâmicos sobre a arte.';
+        $this->dispatch('toast', message: 'Arte de fundo atualizada com sucesso.', type: 'success');
+    }
+
+    /**
+     * Remove the background image reference from the current draft schema.
+     * Preserves historic binary files for issued certificates and previous versions.
+     */
+    public function removeBackgroundImage(CertificateTemplatePublishingService $publishingService): void
+    {
+        $this->resetMessages();
+        [$template, $version] = $this->resolveAuthorizedContext($publishingService);
+
+        if ($this->versionStatus !== 'draft' || $version->certificates()->exists()) {
+            $this->validationError = 'Não é possível alterar uma versão publicada. Crie um novo rascunho.';
+            return;
+        }
+
+        if (isset($this->schema['background']['image_path'])) {
+            unset($this->schema['background']['image_path']);
+            $this->successMessage = 'Arte de fundo removida do rascunho atual.';
+            $this->dispatch('toast', message: 'Arte de fundo removida.', type: 'info');
+        }
+    }
+
+    /**
+     * Add a pre-configured functional dynamic field box to the canvas.
+     */
+    public function addDynamicField(string $fieldKey): void
+    {
+        $this->resetMessages();
+
+        $uniqueSuffix = substr(uniqid(), -5);
+        $newId = 'field_' . $uniqueSuffix;
+
+        $presets = [
+            'student_name' => [
+                'id' => $newId,
+                'type' => 'text',
+                'x' => 160,
+                'y' => 310,
+                'width' => 800,
+                'height' => 50,
+                'content' => '{{student_name}}',
+                'style' => [
+                    'font_family' => 'Helvetica',
+                    'font_size' => '28px',
+                    'font_weight' => 'bold',
+                    'color' => '#ffffff',
+                    'text_align' => 'center',
+                ],
+            ],
+            'course_title' => [
+                'id' => $newId,
+                'type' => 'text',
+                'x' => 160,
+                'y' => 380,
+                'width' => 800,
+                'height' => 45,
+                'content' => 'concluiu com êxito o treinamento corporativo de {{course_title}}',
+                'style' => [
+                    'font_family' => 'Helvetica',
+                    'font_size' => '18px',
+                    'font_weight' => 'normal',
+                    'color' => '#cbd5e1',
+                    'text_align' => 'center',
+                ],
+            ],
+            'company_name' => [
+                'id' => $newId,
+                'type' => 'text',
+                'x' => 160,
+                'y' => 435,
+                'width' => 800,
+                'height' => 35,
+                'content' => 'promovido pela organização {{company_name}}',
+                'style' => [
+                    'font_family' => 'Helvetica',
+                    'font_size' => '14px',
+                    'font_weight' => 'normal',
+                    'color' => '#94a3b8',
+                    'text_align' => 'center',
+                ],
+            ],
+            'workload' => [
+                'id' => $newId,
+                'type' => 'text',
+                'x' => 360,
+                'y' => 475,
+                'width' => 400,
+                'height' => 30,
+                'content' => 'Carga Horária Total: {{workload}}',
+                'style' => [
+                    'font_family' => 'Helvetica',
+                    'font_size' => '13px',
+                    'font_weight' => '500',
+                    'color' => '#64748b',
+                    'text_align' => 'center',
+                ],
+            ],
+            'issued_date' => [
+                'id' => $newId,
+                'type' => 'text',
+                'x' => 100,
+                'y' => 670,
+                'width' => 300,
+                'height' => 30,
+                'content' => 'Emitido em: {{issued_date}}',
+                'style' => [
+                    'font_family' => 'Helvetica',
+                    'font_size' => '11px',
+                    'font_weight' => 'normal',
+                    'color' => '#64748b',
+                    'text_align' => 'left',
+                ],
+            ],
+            'validation_code' => [
+                'id' => $newId,
+                'type' => 'text',
+                'x' => 720,
+                'y' => 670,
+                'width' => 300,
+                'height' => 30,
+                'content' => 'Código: {{validation_code}}',
+                'style' => [
+                    'font_family' => 'monospace',
+                    'font_size' => '11px',
+                    'font_weight' => 'bold',
+                    'color' => '#64748b',
+                    'text_align' => 'right',
+                ],
+            ],
+            'verification_url' => [
+                'id' => $newId,
+                'type' => 'text',
+                'x' => 200,
+                'y' => 710,
+                'width' => 720,
+                'height' => 30,
+                'content' => 'Verificação de autenticidade: {{verification_url}}',
+                'style' => [
+                    'font_family' => 'monospace',
+                    'font_size' => '10px',
+                    'font_weight' => 'normal',
+                    'color' => '#475569',
+                    'text_align' => 'center',
+                ],
+            ],
+            'signature_group' => [
+                'id' => $newId,
+                'type' => 'signature_group',
+                'x' => 430,
+                'y' => 530,
+                'width' => 260,
+                'height' => 65,
+                'content' => "Diretoria de Treinamento e Desenvolvimento\n{{company_name}}",
+                'style' => [
+                    'font_family' => 'Helvetica',
+                    'font_size' => '11px',
+                    'font_weight' => 'bold',
+                    'color' => '#94a3b8',
+                    'text_align' => 'center',
+                    'border_color' => '#475569',
+                    'border_width' => 1,
+                    'border_style' => 'solid',
+                    'padding' => 6,
+                ],
+            ],
+        ];
+
+        if (!isset($presets[$fieldKey])) {
+            $this->validationError = "Campo predefinido não encontrado: '{$fieldKey}'.";
+            return;
+        }
+
+        $this->schema['elements'][] = $presets[$fieldKey];
+        $this->selectedElementId = $newId;
+        $this->dispatch('toast', message: 'Campo dinâmico adicionado ao modelo.', type: 'info');
+    }
+
+    /**
+     * Toggle sample data display on canvas boxes.
+     */
+    public function togglePreviewData(): void
+    {
+        $this->showPreviewData = !$this->showPreviewData;
+    }
+
     public function render(CertificateTemplatePublishingService $publishingService)
     {
         [$template, $currentVersion] = $this->resolveAuthorizedContext($publishingService);
@@ -502,12 +755,36 @@ class CertificateTemplateEditor extends Component
         $selectedIndex = $this->findElementIndex($this->selectedElementId);
         $isReadOnlyVersion = $this->versionStatus !== 'draft' || $currentVersion->certificates()->exists();
 
+        $backgroundImagePath = $this->schema['background']['image_path'] ?? null;
+        $backgroundImageUrl = null;
+        if (!empty($backgroundImagePath)) {
+            if (Storage::disk('local')->exists($backgroundImagePath) || Storage::disk('public')->exists($backgroundImagePath)) {
+                $backgroundImageUrl = route('instructor.certificate-templates.background', [
+                    'template' => $template->id,
+                    'v' => $currentVersion->id,
+                ]);
+            }
+        }
+
+        $demoReplacements = [
+            '{{student_name}}' => 'Lucas Colaborador',
+            '{{course_title}}' => 'Gestão Estratégica e Liderança Empresarial',
+            '{{company_name}}' => $template->company?->name ?? 'ALVORA Educação Corporativa',
+            '{{workload}}' => '40 horas',
+            '{{issued_date}}' => date('d/m/Y'),
+            '{{validation_code}}' => 'ALV-2026-EXEMPLO',
+            '{{verification_url}}' => url('/validar-certificado/ALV-2026-EXEMPLO'),
+        ];
+
         return view('livewire.company.certificate-template-editor', [
             'template' => $template,
             'currentVersion' => $currentVersion,
             'versions' => $versions,
             'selectedIndex' => $selectedIndex,
             'isReadOnlyVersion' => $isReadOnlyVersion,
+            'backgroundImageUrl' => $backgroundImageUrl,
+            'showPreviewData' => $this->showPreviewData,
+            'demoReplacements' => $demoReplacements,
             'allowedFonts' => CertificateSchemaValidator::ALLOWED_FONTS,
             'allowedFontWeights' => CertificateSchemaValidator::ALLOWED_FONT_WEIGHTS,
             'allowedTextAligns' => CertificateSchemaValidator::ALLOWED_TEXT_ALIGNS,

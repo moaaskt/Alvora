@@ -6,6 +6,7 @@ use App\Models\Certificate;
 use App\Models\CertificateTemplateVersion;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Barryvdh\DomPDF\PDF as DomPdfWrapper;
+use Illuminate\Support\Facades\Storage;
 
 class VersionedCertificateRenderer
 {
@@ -72,8 +73,24 @@ class VersionedCertificateRenderer
     {
         $placeholders = $this->buildPlaceholdersMap($certificate);
 
+        $imagePath = $schema['background']['image_path'] ?? null;
+        $imageAbsolutePath = null;
+
+        if (!empty($imagePath)) {
+            // 1. Prioriza o disco local privado ('local' = storage/app/private)
+            $diskLocal = Storage::disk('local');
+            if ($diskLocal->exists($imagePath)) {
+                $imageAbsolutePath = $diskLocal->path($imagePath);
+            } elseif (Storage::disk('public')->exists($imagePath)) {
+                // 2. Fallback retrocompatível transparente para imagens legadas no disco público
+                $imageAbsolutePath = Storage::disk('public')->path($imagePath);
+            }
+        }
+
         $background = [
             'color' => $this->sanitizeColor($schema['background']['color'] ?? '#0b0f19'),
+            'image_path' => $imagePath,
+            'image_absolute_path' => $imageAbsolutePath,
         ];
 
         $border = [

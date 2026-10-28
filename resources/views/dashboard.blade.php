@@ -6,7 +6,7 @@
     <meta content="web_dashboard" name="shell-type">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Painel do Instrutor — ALVORA Corporate EdTech</title>
+    <title>{{ (isset($user) && $user->isAlvoraAdmin()) ? 'Painel de Gestão Global' : 'Painel do Instrutor' }} — ALVORA Corporate EdTech</title>
 
     <!-- Favicon & System Icons -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
@@ -14,11 +14,13 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
 
-    <!-- Google Fonts & Material Symbols -->
+    <!-- Scripts & Styles (Self-hosted Geist Variable font) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Material Symbols -->
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 
     <style>
@@ -116,18 +118,18 @@
                         "margin": "2rem"
                     },
                     fontFamily: {
-                        "body-sm": ["Inter"],
-                        "display-lg": ["Plus Jakarta Sans"],
-                        "headline-lg": ["Plus Jakarta Sans"],
-                        "stat-value": ["Plus Jakarta Sans"],
-                        "body-md": ["Inter"],
-                        "display-lg-mobile": ["Plus Jakarta Sans"],
-                        "label-sm": ["Inter"],
-                        "headline-md": ["Plus Jakarta Sans"],
-                        "label-md": ["Inter"],
-                        "body-lg": ["Inter"],
-                        "table-header": ["Inter"],
-                        "headline-sm": ["Plus Jakarta Sans"]
+                        "body-sm": ["Geist Variable", "system-ui", "sans-serif"],
+                        "display-lg": ["Geist Variable", "system-ui", "sans-serif"],
+                        "headline-lg": ["Geist Variable", "system-ui", "sans-serif"],
+                        "stat-value": ["Geist Variable", "system-ui", "sans-serif"],
+                        "body-md": ["Geist Variable", "system-ui", "sans-serif"],
+                        "display-lg-mobile": ["Geist Variable", "system-ui", "sans-serif"],
+                        "label-sm": ["Geist Variable", "system-ui", "sans-serif"],
+                        "headline-md": ["Geist Variable", "system-ui", "sans-serif"],
+                        "label-md": ["Geist Variable", "system-ui", "sans-serif"],
+                        "body-lg": ["Geist Variable", "system-ui", "sans-serif"],
+                        "table-header": ["Geist Variable", "system-ui", "sans-serif"],
+                        "headline-sm": ["Geist Variable", "system-ui", "sans-serif"]
                     },
                     fontSize: {
                         "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
@@ -148,7 +150,7 @@
         };
     </script>
 </head>
-<body class="bg-background font-body-md text-on-surface antialiased" style="font-family: &quot;Plus Jakarta Sans&quot;, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; font-feature-settings: &quot;cv02&quot;, &quot;cv03&quot;, &quot;cv04&quot;, &quot;cv11&quot;; color: rgb(15, 23, 42); letter-spacing: -0.01em;">
+<body class="bg-background font-body-md text-on-surface antialiased" style="font-family: &quot;Geist Variable&quot;, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; font-feature-settings: &quot;cv02&quot;, &quot;cv03&quot;, &quot;cv04&quot;, &quot;cv11&quot;; color: rgb(15, 23, 42); letter-spacing: -0.01em;">
 
     <!-- Left Sidebar: Fixed Clean Enterprise Navigation -->
     <aside class="fixed left-0 top-0 h-screen w-72 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-r border-slate-200/60">
@@ -241,12 +243,12 @@
                     </a>
 
                     <!-- Assinatura & Plano -->
-                    <a class="flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="assinatura-e-plano" href="{{ route('company.billing') }}">
+                    <a class="flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="assinatura-e-plano" href="{{ auth()->user()?->isAlvoraAdmin() ? route('admin.billing') : route('company.billing') }}">
                         <div class="flex items-center gap-space-sm">
                             <svg class="w-5 h-5 shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15A2.25 2.25 0 0 0 2.25 6.75v10.5A2.25 2.25 0 0 0 4.5 21Z"></path>
                             </svg>
-                            <span>Assinatura &amp; Plano</span>
+                            <span>{{ auth()->user()?->isAlvoraAdmin() ? 'Faturamento Global B2B' : 'Assinatura & Plano' }}</span>
                         </div>
                     </a>
 
@@ -315,6 +317,10 @@
                     <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-primary border border-blue-200">
                         {{ $company->name }}
                     </span>
+                @elseif(auth()->user()?->isAlvoraAdmin())
+                    <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        Super Admin Alvora
+                    </span>
                 @elseif(auth()->user()?->company)
                     <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-primary border border-blue-200">
                         {{ auth()->user()->company->name }}
@@ -328,7 +334,7 @@
                     <div class="hidden md:flex flex-col text-left">
                         <span class="text-xs font-bold text-on-surface leading-tight">{{ $user->name ?? auth()->user()?->name ?? 'Instrutor' }}</span>
                         <span class="text-[11px] text-on-surface-variant font-medium">
-                            {{ (auth()->user()?->isInstructor() || auth()->user()?->isCompanyAdmin()) ? 'Instrutor / T&D' : 'Colaborador' }}
+                            {{ auth()->user()?->isAlvoraAdmin() ? 'Administrador Alvora' : ((auth()->user()?->isInstructor() || auth()->user()?->isCompanyAdmin()) ? 'Instrutor / T&D' : 'Colaborador') }}
                         </span>
                     </div>
                 </div>
@@ -355,11 +361,11 @@
                         <div class="flex flex-col gap-1.5">
                             <div class="flex items-center gap-space-xs flex-wrap">
                                 <h1 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight" style="color: rgb(15, 23, 42); font-weight: 800; letter-spacing: -0.025em;">
-                                    Painel do Instrutor
+                                    {{ auth()->user()?->isAlvoraAdmin() ? 'Painel de Gestão Global' : 'Painel do Instrutor' }}
                                 </h1>
                             </div>
                             <p class="font-body-md text-body-md text-secondary" style="color: rgb(51, 65, 85); font-weight: 450;">
-                                Gerencie os cursos da empresa <strong class="text-on-surface">{{ $company->name ?? 'corporativa' }}</strong>, monitore o Score Preditivo de Evasão e utilize IA para construir ementas.
+                                @if(auth()->user()?->isAlvoraAdmin())Visão consolidada da plataforma ALVORA. Monitore métricas globais, cursos e indicadores de evasão de todos os clientes corporativos.@else Gerencie os cursos da empresa <strong class="text-on-surface">{{ $company?->name ?? 'corporativa' }}</strong>, monitore o Score Preditivo de Evasão e utilize IA para construir ementas.@endif
                             </p>
                         </div>
 
@@ -396,7 +402,7 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="font-stat-value text-stat-value text-on-surface mb-1" style="font-family: &quot;Plus Jakarta Sans&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
+                                <div class="font-stat-value text-stat-value text-on-surface mb-1" style="font-family: &quot;Geist Variable&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
                                     {{ $totalCourses ?? 0 }} {{ ($totalCourses ?? 0) === 1 ? 'Programa' : 'Programas' }}
                                 </div>
                                 <div class="flex items-center justify-between text-secondary font-label-sm text-label-sm mb-2">
@@ -425,15 +431,15 @@
                             </div>
                             <div>
                                 <div class="flex items-baseline gap-2 mb-1">
-                                    <span class="font-stat-value text-stat-value text-on-surface" style="font-family: &quot;Plus Jakarta Sans&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
+                                    <span class="font-stat-value text-stat-value text-on-surface" style="font-family: &quot;Geist Variable&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
                                         {{ number_format($totalStudents ?? 0, 0, ',', '.') }}
                                     </span>
                                     <span class="font-label-sm text-label-sm text-tertiary-container font-semibold">
-                                        {{ $company->max_users ? round((($totalStudents ?? 0) / $company->max_users) * 100) . '% licenças' : 'Acesso Total' }}
+                                        @if($company && $company->max_users){{ round((($totalStudents ?? 0) / $company->max_users) * 100) }}% licenças @elseif($company)Acesso Total @else Global (Todos os Clientes) @endif
                                     </span>
                                 </div>
                                 <p class="font-label-sm text-label-sm text-secondary">
-                                    Plano <strong class="text-on-surface capitalize">{{ $company->plan ?? 'Corporativo' }}</strong> ({{ $company->max_users ?? 50 }} vagas contratadas)
+                                    @if($company)Plano <strong class="text-on-surface capitalize">{{ $company->plan ?? 'Corporativo' }}</strong> ({{ $company->max_users ? $company->max_users . ' vagas contratadas' : 'Vagas Ilimitadas' }})@else Ambiente <strong class="text-on-surface">Super Admin</strong> (Gestão multi-tenant)@endif
                                 </p>
                             </div>
                         </div>
@@ -452,7 +458,7 @@
                             </div>
                             <div>
                                 <div class="flex items-center gap-2 mb-1.5">
-                                    <span class="font-stat-value text-stat-value text-on-surface" style="font-family: &quot;Plus Jakarta Sans&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
+                                    <span class="font-stat-value text-stat-value text-on-surface" style="font-family: &quot;Geist Variable&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
                                         {{ $avgEvasionScore ?? 0 }} pts
                                     </span>
                                     @if(($avgEvasionScore ?? 0) <= 39)
@@ -490,7 +496,7 @@
                             </div>
                             <div>
                                 <div class="flex items-baseline gap-2 mb-1">
-                                    <span class="font-stat-value text-stat-value text-on-surface" style="font-family: &quot;Plus Jakarta Sans&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
+                                    <span class="font-stat-value text-stat-value text-on-surface" style="font-family: &quot;Geist Variable&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
                                         {{ $interventionsCount ?? 0 }}
                                     </span>
                                     <span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-tertiary font-semibold">
@@ -628,9 +634,9 @@
                                             </div>
                                             <div class="absolute bottom-3 left-3 right-3 text-on-primary">
                                                 <span class="font-label-sm text-label-sm uppercase tracking-wider text-surface-variant font-semibold">
-                                                    {{ $company->name ?? 'Corporativo' }}
+                                                    {{ $course->company?->name ?? $company?->name ?? 'Corporativo' }}
                                                 </span>
-                                                <p class="course-title font-headline-sm text-headline-sm text-on-primary font-semibold leading-tight mt-0.5 truncate" style="font-family: &quot;Plus Jakarta Sans&quot;, sans-serif; font-weight: 700; letter-spacing: -0.02em;">
+                                                <p class="course-title font-headline-sm text-headline-sm text-on-primary font-semibold leading-tight mt-0.5 truncate" style="font-family: &quot;Geist Variable&quot;, sans-serif; font-weight: 700; letter-spacing: -0.02em;">
                                                     {{ $course->title }}
                                                 </p>
                                             </div>
@@ -745,7 +751,7 @@
                                         </div>
                                         <div class="flex flex-col">
                                             <div class="flex items-center gap-2 flex-wrap">
-                                                <span class="font-label-md text-label-md font-semibold text-on-surface" style="color: rgb(15, 23, 42); font-weight: 700; font-family: &quot;Plus Jakarta Sans&quot;, sans-serif;">
+                                                <span class="font-label-md text-label-md font-semibold text-on-surface" style="color: rgb(15, 23, 42); font-weight: 700; font-family: &quot;Geist Variable&quot;, sans-serif;">
                                                     {{ $alertStudent->name }}
                                                 </span>
                                                 <span class="px-2 py-0.5 rounded bg-surface-container text-secondary font-label-sm text-label-sm">
