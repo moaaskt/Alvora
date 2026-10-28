@@ -209,6 +209,18 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <!-- Alternar Dados de Exemplo no Canvas -->
+            <button type="button"
+                    wire:click="togglePreviewData"
+                    class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-colors cursor-pointer {{ $showPreviewData ? 'bg-amber-50 text-amber-800 border-amber-300 ring-1 ring-amber-400' : 'bg-slate-50 text-slate-600 border-slate-200' }}"
+                    title="Alternar entre visualização de tags/variáveis e dados reais de exemplo">
+                <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg>
+                <span>{{ $showPreviewData ? 'Modo Edição (Variáveis)' : 'Simular com Dados Reais' }}</span>
+            </button>
+
             <!-- Alternar Guias A4 -->
             <button type="button"
                     @click="showGuides = !showGuides"
@@ -347,6 +359,55 @@
                         </button>
                     @endforeach
                 </div>
+
+                <!-- Adicionar Caixas Rápidas de Dados Dinâmicos (Para Arte Pronta) -->
+                <div class="pt-2.5 border-t border-slate-100 flex flex-col gap-1.5">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Adicionar Caixa Dinâmica (Posicione sobre a Arte Pronta):</span>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <button type="button"
+                                wire:click="addDynamicField('student_name')"
+                                @disabled($isReadOnlyVersion)
+                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition-colors disabled:opacity-40 cursor-pointer">
+                            <span>+ Nome do Colaborador</span>
+                        </button>
+                        <button type="button"
+                                wire:click="addDynamicField('course_title')"
+                                @disabled($isReadOnlyVersion)
+                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition-colors disabled:opacity-40 cursor-pointer">
+                            <span>+ Curso Concluído</span>
+                        </button>
+                        <button type="button"
+                                wire:click="addDynamicField('company_name')"
+                                @disabled($isReadOnlyVersion)
+                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 transition-colors disabled:opacity-40 cursor-pointer">
+                            <span>+ Organização</span>
+                        </button>
+                        <button type="button"
+                                wire:click="addDynamicField('workload')"
+                                @disabled($isReadOnlyVersion)
+                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 transition-colors disabled:opacity-40 cursor-pointer">
+                            <span>+ Carga Horária</span>
+                        </button>
+                        <button type="button"
+                                wire:click="addDynamicField('issued_date')"
+                                @disabled($isReadOnlyVersion)
+                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
+                            <span>+ Data</span>
+                        </button>
+                        <button type="button"
+                                wire:click="addDynamicField('validation_code')"
+                                @disabled($isReadOnlyVersion)
+                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
+                            <span>+ Código ALV</span>
+                        </button>
+                        <button type="button"
+                                wire:click="addDynamicField('verification_url')"
+                                @disabled($isReadOnlyVersion)
+                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
+                            <span>+ Link Validação</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- VIEWPORT RESPONSIVO DO CANVAS A4 (1122 x 793 px) -->
@@ -363,20 +424,30 @@
                          style="width: 1122px; height: 793px; background-color: {{ $schema['background']['color'] ?? '#0b0f19' }}; font-family: Helvetica, Arial, sans-serif; overflow: hidden; box-sizing: border-box;"
                          :style="`transform: scale(${zoomScale}); background-color: {{ $schema['background']['color'] ?? '#0b0f19' }};`">
 
-                        <!-- Borda Externa Oficial do Certificado (25px de margem, 1072x743px conforme versioned-template.blade.php) -->
-                        <div class="pointer-events-none"
-                             style="position: absolute; top: 25px; left: 25px; width: 1072px; height: 743px; border: {{ (int) ($schema['border']['width'] ?? 3) }}px {{ $schema['border']['style'] ?? 'solid' }} {{ $schema['border']['color'] ?? '#6366f1' }}; box-sizing: border-box;">
-                        </div>
+                        <!-- Arte de Fundo Personalizada (se carregada) -->
+                        @if(!empty($backgroundImageUrl))
+                            <img src="{{ $backgroundImageUrl }}"
+                                 alt="Fundo do Certificado"
+                                 class="pointer-events-none select-none"
+                                 style="position: absolute; top: 0; left: 0; width: 1122px; height: 793px; object-fit: cover; z-index: 1;" />
+                        @endif
 
-                        <!-- Borda Interna Decorativa (35px de margem, 1052x723px conforme versioned-template.blade.php) -->
-                        <div class="pointer-events-none"
-                             style="position: absolute; top: 35px; left: 35px; width: 1052px; height: 723px; border: 1px dashed rgba(255, 255, 255, 0.15); box-sizing: border-box;">
-                        </div>
+                        <!-- Borda Externa Oficial do Certificado -->
+                        @if((($schema['border']['width'] ?? 0) > 0) && (($schema['border']['style'] ?? 'solid') !== 'none'))
+                            <div class="pointer-events-none"
+                                 style="position: absolute; top: 25px; left: 25px; width: 1072px; height: 743px; border: {{ (int) ($schema['border']['width'] ?? 3) }}px {{ $schema['border']['style'] ?? 'solid' }} {{ $schema['border']['color'] ?? '#6366f1' }}; box-sizing: border-box; z-index: 5;">
+                            </div>
+
+                            <!-- Borda Interna Decorativa -->
+                            <div class="pointer-events-none"
+                                 style="position: absolute; top: 35px; left: 35px; width: 1052px; height: 723px; border: 1px dashed rgba(255, 255, 255, 0.15); box-sizing: border-box; z-index: 5;">
+                            </div>
+                        @endif
 
                         <!-- Guias de Margem e Área Útil A4 (Visíveis apenas no Editor quando showGuides = true) -->
                         <div x-show="showGuides"
                              class="pointer-events-none"
-                             style="position: absolute; top: 45px; left: 50px; width: 1022px; height: 703px; border: 1px dotted rgba(56, 189, 248, 0.45); box-sizing: border-box;">
+                             style="position: absolute; top: 45px; left: 50px; width: 1022px; height: 703px; border: 1px dotted rgba(56, 189, 248, 0.45); box-sizing: border-box; z-index: 6;">
                             <span style="position: absolute; top: -16px; left: 4px; font-size: 9px; font-family: monospace; color: rgba(56, 189, 248, 0.85); letter-spacing: 0.5px;">
                                 ÁREA ÚTIL RECOMENDADA A4 (1022 × 703 px | Margem 50px/45px)
                             </span>
@@ -397,6 +468,13 @@
                                 $elH = (int) ($element['height'] ?? 40);
                                 $elStyle = $element['style'] ?? [];
                                 $isSelected = $selectedElementId === $elId;
+
+                                $displayContent = (string) ($element['content'] ?? '');
+                                if ($showPreviewData) {
+                                    foreach ($demoReplacements as $placeholder => $demoVal) {
+                                        $displayContent = str_replace($placeholder, $demoVal, $displayContent);
+                                    }
+                                }
 
                                 $inlineRules = [
                                     "position: absolute",
@@ -466,7 +544,7 @@
                                     </div>
                                 @endif
 
-                                {!! nl2br(e((string) ($element['content'] ?? '')), false) !!}
+                                {!! nl2br(e($displayContent), false) !!}
                             </div>
                         @endforeach
                     </div>
@@ -482,6 +560,99 @@
 
         <!-- COLUNA DIREITA (4 COLUNAS): PAINEL DE PROPRIEDADES DO ELEMENTO E DO DOCUMENTO -->
         <div class="xl:col-span-4 flex flex-col gap-4">
+
+            <!-- CARD: ARTE DE FUNDO DO CERTIFICADO (UPLOAD SEGURO) -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-5 flex flex-col gap-3.5">
+                <div class="border-b border-slate-100 pb-2.5 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-900">Arte de Fundo do Certificado</h2>
+                        <p class="text-xs text-slate-500">Envie o layout gráfico pronto em formato A4 Horizontal.</p>
+                    </div>
+                    @if(!empty($backgroundImageUrl))
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            Arte Ativa
+                        </span>
+                    @endif
+                </div>
+
+                @if(!empty($backgroundImageUrl))
+                    <div class="flex flex-col gap-2.5">
+                        <div class="relative rounded-xl overflow-hidden border border-slate-200 aspect-[1122/793] bg-slate-950 shadow-inner">
+                            <img src="{{ $backgroundImageUrl }}" alt="Arte de Fundo" class="w-full h-full object-cover">
+                        </div>
+
+                        @if(!$isReadOnlyVersion)
+                            <div class="flex items-center justify-between gap-2 pt-1">
+                                <label class="cursor-pointer px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-50 rounded-lg border border-blue-200 transition-colors">
+                                    <span>Substituir Arte</span>
+                                    <input type="file" wire:model="backgroundImage" accept="image/png,image/jpeg,image/webp" class="hidden">
+                                </label>
+
+                                <button type="button"
+                                        wire:click="removeBackgroundImage"
+                                        wire:confirm="Deseja desvincular a arte de fundo deste rascunho?"
+                                        class="px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200 transition-colors cursor-pointer">
+                                    Remover Arte
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                @else
+                    <div class="flex flex-col gap-2">
+                        @if(!$isReadOnlyVersion)
+                            <div class="border-2 border-dashed border-slate-200 hover:border-blue-400 rounded-xl p-4 text-center transition-colors bg-slate-50/50">
+                                <input type="file"
+                                       id="bgImageFileInput"
+                                       wire:model="backgroundImage"
+                                       accept="image/png,image/jpeg,image/webp"
+                                       class="hidden">
+
+                                <label for="bgImageFileInput" class="cursor-pointer flex flex-col items-center gap-2">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs font-bold text-slate-800">Enviar Arte Pronta do Certificado</span>
+                                        <p class="text-[11px] text-slate-500 mt-0.5">PNG, JPG ou WebP (máx. 5MB, mínimo 800×500 px)</p>
+                                    </div>
+                                </label>
+                            </div>
+                        @else
+                            <p class="text-xs text-slate-400 italic">Nenhuma arte gráfica de fundo vinculada a esta versão.</p>
+                        @endif
+                    </div>
+                @endif
+
+                @if($backgroundImage)
+                    <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 text-xs font-medium text-blue-800 truncate">
+                            <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            <span class="truncate">Arquivo selecionado pronto</span>
+                        </div>
+                        <button type="button"
+                                wire:click="uploadBackgroundImage"
+                                wire:loading.attr="disabled"
+                                class="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 shrink-0 cursor-pointer">
+                            <span wire:loading.remove wire:target="uploadBackgroundImage">Aplicar</span>
+                            <span wire:loading wire:target="uploadBackgroundImage">Salvando...</span>
+                        </button>
+                    </div>
+                @endif
+
+                <div wire:loading wire:target="backgroundImage" class="text-2xs text-blue-600 font-semibold text-center">
+                    Carregando arquivo selecionado...
+                </div>
+
+                @error('backgroundImage')
+                    <div class="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-2xs text-rose-700 font-medium">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
 
             <!-- CARD 1: PROPRIEDADES DO ELEMENTO SELECIONADO -->
             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-5 flex flex-col gap-4">
