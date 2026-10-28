@@ -1,65 +1,6 @@
 <div class="flex flex-col lg:flex-row items-start gap-6 lg:gap-8">
-    <!-- LEFT STICKY SIDEBAR (280px on desktop, compact stacked card below lg) -->
-    <aside class="w-full lg:w-[280px] shrink-0 lg:sticky lg:top-28">
-        <div class="bg-edtech-surface border-2 border-edtech-blue rounded-[20px] p-5 lg:p-6 shadow-sidebar flex flex-col">
-            <!-- Student Profile Info -->
-            <div class="flex flex-row lg:flex-col items-center lg:text-center gap-4 lg:gap-0 pb-4 lg:pb-6 border-b border-edtech-border">
-                <div class="w-16 h-16 lg:w-[112px] lg:h-[112px] rounded-full bg-gradient-to-br from-edtech-blue to-edtech-blue-dark text-white flex items-center justify-center font-semibold text-2xl lg:text-[36px] lg:mb-4 shadow-[0_0_0_4px_#FFFFFF] shrink-0">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'AL', 0, 2)) }}
-                </div>
-                <div class="min-w-0">
-                    <h2 class="font-semibold text-edtech-text text-[18px] lg:text-[20px] leading-tight truncate">
-                        {{ auth()->user()->name }}
-                    </h2>
-                    @if(auth()->user()->company)
-                        <p class="text-[14px] text-edtech-muted mt-1 truncate">
-                            {{ auth()->user()->company->name }}
-                        </p>
-                    @endif
-                </div>
-            </div>
-
-            <!-- Navigation Menu -->
-            <nav aria-label="Menu do Aluno" class="mt-3 lg:mt-4 flex flex-col">
-                <!-- Item 1: Meu Aprendizado (Active) -->
-                <a href="#meu-aprendizado"
-                   class="flex items-center gap-3 px-3.5 h-[48px] rounded-r-xl text-[15px] font-semibold text-edtech-blue bg-edtech-blue-light border-l-[3px] border-edtech-blue transition-colors">
-                    <x-icon name="book-open" class="w-5 h-5 text-edtech-blue shrink-0" />
-                    <span>Meu Aprendizado</span>
-                </a>
-
-                @if ($trackEnrollments->isNotEmpty())
-                    <div class="h-px bg-edtech-border my-1"></div>
-                    <!-- Item 2: Minhas Trilhas (only when student has tracks) -->
-                    <a href="#minhas-trilhas"
-                       class="flex items-center gap-3 px-3.5 h-[48px] rounded-xl text-[15px] font-medium text-edtech-muted hover:text-edtech-text hover:bg-edtech-border-light transition-colors">
-                        <x-icon name="map" class="w-5 h-5 text-edtech-muted shrink-0" />
-                        <span>Minhas Trilhas</span>
-                    </a>
-                @endif
-
-                <div class="h-px bg-edtech-border my-1"></div>
-                <!-- Item 3: Catálogo de Cursos -->
-                <a href="#catalogo"
-                   class="flex items-center gap-3 px-3.5 h-[48px] rounded-xl text-[15px] font-medium text-edtech-muted hover:text-edtech-text hover:bg-edtech-border-light transition-colors">
-                    <x-icon name="layout-grid" class="w-5 h-5 text-edtech-muted shrink-0" />
-                    <span>Catálogo de Cursos</span>
-                </a>
-
-                <div class="h-px bg-edtech-border my-1"></div>
-                <!-- Item 4: Sair (POST Form with @csrf) -->
-                <form method="POST" action="{{ route('logout') }}" class="w-full">
-                    @csrf
-                    <button type="submit"
-                            title="Sair da Plataforma"
-                            class="w-full flex items-center gap-3 px-3.5 h-[48px] rounded-xl text-[15px] font-medium text-edtech-muted hover:text-rose-600 hover:bg-rose-50/60 transition-colors cursor-pointer text-left">
-                        <x-icon name="log-out" class="w-5 h-5 text-edtech-muted shrink-0" />
-                        <span>Sair</span>
-                    </button>
-                </form>
-            </nav>
-        </div>
-    </aside>
+    <!-- LEFT SIDEBAR -->
+    <x-student.sidebar active="dashboard" />
 
     <!-- RIGHT MAIN CONTENT COLUMN -->
     <section id="meu-aprendizado" class="flex-1 min-w-0 w-full flex flex-col gap-10 scroll-mt-28">

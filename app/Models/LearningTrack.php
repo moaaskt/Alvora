@@ -93,6 +93,14 @@ class LearningTrack extends Model
     }
 
     /**
+     * Published courses contained in this learning track.
+     */
+    public function publishedCourses(): BelongsToMany
+    {
+        return $this->courses()->where('courses.status', 'published');
+    }
+
+    /**
      * Track enrollments.
      */
     public function enrollments(): HasMany
@@ -101,18 +109,19 @@ class LearningTrack extends Model
     }
 
     /**
-     * Calculate consolidated progress percentage for a specific user.
+     * Calculate consolidated progress percentage for a specific user across published courses.
      */
     public function calculateUserProgress(int $userId): int
     {
-        $courses = $this->courses;
+        $courses = $this->publishedCourses;
         $totalCourses = $courses->count();
 
         if ($totalCourses === 0) {
             return 0;
         }
 
-        $sumPercent = Enrollment::where('user_id', $userId)
+        $sumPercent = Enrollment::where('company_id', $this->company_id)
+            ->where('user_id', $userId)
             ->whereIn('course_id', $courses->pluck('id'))
             ->sum('progress_percent');
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\CourseProgressUpdated;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -76,6 +77,7 @@ class Enrollment extends Model
             $this->update([
                 'progress_percent' => 0,
             ]);
+            CourseProgressUpdated::dispatch($this);
             return 0;
         }
 
@@ -100,6 +102,8 @@ class Enrollment extends Model
         }
 
         $this->update($attributes);
+
+        CourseProgressUpdated::dispatch($this);
 
         return $percent;
     }

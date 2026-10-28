@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Lesson;
 use App\Models\LessonProgress;
+use App\Models\TrackEnrollment;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -99,7 +100,7 @@ class Dashboard extends Component
 
         $enrolledCourseIds = $enrollments->pluck('course_id')->toArray();
 
-        // Key stats
+        // Key stats computed over ALL enrollments
         $totalEnrolled = $enrollments->count();
         $completedCount = $enrollments->where('status', 'completed')->count();
         $inProgressCount = $enrollments->where('status', 'active')->count();
@@ -115,14 +116,10 @@ class Dashboard extends Component
             ->latest()
             ->get();
 
-        // Corporate Learning Tracks for this student
-        $trackEnrollments = \App\Models\TrackEnrollment::with(['track.courses'])
+        // Corporate Learning Tracks for this student (read-only, no write on render)
+        $trackEnrollments = TrackEnrollment::with(['track.publishedCourses'])
             ->where('user_id', $user->id)
             ->get();
-
-        foreach ($trackEnrollments as $te) {
-            $te->updateConsolidatedProgress();
-        }
 
         return view('livewire.student.dashboard', [
             'enrollments' => $enrollments,

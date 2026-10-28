@@ -1,7 +1,13 @@
 @props([
     'showHeroBand' => true,
+    'bandHeight' => 340,
     'showAiTutor' => true,
+    'title' => null,
+    'active' => 'dashboard',
 ])
+@php
+    $hasTracks = \App\Helpers\StudentNavHelper::hasTracks();
+@endphp
 <!DOCTYPE html>
 <html lang="pt-BR" class="light scroll-smooth">
 <head>
@@ -41,11 +47,17 @@
                 <!-- Navigation Links -->
                 <nav aria-label="Navegação Principal" class="hidden md:flex items-center gap-2 ml-2">
                     <a href="{{ route('student.dashboard') }}"
-                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ request()->routeIs('student.dashboard') ? 'text-edtech-blue bg-edtech-blue-light' : 'text-edtech-muted hover:text-edtech-text hover:bg-edtech-border-light' }}">
+                       class="px-4 py-2 rounded-lg text-sm transition-colors duration-200 {{ request()->routeIs('student.dashboard') ? 'text-edtech-blue bg-edtech-blue-light font-semibold' : 'text-edtech-muted hover:text-edtech-blue hover:bg-edtech-blue-light/60 font-medium' }}">
                         Meu Aprendizado
                     </a>
-                    <a href="{{ route('student.dashboard') }}#catalogo"
-                       class="px-4 py-2 rounded-lg text-sm font-medium text-edtech-muted hover:text-edtech-text hover:bg-edtech-border-light transition-colors">
+                    @if($hasTracks)
+                        <a href="{{ route('student.tracks') }}"
+                           class="px-4 py-2 rounded-lg text-sm transition-colors duration-200 {{ request()->routeIs('student.tracks') ? 'text-edtech-blue bg-edtech-blue-light font-semibold' : 'text-edtech-muted hover:text-edtech-blue hover:bg-edtech-blue-light/60 font-medium' }}">
+                            Minhas Trilhas
+                        </a>
+                    @endif
+                    <a href="{{ route('student.catalog') }}"
+                       class="px-4 py-2 rounded-lg text-sm transition-colors duration-200 {{ request()->routeIs('student.catalog') ? 'text-edtech-blue bg-edtech-blue-light font-semibold' : 'text-edtech-muted hover:text-edtech-blue hover:bg-edtech-blue-light/60 font-medium' }}">
                         Catálogo de Cursos
                     </a>
                 </nav>
@@ -80,9 +92,9 @@
     </header>
 
     @if($showHeroBand ?? true)
-        <!-- HERO BACKGROUND BAND (340px tall, linear vertical gradient, clean straight bottom edge) -->
-        <div class="absolute top-20 left-0 right-0 h-[340px] w-full pointer-events-none z-0"
-             style="background: linear-gradient(180deg, var(--color-edtech-bg) 0%, var(--color-edtech-hero-mid) 45%, var(--color-edtech-hero-end) 100%);"
+        <!-- HERO BACKGROUND BAND (linear vertical gradient, clean straight bottom edge) -->
+        <div class="absolute top-20 left-0 right-0 w-full pointer-events-none z-0"
+             style="height: {{ $bandHeight ?? 340 }}px; background: linear-gradient(180deg, var(--color-edtech-bg) 0%, var(--color-edtech-hero-mid) 45%, var(--color-edtech-hero-end) 100%);"
              aria-hidden="true"></div>
     @endif
 

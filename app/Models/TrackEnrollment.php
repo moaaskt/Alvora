@@ -75,6 +75,9 @@ class TrackEnrollment extends Model
             if (! $this->completed_at) {
                 $this->completed_at = now();
             }
+        } elseif ($this->status === 'completed' && $calculatedProgress < 100) {
+            $this->status = 'active';
+            $this->completed_at = null;
         }
 
         $this->save();
