@@ -6,7 +6,7 @@
     <meta content="web_dashboard" name="shell-type">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Painel do Instrutor — ALVORA Corporate EdTech</title>
+    <title>{{ (isset($user) && $user->isAlvoraAdmin()) ? 'Painel de Gestão Global' : 'Painel do Instrutor' }} — ALVORA Corporate EdTech</title>
 
     <!-- Favicon & System Icons -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
@@ -241,12 +241,12 @@
                     </a>
 
                     <!-- Assinatura & Plano -->
-                    <a class="flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="assinatura-e-plano" href="{{ route('company.billing') }}">
+                    <a class="flex items-center justify-between px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="assinatura-e-plano" href="{{ auth()->user()?->isAlvoraAdmin() ? route('admin.billing') : route('company.billing') }}">
                         <div class="flex items-center gap-space-sm">
                             <svg class="w-5 h-5 shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15A2.25 2.25 0 0 0 2.25 6.75v10.5A2.25 2.25 0 0 0 4.5 21Z"></path>
                             </svg>
-                            <span>Assinatura &amp; Plano</span>
+                            <span>{{ auth()->user()?->isAlvoraAdmin() ? 'Faturamento Global B2B' : 'Assinatura & Plano' }}</span>
                         </div>
                     </a>
 
@@ -315,6 +315,10 @@
                     <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-primary border border-blue-200">
                         {{ $company->name }}
                     </span>
+                @elseif(auth()->user()?->isAlvoraAdmin())
+                    <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        Super Admin Alvora
+                    </span>
                 @elseif(auth()->user()?->company)
                     <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-primary border border-blue-200">
                         {{ auth()->user()->company->name }}
@@ -328,7 +332,7 @@
                     <div class="hidden md:flex flex-col text-left">
                         <span class="text-xs font-bold text-on-surface leading-tight">{{ $user->name ?? auth()->user()?->name ?? 'Instrutor' }}</span>
                         <span class="text-[11px] text-on-surface-variant font-medium">
-                            {{ (auth()->user()?->isInstructor() || auth()->user()?->isCompanyAdmin()) ? 'Instrutor / T&D' : 'Colaborador' }}
+                            {{ auth()->user()?->isAlvoraAdmin() ? 'Administrador Alvora' : ((auth()->user()?->isInstructor() || auth()->user()?->isCompanyAdmin()) ? 'Instrutor / T&D' : 'Colaborador') }}
                         </span>
                     </div>
                 </div>
@@ -355,11 +359,11 @@
                         <div class="flex flex-col gap-1.5">
                             <div class="flex items-center gap-space-xs flex-wrap">
                                 <h1 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight" style="color: rgb(15, 23, 42); font-weight: 800; letter-spacing: -0.025em;">
-                                    Painel do Instrutor
+                                    {{ auth()->user()?->isAlvoraAdmin() ? 'Painel de Gestão Global' : 'Painel do Instrutor' }}
                                 </h1>
                             </div>
                             <p class="font-body-md text-body-md text-secondary" style="color: rgb(51, 65, 85); font-weight: 450;">
-                                Gerencie os cursos da empresa <strong class="text-on-surface">{{ $company->name ?? 'corporativa' }}</strong>, monitore o Score Preditivo de Evasão e utilize IA para construir ementas.
+                                @if(auth()->user()?->isAlvoraAdmin())Visão consolidada da plataforma ALVORA. Monitore métricas globais, cursos e indicadores de evasão de todos os clientes corporativos.@else Gerencie os cursos da empresa <strong class="text-on-surface">{{ $company?->name ?? 'corporativa' }}</strong>, monitore o Score Preditivo de Evasão e utilize IA para construir ementas.@endif
                             </p>
                         </div>
 
@@ -429,11 +433,11 @@
                                         {{ number_format($totalStudents ?? 0, 0, ',', '.') }}
                                     </span>
                                     <span class="font-label-sm text-label-sm text-tertiary-container font-semibold">
-                                        {{ $company->max_users ? round((($totalStudents ?? 0) / $company->max_users) * 100) . '% licenças' : 'Acesso Total' }}
+                                        @if($company && $company->max_users){{ round((($totalStudents ?? 0) / $company->max_users) * 100) }}% licenças @elseif($company)Acesso Total @else Global (Todos os Clientes) @endif
                                     </span>
                                 </div>
                                 <p class="font-label-sm text-label-sm text-secondary">
-                                    Plano <strong class="text-on-surface capitalize">{{ $company->plan ?? 'Corporativo' }}</strong> ({{ $company->max_users ?? 50 }} vagas contratadas)
+                                    @if($company)Plano <strong class="text-on-surface capitalize">{{ $company->plan ?? 'Corporativo' }}</strong> ({{ $company->max_users ? $company->max_users . ' vagas contratadas' : 'Vagas Ilimitadas' }})@else Ambiente <strong class="text-on-surface">Super Admin</strong> (Gestão multi-tenant)@endif
                                 </p>
                             </div>
                         </div>
@@ -628,7 +632,7 @@
                                             </div>
                                             <div class="absolute bottom-3 left-3 right-3 text-on-primary">
                                                 <span class="font-label-sm text-label-sm uppercase tracking-wider text-surface-variant font-semibold">
-                                                    {{ $company->name ?? 'Corporativo' }}
+                                                    {{ $course->company?->name ?? $company?->name ?? 'Corporativo' }}
                                                 </span>
                                                 <p class="course-title font-headline-sm text-headline-sm text-on-primary font-semibold leading-tight mt-0.5 truncate" style="font-family: &quot;Plus Jakarta Sans&quot;, sans-serif; font-weight: 700; letter-spacing: -0.02em;">
                                                     {{ $course->title }}
