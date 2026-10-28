@@ -33,6 +33,15 @@
     --color-edtech-blue-border: #BFDBFE;
     --color-edtech-navy: #0F172A;
     --color-edtech-navy-soft: #1E293B;
+    --color-edtech-hero-mid: #DBEAFE;
+    --color-edtech-hero-end: #BFDBFE;
+    --color-edtech-amber: #F59E0B;
+    --color-edtech-amber-dark: #D97706;
+    --color-edtech-amber-light: #FEF3C7;
+
+    --shadow-card: 0 4px 16px rgba(15, 23, 42, 0.06);
+    --shadow-card-hover: 0 16px 32px -4px rgba(15, 23, 42, 0.12), 0 8px 16px -4px rgba(15, 23, 42, 0.06);
+    --shadow-sidebar: 0 12px 32px rgba(37, 99, 235, 0.12);
 
     /* Stitch Design Tokens - Clean Enterprise */
     --color-surface: #F8F9FF;
