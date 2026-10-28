@@ -140,3 +140,4 @@ class AdminDashboardAccessTest extends TestCase
         $response->assertSee('100 vagas contratadas');
     }
 }
+

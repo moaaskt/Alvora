@@ -14,10 +14,10 @@
                              class="h-8 sm:h-9 w-auto shrink-0">
                     </a>
                 </div>
-                <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                <p class="text-[15px] sm:text-base text-slate-400 leading-[1.6] mb-6">
                     Plataforma de capacitação corporativa orientada à retenção com inteligência preditiva ativa. Projetada para empresas que investem estrategicamente no desenvolvimento de seus talentos.
                 </p>
-                <div class="flex items-center gap-2 text-xs text-edtech-blue-border">
+                <div class="flex items-center gap-2 text-[13px] text-edtech-blue-border">
                     <svg class="w-4 h-4 text-edtech-blue shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                     <span>Conformidade com LGPD &amp; Criptografia Ponta a Ponta</span>
                 </div>
@@ -25,7 +25,7 @@
 
             <!-- COL 2: Catálogo B2B -->
             <div>
-                <h4 class="text-xs font-bold text-slate-300 mb-4">Catálogo B2B</h4>
+                <h4 class="text-[13px] font-semibold text-slate-300 uppercase tracking-wider mb-4">Catálogo B2B</h4>
                 <ul class="space-y-3 text-sm text-slate-400">
                     <li><a href="{{ url('/#cursos') }}" class="hover:text-white transition-colors">Cursos em Destaque</a></li>
                     <li><a href="{{ url('/#trilhas') }}" class="hover:text-white transition-colors">Trilhas por Departamento</a></li>
@@ -37,7 +37,7 @@
 
             <!-- COL 3: Empresa -->
             <div>
-                <h4 class="text-xs font-bold text-slate-300 mb-4">Empresa</h4>
+                <h4 class="text-[13px] font-semibold text-slate-300 uppercase tracking-wider mb-4">Empresa</h4>
                 <ul class="space-y-3 text-sm text-slate-400">
                     <li><a href="{{ url('/planos') }}" class="hover:text-white transition-colors">Planos Corporativos</a></li>
                     <li><a href="{{ url('/#apresentacao') }}" class="hover:text-white transition-colors">Solicitar Apresentação</a></li>
@@ -49,11 +49,11 @@
 
             <!-- COL 4: Acesso Corporativo -->
             <div>
-                <h4 class="text-xs font-bold text-slate-300 mb-4">Acesso Corporativo</h4>
-                <p class="text-sm text-slate-400 mb-4">
+                <h4 class="text-[13px] font-semibold text-slate-300 uppercase tracking-wider mb-4">Acesso Corporativo</h4>
+                <p class="text-base text-slate-400 leading-[1.6] mb-4">
                     Sua empresa já é parceira Alvora? Acesse o portal do colaborador ou gestor de RH.
                 </p>
-                <a href="{{ route('login') }}" class="inline-flex items-center justify-center w-full py-3 px-4 rounded-xl bg-edtech-navy-soft hover:bg-edtech-blue text-white text-sm font-bold transition-colors border border-alvora-border">
+                <a href="{{ route('login') }}" class="inline-flex items-center justify-center w-full py-3 px-4 rounded-xl bg-edtech-navy-soft hover:bg-edtech-blue text-white text-sm font-semibold transition-colors border border-alvora-border">
                     Entrar na Plataforma
                 </a>
             </div>
@@ -61,7 +61,7 @@
         </div>
 
         <!-- BOTTOM ROW -->
-        <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+        <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-[13px] text-slate-400 gap-4">
             <div>
                 &copy; {{ date('Y') }} ALVORA Educação Corporativa S.A. Todos os direitos reservados.
             </div>
@@ -71,4 +71,3 @@
         </div>
     </div>
 </footer>
-

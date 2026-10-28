@@ -14,11 +14,13 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
 
-    <!-- Google Fonts & Material Symbols -->
+    <!-- Scripts & Styles (Self-hosted Geist Variable font) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Material Symbols -->
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 
     <style>
@@ -116,18 +118,18 @@
                         "margin": "2rem"
                     },
                     fontFamily: {
-                        "body-sm": ["Inter"],
-                        "display-lg": ["Plus Jakarta Sans"],
-                        "headline-lg": ["Plus Jakarta Sans"],
-                        "stat-value": ["Plus Jakarta Sans"],
-                        "body-md": ["Inter"],
-                        "display-lg-mobile": ["Plus Jakarta Sans"],
-                        "label-sm": ["Inter"],
-                        "headline-md": ["Plus Jakarta Sans"],
-                        "label-md": ["Inter"],
-                        "body-lg": ["Inter"],
-                        "table-header": ["Inter"],
-                        "headline-sm": ["Plus Jakarta Sans"]
+                        "body-sm": ["Geist Variable", "system-ui", "sans-serif"],
+                        "display-lg": ["Geist Variable", "system-ui", "sans-serif"],
+                        "headline-lg": ["Geist Variable", "system-ui", "sans-serif"],
+                        "stat-value": ["Geist Variable", "system-ui", "sans-serif"],
+                        "body-md": ["Geist Variable", "system-ui", "sans-serif"],
+                        "display-lg-mobile": ["Geist Variable", "system-ui", "sans-serif"],
+                        "label-sm": ["Geist Variable", "system-ui", "sans-serif"],
+                        "headline-md": ["Geist Variable", "system-ui", "sans-serif"],
+                        "label-md": ["Geist Variable", "system-ui", "sans-serif"],
+                        "body-lg": ["Geist Variable", "system-ui", "sans-serif"],
+                        "table-header": ["Geist Variable", "system-ui", "sans-serif"],
+                        "headline-sm": ["Geist Variable", "system-ui", "sans-serif"]
                     },
                     fontSize: {
                         "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
@@ -148,7 +150,7 @@
         };
     </script>
 </head>
-<body class="bg-background font-body-md text-on-surface antialiased" style="font-family: &quot;Plus Jakarta Sans&quot;, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; font-feature-settings: &quot;cv02&quot;, &quot;cv03&quot;, &quot;cv04&quot;, &quot;cv11&quot;; color: rgb(15, 23, 42); letter-spacing: -0.01em;">
+<body class="bg-background font-body-md text-on-surface antialiased" style="font-family: &quot;Geist Variable&quot;, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; font-feature-settings: &quot;cv02&quot;, &quot;cv03&quot;, &quot;cv04&quot;, &quot;cv11&quot;; color: rgb(15, 23, 42); letter-spacing: -0.01em;">
 
     <!-- Left Sidebar: Fixed Clean Enterprise Navigation -->
     <aside class="fixed left-0 top-0 h-screen w-72 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-r border-slate-200/60">
@@ -400,7 +402,7 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="font-stat-value text-stat-value text-on-surface mb-1" style="font-family: &quot;Plus Jakarta Sans&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
+                                <div class="font-stat-value text-stat-value text-on-surface mb-1" style="font-family: &quot;Geist Variable&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
                                     {{ $totalCourses ?? 0 }} {{ ($totalCourses ?? 0) === 1 ? 'Programa' : 'Programas' }}
                                 </div>
                                 <div class="flex items-center justify-between text-secondary font-label-sm text-label-sm mb-2">
@@ -429,7 +431,7 @@
                             </div>
                             <div>
                                 <div class="flex items-baseline gap-2 mb-1">
-                                    <span class="font-stat-value text-stat-value text-on-surface" style="font-family: &quot;Plus Jakarta Sans&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
+                                    <span class="font-stat-value text-stat-value text-on-surface" style="font-family: &quot;Geist Variable&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
                                         {{ number_format($totalStudents ?? 0, 0, ',', '.') }}
                                     </span>
                                     <span class="font-label-sm text-label-sm text-tertiary-container font-semibold">
@@ -456,7 +458,7 @@
                             </div>
                             <div>
                                 <div class="flex items-center gap-2 mb-1.5">
-                                    <span class="font-stat-value text-stat-value text-on-surface" style="font-family: &quot;Plus Jakarta Sans&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
+                                    <span class="font-stat-value text-stat-value text-on-surface" style="font-family: &quot;Geist Variable&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
                                         {{ $avgEvasionScore ?? 0 }} pts
                                     </span>
                                     @if(($avgEvasionScore ?? 0) <= 39)
@@ -494,7 +496,7 @@
                             </div>
                             <div>
                                 <div class="flex items-baseline gap-2 mb-1">
-                                    <span class="font-stat-value text-stat-value text-on-surface" style="font-family: &quot;Plus Jakarta Sans&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
+                                    <span class="font-stat-value text-stat-value text-on-surface" style="font-family: &quot;Geist Variable&quot;, sans-serif; font-weight: 800; color: rgb(15, 23, 42); letter-spacing: -0.03em;">
                                         {{ $interventionsCount ?? 0 }}
                                     </span>
                                     <span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-tertiary font-semibold">
@@ -634,7 +636,7 @@
                                                 <span class="font-label-sm text-label-sm uppercase tracking-wider text-surface-variant font-semibold">
                                                     {{ $course->company?->name ?? $company?->name ?? 'Corporativo' }}
                                                 </span>
-                                                <p class="course-title font-headline-sm text-headline-sm text-on-primary font-semibold leading-tight mt-0.5 truncate" style="font-family: &quot;Plus Jakarta Sans&quot;, sans-serif; font-weight: 700; letter-spacing: -0.02em;">
+                                                <p class="course-title font-headline-sm text-headline-sm text-on-primary font-semibold leading-tight mt-0.5 truncate" style="font-family: &quot;Geist Variable&quot;, sans-serif; font-weight: 700; letter-spacing: -0.02em;">
                                                     {{ $course->title }}
                                                 </p>
                                             </div>
@@ -749,7 +751,7 @@
                                         </div>
                                         <div class="flex flex-col">
                                             <div class="flex items-center gap-2 flex-wrap">
-                                                <span class="font-label-md text-label-md font-semibold text-on-surface" style="color: rgb(15, 23, 42); font-weight: 700; font-family: &quot;Plus Jakarta Sans&quot;, sans-serif;">
+                                                <span class="font-label-md text-label-md font-semibold text-on-surface" style="color: rgb(15, 23, 42); font-weight: 700; font-family: &quot;Geist Variable&quot;, sans-serif;">
                                                     {{ $alertStudent->name }}
                                                 </span>
                                                 <span class="px-2 py-0.5 rounded bg-surface-container text-secondary font-label-sm text-label-sm">

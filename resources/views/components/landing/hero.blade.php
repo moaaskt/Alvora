@@ -9,11 +9,13 @@
 
             <!-- LEFT COLUMN: Content (left aligned) -->
             <div class="lg:col-span-7 flex flex-col items-start pr-0 lg:pr-6 text-left">
-                <h1 id="hero-heading" class="text-3xl sm:text-5xl lg:text-[58px] leading-[1.14] lg:leading-[1.12] font-bold text-edtech-text tracking-tight mb-6 text-left">
+                <!-- H1: 56-64px on desktop, font-weight 600, letter-spacing -0.02em, line-height 1.1 -->
+                <h1 id="hero-heading" class="text-3xl sm:text-5xl lg:text-[60px] leading-[1.14] lg:leading-[1.1] font-semibold text-edtech-text tracking-[-0.02em] mb-6 text-left">
                     Capacitação corporativa de alto impacto com <span class="text-edtech-blue">previsão ativa</span> de retenção.
                 </h1>
 
-                <p class="text-base sm:text-lg text-edtech-muted leading-relaxed mb-8 max-w-2xl font-normal text-left">
+                <!-- Body text: minimum 16px, line-height 1.6, color edtech-muted -->
+                <p class="text-base sm:text-lg text-edtech-muted leading-[1.6] mb-8 max-w-2xl font-normal text-left">
                     O Alvora calcula continuamente o Score de Risco de Evasão de cada colaborador e dispara intervenções pedagógicas automatizadas antes que a desistência aconteça.
                 </p>
 
@@ -33,26 +35,26 @@
                     </a>
                 </div>
 
-                <!-- Inline trust row -->
+                <!-- Inline trust row: Stats numbers tabular-nums, weight 700 -->
                 <div class="flex flex-wrap items-center gap-5 sm:gap-8 pt-2">
                     <div class="flex flex-col">
-                        <span class="text-2xl font-bold text-edtech-text leading-tight">+78%</span>
-                        <span class="text-xs text-edtech-muted mt-0.5">conclusão estimada</span>
+                        <span class="text-2xl sm:text-3xl font-bold text-edtech-text tabular-nums leading-tight">+78%</span>
+                        <span class="text-[13px] text-edtech-muted mt-0.5">conclusão estimada</span>
                     </div>
                     <div class="w-px h-8 bg-edtech-border" aria-hidden="true"></div>
                     <div class="flex flex-col">
-                        <span class="text-2xl font-bold text-edtech-text leading-tight">&lt; 3s</span>
-                        <span class="text-xs text-edtech-muted mt-0.5">resposta do tutor IA</span>
+                        <span class="text-2xl sm:text-3xl font-bold text-edtech-text tabular-nums leading-tight">&lt; 3s</span>
+                        <span class="text-[13px] text-edtech-muted mt-0.5">resposta do tutor IA</span>
                     </div>
                     <div class="w-px h-8 bg-edtech-border" aria-hidden="true"></div>
                     <div class="flex flex-col">
-                        <span class="text-2xl font-bold text-edtech-text leading-tight">100%</span>
-                        <span class="text-xs text-edtech-muted mt-0.5">conformidade LGPD</span>
+                        <span class="text-2xl sm:text-3xl font-bold text-edtech-text tabular-nums leading-tight">100%</span>
+                        <span class="text-[13px] text-edtech-muted mt-0.5">conformidade LGPD</span>
                     </div>
                 </div>
 
-                <!-- Small slate footnote -->
-                <p class="text-xs text-edtech-muted mt-3">
+                <!-- Small slate footnote: raised to 13px -->
+                <p class="text-[13px] text-edtech-muted mt-3.5 leading-normal">
                     Estimativas baseadas em simulação do modelo preditivo.
                 </p>
             </div>
@@ -76,7 +78,7 @@
                         </svg>
                     </div>
 
-                    <!-- Corporate Person Photo (using girl-hero.jpg) -->
+                    <!-- Corporate Person Photo -->
                     <img src="{{ $heroImagePath }}"
                          width="2774"
                          height="1536"
@@ -85,14 +87,14 @@
                          class="relative z-10 w-full h-full object-cover object-center rounded-[32px] transform scale-[1.02] -translate-y-1">
 
                     <!-- Overlapping plain floating UI card 1: Score de Risco -->
-                    <div class="hero-float-1 absolute -top-4 -left-2 sm:-top-5 sm:-left-6 z-20 bg-edtech-surface/95 backdrop-blur-md border border-edtech-border shadow-xl p-3.5 sm:p-4 rounded-2xl w-[185px] sm:w-[210px]">
+                    <div class="hero-float-1 absolute -top-4 -left-2 sm:-top-5 sm:-left-6 z-20 bg-edtech-surface/95 backdrop-blur-md border border-edtech-border shadow-xl p-3.5 sm:p-4 rounded-2xl w-[190px] sm:w-[215px]">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-semibold text-edtech-muted">Score de Risco</span>
-                            <span class="text-xs font-semibold text-alvora-emerald">Baixo</span>
+                            <span class="text-[13px] font-semibold text-edtech-muted">Score de Risco</span>
+                            <span class="text-[13px] font-semibold text-alvora-emerald">Baixo</span>
                         </div>
                         <div class="flex items-baseline gap-1 mb-1.5">
-                            <span class="text-xl font-bold text-edtech-text">15</span>
-                            <span class="text-xs text-edtech-muted">/ 100 pts</span>
+                            <span class="text-xl sm:text-2xl font-bold text-edtech-text tabular-nums">15</span>
+                            <span class="text-[13px] text-edtech-muted">/ 100 pts</span>
                         </div>
                         <div class="w-full bg-edtech-border-light rounded-full h-1.5 overflow-hidden">
                             <div class="bg-alvora-emerald h-1.5 rounded-full" style="width: 15%"></div>
@@ -100,7 +102,7 @@
                     </div>
 
                     <!-- Overlapping plain floating UI card 2: Intervenção enviada -->
-                    <div class="hero-float-2 absolute top-[42%] -right-2 sm:-right-6 z-20 bg-edtech-surface/95 backdrop-blur-md border border-edtech-border shadow-xl p-3 sm:p-3.5 rounded-2xl max-w-[195px] sm:max-w-[220px]">
+                    <div class="hero-float-2 absolute top-[42%] -right-2 sm:-right-6 z-20 bg-edtech-surface/95 backdrop-blur-md border border-edtech-border shadow-xl p-3.5 rounded-2xl max-w-[210px] sm:max-w-[230px]">
                         <div class="flex items-center gap-2.5">
                             <div class="w-8 h-8 rounded-xl bg-edtech-blue-light border border-edtech-blue-border text-edtech-blue flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -108,17 +110,17 @@
                                 </svg>
                             </div>
                             <div>
-                                <div class="text-[11px] font-bold text-edtech-text leading-tight">Intervenção enviada</div>
-                                <div class="text-[10px] text-edtech-muted font-medium">Micro-revisão no Slack</div>
+                                <div class="text-[13px] font-bold text-edtech-text leading-tight">Intervenção enviada</div>
+                                <div class="text-[13px] text-edtech-muted font-normal mt-0.5">Micro-revisão no Slack</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Overlapping plain floating UI card 3: Mini chart Conclusão -->
-                    <div class="hero-float-3 absolute -bottom-4 -left-2 sm:-bottom-5 sm:-left-4 z-20 bg-edtech-surface/95 backdrop-blur-md border border-edtech-border shadow-xl p-3.5 sm:p-4 rounded-2xl w-[200px] sm:w-[220px]">
+                    <div class="hero-float-3 absolute -bottom-4 -left-2 sm:-bottom-5 sm:-left-4 z-20 bg-edtech-surface/95 backdrop-blur-md border border-edtech-border shadow-xl p-3.5 sm:p-4 rounded-2xl w-[205px] sm:w-[225px]">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-semibold text-edtech-muted">Conclusão Alvo</span>
-                            <span class="text-xs font-bold text-edtech-blue">+78%</span>
+                            <span class="text-[13px] font-semibold text-edtech-muted">Conclusão Alvo</span>
+                            <span class="text-[13px] font-bold text-edtech-blue tabular-nums">+78%</span>
                         </div>
                         <div class="flex items-end gap-1.5 h-8 pt-1">
                             <div class="w-3 bg-edtech-border rounded-t h-3"></div>
@@ -128,7 +130,7 @@
                             <div class="w-3 bg-edtech-blue rounded-t h-8"></div>
                             <div class="w-3 bg-edtech-blue rounded-t h-7"></div>
                             <div class="w-3 bg-edtech-blue rounded-t h-8"></div>
-                            <span class="text-[10px] font-semibold text-alvora-emerald ml-auto leading-none">Meta atingida</span>
+                            <span class="text-[13px] font-semibold text-alvora-emerald ml-auto leading-none">Meta atingida</span>
                         </div>
                     </div>
 

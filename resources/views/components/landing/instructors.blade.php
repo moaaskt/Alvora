@@ -13,10 +13,11 @@
 
         <!-- Section Header (left-aligned) -->
         <div class="max-w-2xl mb-10 sm:mb-12 text-left">
-            <h2 id="instructors-heading" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-edtech-text tracking-tight text-left">
+            <!-- Section H2: 36-40px, weight 600, letter-spacing -0.015em -->
+            <h2 id="instructors-heading" class="text-3xl sm:text-[38px] lg:text-[40px] leading-[1.15] font-semibold text-edtech-text tracking-[-0.015em] text-left">
                 Líderes e Especialistas de Mercado
             </h2>
-            <p class="text-base sm:text-lg text-edtech-muted mt-2 text-left">
+            <p class="text-base sm:text-lg text-edtech-muted mt-2 leading-[1.6] text-left">
                 Profissionais com sólida trajetória em grandes empresas para desenvolver competências práticas nas equipes.
             </p>
         </div>
@@ -48,12 +49,14 @@
                     </div>
 
                     <div class="text-center sm:text-left min-w-0">
-                        <h3 class="text-lg font-bold text-edtech-text">{{ $inst->name }}</h3>
-                        <p class="text-xs font-semibold text-edtech-blue mb-2">{{ $roleSubtitle }}</p>
-                        <p class="text-sm text-edtech-muted leading-relaxed mb-3">
+                        <!-- Card titles: 18-20px, weight 600 -->
+                        <h3 class="text-[19px] font-semibold text-edtech-text">{{ $inst->name }}</h3>
+                        <p class="text-[13px] font-semibold text-edtech-blue mb-2.5 mt-0.5">{{ $roleSubtitle }}</p>
+                        <!-- Body text: minimum 16px, line-height 1.6 -->
+                        <p class="text-base text-edtech-muted leading-[1.6] mb-3.5">
                             {{ $bioText }}
                         </p>
-                        <p class="text-xs font-semibold text-edtech-text">
+                        <p class="text-[14px] font-medium text-edtech-text">
                             {{ $specialtiesText }}
                         </p>
                     </div>

@@ -3,10 +3,11 @@
 
         <!-- Section Header (left-aligned, plain text, no eyebrow or pill badge) -->
         <div class="max-w-3xl mb-12 sm:mb-16 text-left">
-            <h2 id="why-alvora-heading" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-edtech-text tracking-tight mb-4 text-left">
+            <!-- Section H2: 36-40px, weight 600, letter-spacing -0.015em -->
+            <h2 id="why-alvora-heading" class="text-3xl sm:text-[38px] lg:text-[40px] leading-[1.15] font-semibold text-edtech-text tracking-[-0.015em] mb-4 text-left">
                 Por que a Alvora difere de um LMS convencional?
             </h2>
-            <p class="text-base sm:text-lg text-edtech-muted leading-relaxed text-left">
+            <p class="text-base sm:text-lg text-edtech-muted leading-[1.6] text-left">
                 Sistemas legados de gestão de aprendizagem apenas notificam o RH semanas após o abandono do colaborador. Nossa arquitetura preditiva detecta micro-sinais e intervém preventivamente.
             </p>
         </div>
@@ -18,7 +19,8 @@
             <div class="bg-edtech-bg border border-edtech-border rounded-[24px] p-6 sm:p-8 lg:p-10 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl">
                 <div>
                     <div class="pb-6 border-b border-edtech-border mb-6">
-                        <h3 class="text-2xl font-bold text-edtech-text">LMS Tradicional &amp; EAD Legado</h3>
+                        <!-- Card titles: 18-20px, weight 600 -->
+                        <h3 class="text-xl font-semibold text-edtech-text">LMS Tradicional &amp; EAD Legado</h3>
                     </div>
 
                     <ul class="space-y-5">
@@ -26,7 +28,7 @@
                             <div class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </div>
-                            <div class="text-[15px] sm:text-base text-edtech-muted leading-relaxed">
+                            <div class="text-base text-edtech-muted leading-[1.6]">
                                 <strong class="text-edtech-text">Relatórios post-mortem:</strong> Descobre o abandono apenas semanas após o colaborador parar de acessar.
                             </div>
                         </li>
@@ -34,7 +36,7 @@
                             <div class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </div>
-                            <div class="text-[15px] sm:text-base text-edtech-muted leading-relaxed">
+                            <div class="text-base text-edtech-muted leading-[1.6]">
                                 <strong class="text-edtech-text">Taxa de evasão de 41,6%:</strong> Perda massiva de orçamento corporativo em licenças que nunca chegam ao fim.
                             </div>
                         </li>
@@ -42,7 +44,7 @@
                             <div class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </div>
-                            <div class="text-[15px] sm:text-base text-edtech-muted leading-relaxed">
+                            <div class="text-base text-edtech-muted leading-[1.6]">
                                 <strong class="text-edtech-text">Fóruns estáticos &amp; dúvidas lentas:</strong> Colaborador trava em conceitos técnicos e desiste sem suporte imediato.
                             </div>
                         </li>
@@ -50,7 +52,7 @@
                             <div class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </div>
-                            <div class="text-[15px] sm:text-base text-edtech-muted leading-relaxed">
+                            <div class="text-base text-edtech-muted leading-[1.6]">
                                 <strong class="text-edtech-text">Sem mensuração de ROI:</strong> Impossível provar o valor econômico do treinamento à diretoria executiva.
                             </div>
                         </li>
@@ -69,7 +71,8 @@
 
                 <div class="relative z-10">
                     <div class="pb-6 border-b border-edtech-blue-border/80 mb-6">
-                        <h3 class="text-2xl font-bold text-edtech-text">Alvora Corporate EdTech</h3>
+                        <!-- Card titles: 18-20px, weight 600 -->
+                        <h3 class="text-xl font-semibold text-edtech-text">Alvora Corporate EdTech</h3>
                     </div>
 
                     <ul class="space-y-5">
@@ -77,7 +80,7 @@
                             <div class="w-6 h-6 rounded-full bg-emerald-100 text-alvora-emerald flex items-center justify-center shrink-0 mt-0.5">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                             </div>
-                            <div class="text-[15px] sm:text-base text-edtech-text leading-relaxed">
+                            <div class="text-base text-edtech-text leading-[1.6]">
                                 <strong>Antecipação algorítmica:</strong> O sistema detecta inatividade e lentidão em módulos antes da evasão se consolidar.
                             </div>
                         </li>
@@ -85,7 +88,7 @@
                             <div class="w-6 h-6 rounded-full bg-emerald-100 text-alvora-emerald flex items-center justify-center shrink-0 mt-0.5">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                             </div>
-                            <div class="text-[15px] sm:text-base text-edtech-text leading-relaxed">
+                            <div class="text-base text-edtech-text leading-[1.6]">
                                 <strong>+78% de conclusão efetiva:</strong> Micro-intervenções personalizadas garantem que as equipes finalizem as certificações.
                             </div>
                         </li>
@@ -93,7 +96,7 @@
                             <div class="w-6 h-6 rounded-full bg-emerald-100 text-alvora-emerald flex items-center justify-center shrink-0 mt-0.5">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                             </div>
-                            <div class="text-[15px] sm:text-base text-edtech-text leading-relaxed">
+                            <div class="text-base text-edtech-text leading-[1.6]">
                                 <strong>Tutor IA integrado (&lt;3s):</strong> Sanção de dúvidas conceituais diretamente durante a reprodução da aula.
                             </div>
                         </li>
@@ -101,7 +104,7 @@
                             <div class="w-6 h-6 rounded-full bg-emerald-100 text-alvora-emerald flex items-center justify-center shrink-0 mt-0.5">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                             </div>
-                            <div class="text-[15px] sm:text-base text-edtech-text leading-relaxed">
+                            <div class="text-base text-edtech-text leading-[1.6]">
                                 <strong>ROI mensurado em tempo real:</strong> Painéis para diretoria com custos evitados de turnover e tempo de ramp-up.
                             </div>
                         </li>
@@ -116,7 +119,7 @@
 
         </div>
 
-        <!-- Compliance & Transparency metadata for test and regulatory compliance (discreet, screen-reader / accessible semantic container) -->
+        <!-- Compliance & Transparency metadata for test and regulatory compliance (discreet, accessible semantic container) -->
         <div class="sr-only" aria-hidden="true">
             <span>Benchmark de Mercado</span>
             <span>Dado Demonstrativo</span>

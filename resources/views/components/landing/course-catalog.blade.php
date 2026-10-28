@@ -6,14 +6,15 @@
         <!-- Section Header with Link (left-aligned, plain text, no eyebrow pill) -->
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 gap-4 text-left">
             <div class="max-w-2xl text-left">
-                <h2 id="courses-heading" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-edtech-text tracking-tight text-left">
+                <!-- Section H2: 36-40px, weight 600, letter-spacing -0.015em -->
+                <h2 id="courses-heading" class="text-3xl sm:text-[38px] lg:text-[40px] leading-[1.15] font-semibold text-edtech-text tracking-[-0.015em] text-left">
                     Catálogo de Cursos &amp; Programas Executivos
                 </h2>
-                <p class="text-base sm:text-lg text-edtech-muted mt-2 text-left">
+                <p class="text-base sm:text-lg text-edtech-muted mt-2 leading-[1.6] text-left">
                     Cursos estruturados com acompanhamento analítico em tempo real e certificação oficial para equipes de alta performance.
                 </p>
             </div>
-            <a href="#apresentacao" class="inline-flex items-center gap-1.5 text-sm font-bold text-edtech-blue hover:text-edtech-blue-hover transition-colors shrink-0">
+            <a href="#apresentacao" class="inline-flex items-center gap-1.5 text-sm font-semibold text-edtech-blue hover:text-edtech-blue-hover transition-colors shrink-0">
                 <span>Solicitar catálogo completo</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
@@ -55,8 +56,8 @@
                             <div class="h-44 overflow-hidden relative bg-edtech-navy">
                                 <div class="w-full h-full bg-gradient-to-br {{ $meta['gradient'] }} p-6 flex flex-col justify-between text-white transition-transform duration-300 group-hover:scale-105">
                                     <div class="flex justify-between items-start">
-                                        <!-- Plain category text above title (no badge/pill) -->
-                                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-200">
+                                        <!-- Plain category text above title (13px, no badge/pill) -->
+                                        <p class="text-[13px] font-semibold uppercase tracking-wider text-slate-200">
                                             {{ $meta['category'] }}
                                         </p>
                                         <img src="{{ asset('images/logo-symbol.png') }}"
@@ -67,7 +68,8 @@
                                              class="h-4 w-auto opacity-75 shrink-0">
                                     </div>
                                     <div>
-                                        <h3 class="text-lg font-bold text-white leading-tight line-clamp-2">{{ $course->title }}</h3>
+                                        <!-- Card titles: 18-20px, weight 600 -->
+                                        <h3 class="text-[19px] font-semibold text-white leading-tight line-clamp-2">{{ $course->title }}</h3>
                                     </div>
                                 </div>
                             </div>
@@ -87,14 +89,14 @@
                                             <span>{{ $initials ?: 'AV' }}</span>
                                         </div>
                                         <div class="min-w-0">
-                                            <div class="text-sm font-bold text-edtech-text truncate">{{ $course->instructor->name }}</div>
-                                            <div class="text-xs text-edtech-muted">Especialista Corporativo Alvora</div>
+                                            <div class="text-sm font-semibold text-edtech-text truncate">{{ $course->instructor->name }}</div>
+                                            <div class="text-[13px] text-edtech-muted">Especialista Corporativo Alvora</div>
                                         </div>
                                     </div>
                                 @endif
 
                                 @if($course->description)
-                                    <p class="text-sm text-edtech-muted leading-relaxed line-clamp-3">
+                                    <p class="text-base text-edtech-muted leading-[1.6] line-clamp-3">
                                         {{ \Illuminate\Support\Str::limit(strip_tags($course->description), 160) }}
                                     </p>
                                 @endif
@@ -103,16 +105,16 @@
 
                         <!-- Card Footer with Duration & Action Link -->
                         <div class="px-6 py-4 bg-edtech-bg border-t border-edtech-border-light flex items-center justify-between">
-                            <div class="flex items-center gap-1.5 text-xs font-semibold text-edtech-muted">
+                            <div class="flex items-center gap-1.5 text-[13px] font-medium text-edtech-muted">
                                 <svg class="w-4 h-4 text-edtech-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span>
+                                <span class="tabular-nums">
                                     {{ $course->lessons_count ?? 1 }} aulas
                                     @if(!empty($course->total_duration_minutes) && $course->total_duration_minutes > 0)
                                         · {{ $course->total_duration_minutes }} min
                                     @endif
                                 </span>
                             </div>
-                            <a href="#apresentacao" class="text-xs font-bold text-edtech-blue hover:text-edtech-blue-hover flex items-center gap-1">
+                            <a href="#apresentacao" class="text-[13px] font-semibold text-edtech-blue hover:text-edtech-blue-hover flex items-center gap-1">
                                 <span>Capacitar Equipe</span>
                                 <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
                             </a>
@@ -126,8 +128,8 @@
                 <div class="w-12 h-12 rounded-xl bg-edtech-blue-light text-edtech-blue flex items-center justify-center mx-auto">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                 </div>
-                <h3 class="text-lg font-bold text-edtech-text">Catálogo em Atualização Curatorial</h3>
-                <p class="text-xs sm:text-sm text-edtech-muted leading-relaxed">
+                <h3 class="text-xl font-semibold text-edtech-text">Catálogo em Atualização Curatorial</h3>
+                <p class="text-base text-edtech-muted leading-[1.6]">
                     Novos treinamentos corporativos estão sendo preparados pelo corpo docente. Entre em contato para conhecer as opções sob medida para o seu setor.
                 </p>
             </div>

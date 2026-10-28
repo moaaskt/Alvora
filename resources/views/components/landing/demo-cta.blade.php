@@ -4,22 +4,22 @@
 
             <!-- LEFT: 3 Check-list Benefits -->
             <div class="lg:col-span-6">
-                <h2 id="demo-cta-heading" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-edtech-text tracking-tight mb-6">
+                <h2 id="demo-cta-heading" class="text-3xl lg:text-[40px] font-semibold text-edtech-text tracking-[-0.015em] leading-[1.15] mb-6">
                     Transforme o treinamento corporativo da sua organização.
                 </h2>
-                <p class="text-sm sm:text-base text-edtech-muted leading-relaxed mb-8">
+                <p class="text-base text-edtech-muted leading-[1.6] mb-8">
                     Agende uma conversa estratégica de 20 minutos com nosso time executivo. Vamos analisar o cenário de retenção da sua empresa e demonstrar na prática como a IA preditiva atua no engajamento dos seus colaboradores.
                 </p>
 
                 <!-- 3 Check-list items -->
-                <div class="space-y-5">
+                <div class="space-y-6">
                     <div class="flex items-start gap-4">
                         <div class="w-6 h-6 rounded-full bg-edtech-blue-light text-edtech-blue flex items-center justify-center shrink-0 mt-0.5">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                         </div>
                         <div>
-                            <h3 class="text-base font-bold text-edtech-text">Demonstração prática dos algoritmos preditivos</h3>
-                            <p class="text-sm text-edtech-muted">Simulação do cálculo do Score de Risco de Evasão em tempo real.</p>
+                            <h3 class="text-[18px] font-semibold text-edtech-text">Demonstração prática dos algoritmos preditivos</h3>
+                            <p class="text-base text-edtech-muted leading-[1.6] mt-1">Simulação do cálculo do Score de Risco de Evasão em tempo real.</p>
                         </div>
                     </div>
 
@@ -28,8 +28,8 @@
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                         </div>
                         <div>
-                            <h3 class="text-base font-bold text-edtech-text">Tour guiado pela Sala de Situação e métricas de RH</h3>
-                            <p class="text-sm text-edtech-muted">Visualização do painel executivo com telemetria ativa e governança.</p>
+                            <h3 class="text-[18px] font-semibold text-edtech-text">Tour guiado pela Sala de Situação e métricas de RH</h3>
+                            <p class="text-base text-edtech-muted leading-[1.6] mt-1">Visualização do painel executivo com telemetria ativa e governança.</p>
                         </div>
                     </div>
 
@@ -38,8 +38,8 @@
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                         </div>
                         <div>
-                            <h3 class="text-base font-bold text-edtech-text">Simulação de ROI e estimativa de retenção de talentos</h3>
-                            <p class="text-sm text-edtech-muted">Cálculo personalizado de custos evitados com turnover e recontratações.</p>
+                            <h3 class="text-[18px] font-semibold text-edtech-text">Simulação de ROI e estimativa de retenção de talentos</h3>
+                            <p class="text-base text-edtech-muted leading-[1.6] mt-1">Cálculo personalizado de custos evitados com turnover e recontratações.</p>
                         </div>
                     </div>
                 </div>
@@ -53,4 +53,3 @@
         </div>
     </div>
 </section>
-
