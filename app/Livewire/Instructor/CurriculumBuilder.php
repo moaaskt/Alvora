@@ -33,9 +33,14 @@ class CurriculumBuilder extends Component
     public string $attachmentUrl = '';
     public bool $showAttachmentModal = false;
 
-    public function mount(Course $course): void
+    public function mount(Course $course): mixed
     {
+        if (Auth::user()?->isAlvoraAdmin() && request()->routeIs('instructor.courses.*')) {
+            return redirect()->route('admin.courses.curriculum', $course);
+        }
+
         $this->courseId = $course->id;
+        return null;
     }
 
     public function addModule(): void
@@ -225,9 +230,11 @@ class CurriculumBuilder extends Component
     {
         $course = Course::with(['modules.lessons.attachments', 'quizzes.questions'])->findOrFail($this->courseId);
 
+        $layout = Auth::user()?->isAlvoraAdmin() ? 'layouts.admin' : 'layouts.instructor';
+
         return view('livewire.instructor.curriculum-builder', [
             'course' => $course,
-        ])->layout('layouts.instructor', [
+        ])->layout($layout, [
             'title' => 'Grade Curricular — ' . $course->title . ' — ALVORA',
             'breadcrumb' => 'Grade Curricular',
         ]);

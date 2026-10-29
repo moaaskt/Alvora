@@ -3,6 +3,10 @@
 use App\Http\Controllers\BillingReturnController;
 use App\Http\Controllers\CertificateController;
 use App\Livewire\Admin\AdminBilling;
+use App\Livewire\Admin\CategoryManager;
+use App\Livewire\Admin\CourseManager;
+use App\Livewire\Admin\Dashboard as AdminDashboard;
+use App\Livewire\Company\CertificateTemplateList;
 use App\Livewire\Company\CompanyBilling;
 use App\Livewire\Company\EmployeeManager;
 use App\Livewire\Company\TrackManager;
@@ -206,20 +210,17 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
     Route::redirect('/empresa/insights-executivos', '/instrutor/insights-executivos');
     Route::redirect('/empresa/certificados/templates', '/instrutor/certificados/templates');
 
-    // Super Admin Alvora - Dashboard e Governança Global
-    Route::get('/admin/dashboard', \App\Livewire\Admin\Dashboard::class)
-        ->middleware('role:admin_alvora')
-        ->name('admin.dashboard');
-
-    // Super Admin Alvora - Gestão de Categorias e Subcategorias
-    Route::get('/admin/categorias', \App\Livewire\Admin\CategoryManager::class)
-        ->middleware('role:admin_alvora')
-        ->name('admin.categories.index');
-
-    // Super Admin Alvora - Faturamento Global B2B
-    Route::get('/admin/faturamento', AdminBilling::class)
-        ->middleware('role:admin_alvora')
-        ->name('admin.billing');
+    // Super Admin Alvora - Governança Global, Cursos e Operações
+    Route::middleware('role:admin_alvora')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', AdminDashboard::class)->name('dashboard');
+        Route::get('/categorias', CategoryManager::class)->name('categories.index');
+        Route::get('/faturamento', AdminBilling::class)->name('billing');
+        Route::get('/cursos', CourseManager::class)->name('courses.index');
+        Route::get('/cursos/novo', CourseEditor::class)->name('courses.create');
+        Route::get('/cursos/{course}/editar', CourseEditor::class)->name('courses.edit');
+        Route::get('/cursos/{course}/curriculo', CurriculumBuilder::class)->name('courses.curriculum');
+        Route::get('/certificados', CertificateTemplateList::class)->name('certificates.index');
+    });
 
     // Rotas de Gestão de Conteúdo (Instrutor / RH)
     Route::middleware('role:instructor,company_admin')->prefix('instrutor')->name('instructor.')->group(function () {

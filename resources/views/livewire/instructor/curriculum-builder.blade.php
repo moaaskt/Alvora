@@ -2,7 +2,7 @@
     <!-- SUB-NAV / BREADCRUMBS & STATUS TOP BAR -->
     <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
-            <a href="{{ route('instructor.courses.index') }}" 
+            <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.index') : route('instructor.courses.index')) }}" 
                class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
                 <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"></path>
@@ -12,7 +12,7 @@
             <span class="text-slate-300">/</span>
             <span class="text-xs text-slate-500 font-medium">Home</span>
             <span class="text-slate-300">/</span>
-            <a href="{{ route('instructor.courses.edit', $course) }}" class="text-xs text-slate-500 hover:text-blue-600 font-medium transition-colors">
+            <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.edit', $course) : route('instructor.courses.edit', $course)) }}" class="text-xs text-slate-500 hover:text-blue-600 font-medium transition-colors">
                 {{ Str::limit($course->title, 25) }}
             </a>
             <span class="text-slate-300">/</span>
@@ -69,7 +69,7 @@
     <!-- NAVEGAÇÃO DE ABAS NO PADRÃO STITCH -->
     <div class="flex items-center gap-2 border-b border-slate-200 overflow-x-auto select-none">
         <!-- Aba 1: Informações Básicas -->
-        <a href="{{ route('instructor.courses.edit', $course) }}?tab=basic" 
+        <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.edit', $course) : route('instructor.courses.edit', $course)) }}?tab=basic" 
            class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-800 border-b-2 border-transparent transition-colors shrink-0">
             <span class="flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-500 text-xs font-bold">1</span>
             <span>Informações Básicas</span>
@@ -85,7 +85,7 @@
         </div>
 
         <!-- Aba 3: Avaliações & Quizzes -->
-        <a href="{{ route('instructor.courses.edit', $course) }}?tab=quizzes" 
+        <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.edit', $course) : route('instructor.courses.edit', $course)) }}?tab=quizzes" 
            class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-800 border-b-2 border-transparent transition-colors shrink-0">
             <span class="flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-500 text-xs font-bold">3</span>
             <span>Avaliações & Quizzes</span>
@@ -97,7 +97,7 @@
         </a>
 
         <!-- Aba 4: Mídia & Publicação -->
-        <a href="{{ route('instructor.courses.edit', $course) }}?tab=publish" 
+        <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.edit', $course) : route('instructor.courses.edit', $course)) }}?tab=publish" 
            class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-800 border-b-2 border-transparent transition-colors shrink-0">
             <span class="flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-500 text-xs font-bold">4</span>
             <span>Mídia & Publicação</span>
@@ -408,13 +408,13 @@
 
     <!-- NAVEGAÇÃO DE RODAPÉ -->
     <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-slate-200/80">
-        <a href="{{ route('instructor.courses.edit', $course) }}?tab=basic" 
+        <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.edit', $course) : route('instructor.courses.edit', $course)) }}?tab=basic" 
            class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 shadow-2xs transition-colors flex items-center gap-1.5 w-full sm:w-auto justify-center">
             <span>&larr;</span>
             <span>Voltar para Informações Básicas</span>
         </a>
 
-        <a href="{{ route('instructor.courses.edit', $course) }}?tab=quizzes" 
+        <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.edit', $course) : route('instructor.courses.edit', $course)) }}?tab=quizzes" 
            class="px-5 py-2 rounded-xl font-semibold text-xs text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center justify-center gap-1.5 w-full sm:w-auto">
             <span>Avançar para Quizzes & Avaliações</span>
             <span>&rarr;</span>

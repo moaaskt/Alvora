@@ -2,7 +2,7 @@
     <!-- SUB-NAV / BREADCRUMBS & STATUS TOP BAR -->
     <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
-            <a href="{{ route('instructor.courses.index') }}" 
+            <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.index') : route('instructor.courses.index')) }}" 
                class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
                 <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"></path>
@@ -55,13 +55,13 @@
         </div>
 
         <div class="flex items-center gap-2.5 shrink-0">
-            <a href="{{ route('instructor.courses.index') }}" 
+            <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.index') : route('instructor.courses.index')) }}" 
                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-xs font-semibold">
                 Cancelar
             </a>
 
             @if($courseId)
-                <a href="{{ route('instructor.courses.curriculum', $courseId) }}" 
+                <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.curriculum', $courseId) : route('instructor.courses.curriculum', $courseId)) }}" 
                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-colors text-xs font-semibold border border-slate-200 shadow-2xs">
                     <svg class="w-4 h-4 text-slate-500 shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"></path>
@@ -103,7 +103,7 @@
 
         <!-- Aba 2: Grade Curricular -->
         @if($courseId)
-            <a href="{{ route('instructor.courses.curriculum', $courseId) }}" 
+            <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.curriculum', $courseId) : route('instructor.courses.curriculum', $courseId)) }}" 
                class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-800 border-b-2 border-transparent transition-colors shrink-0">
                 <span class="flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-500 text-xs font-bold">2</span>
                 <span>Grade Curricular</span>

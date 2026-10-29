@@ -48,8 +48,15 @@ class CourseEditor extends Component
         'category_id.exists' => 'A categoria selecionada é inválida.',
     ];
 
-    public function mount(?Course $course = null): void
+    public function mount(?Course $course = null): mixed
     {
+        if (Auth::user()?->isAlvoraAdmin() && request()->routeIs('instructor.courses.*')) {
+            if ($course && $course->exists) {
+                return redirect()->route('admin.courses.edit', $course);
+            }
+            return redirect()->route('admin.courses.create');
+        }
+
         $requestedTab = request()->query('tab', 'basic');
         $this->activeTab = in_array($requestedTab, ['basic', 'quizzes', 'publish']) ? $requestedTab : 'basic';
 
@@ -67,6 +74,8 @@ class CourseEditor extends Component
             // Categoria padrão opcional (primeira de desenvolvimento ou vazia)
             $this->category_id = Category::value('id');
         }
+
+        return null;
     }
 
     public function setTab(string $tab): void
@@ -149,7 +158,8 @@ class CourseEditor extends Component
             ]);
 
             $this->dispatch('toast', message: 'Curso criado com sucesso! Agora adicione os módulos e aulas.', type: 'success');
-            return redirect()->route('instructor.courses.curriculum', $course);
+            $redirectRoute = Auth::user()?->isAlvoraAdmin() ? 'admin.courses.curriculum' : 'instructor.courses.curriculum';
+            return redirect()->route($redirectRoute, $course);
         }
     }
 
@@ -183,16 +193,18 @@ class CourseEditor extends Component
         $categories = Category::with('subcategories')->root()->active()->orderBy('order')->orderBy('name')->get();
 
         $course = $this->courseId 
-            ? Course::withCount(['modules', 'lessons', 'quizzes'])
+            ? Course::withCount(['modules', 'lessons', 'quizzes', 'enrollments'])
                 ->with(['quizzes.questions', 'quizzes.module'])
                 ->find($this->courseId) 
             : null;
+
+        $layout = Auth::user()?->isAlvoraAdmin() ? 'layouts.admin' : 'layouts.instructor';
 
         return view('livewire.instructor.course-editor', [
             'instructors' => $instructors,
             'categories' => $categories,
             'course' => $course,
-        ])->layout('layouts.instructor', [
+        ])->layout($layout, [
             'title' => ($this->courseId ? 'Atualizar: ' . $this->title : 'Criar Novo Treinamento') . ' — ALVORA',
             'breadcrumb' => $this->courseId ? 'Atualizar Curso' : 'Novo Curso',
         ]);
