@@ -105,18 +105,18 @@
             <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Matrículas Ativas</span>
-                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
                         <span class="material-symbols-outlined text-xl">verified_user</span>
                     </div>
                 </div>
                 <div class="mt-3 flex items-baseline gap-2">
                     <span class="text-2xl md:text-3xl font-extrabold text-slate-900">{{ number_format($activeEnrollments, 0, ',', '.') }}</span>
-                    <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-800 border border-slate-200">
                         {{ $totalEnrollments > 0 ? round(($activeEnrollments / $totalEnrollments) * 100, 1) : 100 }}% ativação
                     </span>
                 </div>
                 <div class="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
-                    <span class="material-symbols-outlined text-sm text-emerald-600">check_circle</span>
+                    <span class="w-2 h-2 rounded-full bg-slate-600"></span>
                     <span>Engajamento em conformidade</span>
                 </div>
             </div>
@@ -125,7 +125,7 @@
             <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Acessos Vitalícios</span>
-                    <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
                         <span class="material-symbols-outlined text-xl">all_inclusive</span>
                     </div>
                 </div>
@@ -136,7 +136,7 @@
                     </span>
                 </div>
                 <div class="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
-                    <span class="material-symbols-outlined text-sm text-purple-600">corporate_fare</span>
+                    <span class="material-symbols-outlined text-sm text-slate-500">corporate_fare</span>
                     <span>Contratos corporativos perenes</span>
                 </div>
             </div>
@@ -307,18 +307,18 @@
                                 <!-- Validade / Licença -->
                                 <td class="py-3.5 px-4">
                                     @if($enrollment->isLifetime())
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">
-                                            <span class="material-symbols-outlined text-xs">all_inclusive</span>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white shadow-2xs">
+                                            <span class="material-symbols-outlined text-[13px]">all_inclusive</span>
                                             Acesso Vitalício
                                         </span>
                                     @elseif($enrollment->isExpired())
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
-                                            <span class="material-symbols-outlined text-xs">history_toggle_off</span>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                                            <span class="material-symbols-outlined text-[13px] text-slate-500">history_toggle_off</span>
                                             Expirou em {{ $enrollment->expires_at->format('d/m/Y') }}
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
-                                            <span class="material-symbols-outlined text-xs">schedule</span>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-300">
+                                            <span class="material-symbols-outlined text-[13px] text-slate-600">schedule</span>
                                             Expira em {{ $enrollment->expires_at->format('d/m/Y') }}
                                         </span>
                                     @endif
@@ -327,22 +327,22 @@
                                 <!-- Status -->
                                 <td class="py-3.5 px-4">
                                     @if($enrollment->status === 'active')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                            <span class="w-2 h-2 rounded-full bg-slate-900"></span>
                                             Ativo
                                         </span>
                                     @elseif($enrollment->status === 'completed')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">
+                                            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
                                             Concluído
                                         </span>
                                     @elseif($enrollment->status === 'dropped')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                            <span class="w-2 h-2 rounded-full bg-rose-600"></span>
                                             Revogado
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                                             {{ ucfirst($enrollment->status) }}
                                         </span>
                                     @endif
@@ -465,7 +465,7 @@
                             </div>
                         </div>
                         @if($selectedStudent)
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white shadow-2xs">
                                 <span class="material-symbols-outlined text-xs">check_circle</span> Aluno Selecionado
                             </span>
                         @endif
@@ -558,7 +558,7 @@
                             </div>
                         </div>
                         @if($selectedCourse)
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white shadow-2xs">
                                 <span class="material-symbols-outlined text-xs">check_circle</span> Curso Selecionado
                             </span>
                         @endif
@@ -589,8 +589,8 @@
                                             </span>
                                             <span>•</span>
                                         @endif
-                                        <span class="flex items-center gap-1 text-emerald-700 font-semibold">
-                                            <span class="material-symbols-outlined text-sm text-emerald-600">verified</span>
+                                        <span class="flex items-center gap-1 text-slate-700 font-medium">
+                                            <span class="material-symbols-outlined text-sm text-slate-600">verified</span>
                                             Certificado Incluso
                                         </span>
                                     </div>
@@ -644,7 +644,7 @@
                         <div wire:click="$set('isLifetime', true)" 
                              class="relative p-5 rounded-xl border-2 cursor-pointer transition-all hover:shadow-2xs {{ $isLifetime ? 'border-blue-600 bg-blue-50/50' : 'border-slate-200 bg-white opacity-80 hover:opacity-100' }}">
                             <div class="flex items-start justify-between">
-                                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mb-3">
+                                <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center mb-3">
                                     <span class="material-symbols-outlined text-2xl">all_inclusive</span>
                                 </div>
                                 <div class="w-5 h-5 rounded-full {{ $isLifetime ? 'bg-blue-600 text-white flex items-center justify-center' : 'border-2 border-slate-300' }}">
@@ -653,9 +653,9 @@
                                     @endif
                                 </div>
                             </div>
-                            <div class="flex items-center gap-1.5 font-bold text-slate-900 text-sm">
-                                <span>🌟 Acesso Ilimitado</span>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white uppercase">Recomendado</span>
+                            <div class="flex items-center gap-2 font-bold text-slate-900 text-sm">
+                                <span>Acesso Ilimitado</span>
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-900 text-white uppercase">Recomendado</span>
                             </div>
                             <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
                                 O aluno terá acesso vitalício e poderá assistir quando quiser, sem prazo de expiração ou bloqueio de trilha.
@@ -778,13 +778,13 @@
                         <div class="flex items-center justify-between">
                             <span class="text-xs text-slate-500 font-medium">Regime de Acesso:</span>
                             @if($isLifetime)
-                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
-                                    <span class="material-symbols-outlined text-xs">all_inclusive</span>
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white shadow-2xs">
+                                    <span class="material-symbols-outlined text-[13px]">all_inclusive</span>
                                     Acesso Ilimitado Vitalício
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                    <span class="material-symbols-outlined text-xs">schedule</span>
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-300">
+                                    <span class="material-symbols-outlined text-[13px] text-slate-600">schedule</span>
                                     Expira em: {{ $expiresAt ? \Carbon\Carbon::parse($expiresAt)->format('d/m/Y') : 'A definir' }}
                                 </span>
                             @endif
@@ -797,15 +797,15 @@
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="text-xs text-slate-500 font-medium">Certificação:</span>
-                            <span class="text-xs font-semibold text-emerald-700">Habilitada ao término</span>
+                            <span class="text-xs font-semibold text-slate-800">Habilitada ao término</span>
                         </div>
                     </div>
 
-                    <!-- Selo de Governança e Auditoria -->
-                    <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-2.5">
-                        <span class="material-symbols-outlined text-emerald-700 text-lg shrink-0 mt-0.5">verified_user</span>
-                        <div class="text-[11px] text-emerald-800 leading-snug">
-                            <strong class="font-bold block text-emerald-900">Auditoria LGPD & Concessão Registrada</strong>
+                    <!-- Selo de Governança e Auditoria (shadcn style: sólido executivo) -->
+                    <div class="p-3.5 rounded-xl bg-slate-900 text-white flex items-start gap-3 shadow-xs">
+                        <span class="material-symbols-outlined text-slate-300 text-lg shrink-0 mt-0.5">verified_user</span>
+                        <div class="text-[11px] text-slate-300 leading-snug">
+                            <strong class="font-semibold block text-white text-xs mb-0.5">Auditoria LGPD & Concessão Registrada</strong>
                             Ação com trilha de auditoria para o gestor de RH. {{ auth()->user()->name ?? 'Super Admin' }} será registrado como outorgante.
                         </div>
                     </div>
