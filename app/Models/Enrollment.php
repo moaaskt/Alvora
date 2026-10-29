@@ -25,6 +25,8 @@ class Enrollment extends Model
         'progress_percent',
         'enrolled_at',
         'completed_at',
+        'expires_at',
+        'enrolled_by_id',
     ];
 
     /**
@@ -37,6 +39,7 @@ class Enrollment extends Model
         return [
             'enrolled_at' => 'datetime',
             'completed_at' => 'datetime',
+            'expires_at' => 'datetime',
             'progress_percent' => 'integer',
         ];
     }
@@ -63,6 +66,30 @@ class Enrollment extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    /**
+     * User who manually performed the enrollment (if manual).
+     */
+    public function enrolledBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'enrolled_by_id');
+    }
+
+    /**
+     * Check if the enrollment has lifetime access.
+     */
+    public function isLifetime(): bool
+    {
+        return is_null($this->expires_at);
+    }
+
+    /**
+     * Check if the enrollment has expired.
+     */
+    public function isExpired(): bool
+    {
+        return !$this->isLifetime() && $this->expires_at->isPast();
     }
 
     /**

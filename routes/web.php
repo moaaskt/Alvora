@@ -6,6 +6,7 @@ use App\Livewire\Admin\AdminBilling;
 use App\Livewire\Admin\CategoryManager;
 use App\Livewire\Admin\CourseManager;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
+use App\Livewire\Admin\EnrollmentManager;
 use App\Livewire\Company\CertificateTemplateList;
 use App\Livewire\Company\CompanyBilling;
 use App\Livewire\Company\EmployeeManager;
@@ -214,6 +215,7 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
     Route::middleware('role:admin_alvora')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', AdminDashboard::class)->name('dashboard');
         Route::get('/categorias', CategoryManager::class)->name('categories.index');
+        Route::get('/matriculas', EnrollmentManager::class)->name('enrollments.index');
         Route::get('/faturamento', AdminBilling::class)->name('billing');
         Route::get('/cursos', CourseManager::class)->name('courses.index');
         Route::get('/cursos/novo', CourseEditor::class)->name('courses.create');
