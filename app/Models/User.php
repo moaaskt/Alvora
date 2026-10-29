@@ -137,6 +137,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Courses taught by instructor.
+     */
+    public function courses(): HasMany
+    {
+        return $this->hasMany(Course::class, 'instructor_id');
+    }
+
+    /**
      * User lessons progress.
      */
     public function lessonProgress(): HasMany

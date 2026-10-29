@@ -84,16 +84,15 @@ class AdminDashboardAccessTest extends TestCase
             'role' => UserRole::ADMIN_ALVORA,
         ]);
 
-        // 3. Acessar o Dashboard como Super Admin
+        // 3. Acessar o Dashboard como Super Admin (redireciona para /admin/dashboard)
         $response = $this->actingAs($superAdmin)->get('/dashboard');
+        $response->assertRedirect(route('admin.dashboard'));
 
-        $response->assertOk();
-        $response->assertSee('Painel de Gestão Global');
-        $response->assertSee('Super Admin Alvora');
-        $response->assertSee('Global (Todos os Clientes)');
-        $response->assertSee('Ambiente');
-        $response->assertSee('Super Admin');
-        $response->assertSee($course->title);
+        $adminDashboardResponse = $this->actingAs($superAdmin)->get(route('admin.dashboard'));
+        $adminDashboardResponse->assertOk();
+        $adminDashboardResponse->assertSee('Painel Geral');
+        $adminDashboardResponse->assertSee('Super Admin');
+        $adminDashboardResponse->assertSee($course->title);
     }
 
     public function test_company_admin_accesses_dashboard_with_tenant_quota_and_name(): void
