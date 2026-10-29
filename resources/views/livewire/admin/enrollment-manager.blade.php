@@ -307,7 +307,7 @@
                                 <!-- Validade / Licença -->
                                 <td class="py-3.5 px-4">
                                     @if($enrollment->isLifetime())
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white shadow-2xs">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80">
                                             <span class="material-symbols-outlined text-[13px]">all_inclusive</span>
                                             Acesso Vitalício
                                         </span>
@@ -465,7 +465,7 @@
                             </div>
                         </div>
                         @if($selectedStudent)
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white shadow-2xs">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80">
                                 <span class="material-symbols-outlined text-xs">check_circle</span> Aluno Selecionado
                             </span>
                         @endif
@@ -558,7 +558,7 @@
                             </div>
                         </div>
                         @if($selectedCourse)
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white shadow-2xs">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80">
                                 <span class="material-symbols-outlined text-xs">check_circle</span> Curso Selecionado
                             </span>
                         @endif
@@ -655,7 +655,7 @@
                             </div>
                             <div class="flex items-center gap-2 font-bold text-slate-900 text-sm">
                                 <span>Acesso Ilimitado</span>
-                                <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-900 text-white uppercase">Recomendado</span>
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 uppercase">Recomendado</span>
                             </div>
                             <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
                                 O aluno terá acesso vitalício e poderá assistir quando quiser, sem prazo de expiração ou bloqueio de trilha.
@@ -778,12 +778,12 @@
                         <div class="flex items-center justify-between">
                             <span class="text-xs text-slate-500 font-medium">Regime de Acesso:</span>
                             @if($isLifetime)
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white shadow-2xs">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80">
                                     <span class="material-symbols-outlined text-[13px]">all_inclusive</span>
                                     Acesso Ilimitado Vitalício
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-300">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-300">
                                     <span class="material-symbols-outlined text-[13px] text-slate-600">schedule</span>
                                     Expira em: {{ $expiresAt ? \Carbon\Carbon::parse($expiresAt)->format('d/m/Y') : 'A definir' }}
                                 </span>
@@ -797,15 +797,15 @@
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="text-xs text-slate-500 font-medium">Certificação:</span>
-                            <span class="text-xs font-semibold text-slate-800">Habilitada ao término</span>
+                            <span class="text-xs font-semibold text-slate-700">Habilitada ao término</span>
                         </div>
                     </div>
 
-                    <!-- Selo de Governança e Auditoria (shadcn style: sólido executivo) -->
-                    <div class="p-3.5 rounded-xl bg-slate-900 text-white flex items-start gap-3 shadow-xs">
-                        <span class="material-symbols-outlined text-slate-300 text-lg shrink-0 mt-0.5">verified_user</span>
-                        <div class="text-[11px] text-slate-300 leading-snug">
-                            <strong class="font-semibold block text-white text-xs mb-0.5">Auditoria LGPD & Concessão Registrada</strong>
+                    <!-- Selo de Governança e Auditoria (Sutil, elegante e integrado) -->
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start gap-2.5">
+                        <span class="material-symbols-outlined text-slate-500 text-lg shrink-0 mt-0.5">verified_user</span>
+                        <div class="text-[11px] text-slate-500 leading-snug">
+                            <strong class="font-semibold block text-slate-800 text-xs mb-0.5">Auditoria LGPD & Concessão Registrada</strong>
                             Ação com trilha de auditoria para o gestor de RH. {{ auth()->user()->name ?? 'Super Admin' }} será registrado como outorgante.
                         </div>
                     </div>
