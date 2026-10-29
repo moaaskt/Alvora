@@ -312,4 +312,302 @@ class QuizTest extends TestCase
             ->assertSet('title', 'Avaliação Final DevOps')
             ->assertSet('passing_score', 75);
     }
+
+    public function test_quiz_runner_renders_new_visual_structure_and_back_link_points_to_player(): void
+    {
+        $company = Company::create(['name' => 'Empresa Alfa', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Roberto',
+            'email' => 'roberto@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Aluno Marcos',
+            'email' => 'marcos@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Liderança e Estratégia',
+            'slug' => 'lideranca-e-estrategia',
+            'status' => 'published',
+        ]);
+
+        $quiz = Quiz::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'title' => 'Avaliação Final de Liderança',
+            'passing_score' => 70,
+        ]);
+
+        $question = QuizQuestion::create([
+            'company_id' => $company->id,
+            'quiz_id' => $quiz->id,
+            'question_text' => 'Qual é o pilar fundamental?',
+            'order' => 1,
+        ]);
+
+        QuizOption::create([
+            'quiz_question_id' => $question->id,
+            'option_text' => 'Opção A',
+            'is_correct' => true,
+        ]);
+
+        $this->actingAs($student);
+
+        $expectedPlayerUrl = route('student.player', ['course' => $course->slug]);
+
+        Livewire::test(QuizRunner::class, ['quiz' => $quiz])
+            ->assertSee('Voltar ao Curso')
+            ->assertSee($expectedPlayerUrl)
+            ->assertSee('Avaliação Final de Liderança')
+            ->assertSee('Nota mínima para aprovação: 70%')
+            ->assertSee('Questão 1 de 1')
+            ->assertSee('Respondidas:')
+            ->assertSee('questões')
+            ->assertSee('Finalizar e Ver Resultado')
+            ->assertDontSee('Aprovado')
+            ->assertDontSee('Não aprovado');
+    }
+
+    public function test_quiz_runner_result_banner_and_sticky_bar_behavior(): void
+    {
+        $company = Company::create(['name' => 'Empresa Alfa', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Roberto',
+            'email' => 'roberto@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Aluno Marcos',
+            'email' => 'marcos@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Gestão de Mudanças',
+            'slug' => 'gestao-de-mudancas',
+            'status' => 'published',
+        ]);
+
+        $quiz = Quiz::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'title' => 'Quiz de Mudanças',
+            'passing_score' => 70,
+        ]);
+
+        $question = QuizQuestion::create([
+            'company_id' => $company->id,
+            'quiz_id' => $quiz->id,
+            'question_text' => 'O que impulsiona a mudança?',
+            'order' => 1,
+        ]);
+
+        $correctOption = QuizOption::create([
+            'quiz_question_id' => $question->id,
+            'option_text' => 'Comunicação clara e liderança ativa',
+            'is_correct' => true,
+        ]);
+
+        $wrongOption = QuizOption::create([
+            'quiz_question_id' => $question->id,
+            'option_text' => 'Imposição unilateral sem alinhamento',
+            'is_correct' => false,
+        ]);
+
+        $this->actingAs($student);
+
+        // Cenário 1: Reprovação (seleciona errada)
+        Livewire::test(QuizRunner::class, ['quiz' => $quiz])
+            ->call('selectOption', $question->id, $wrongOption->id)
+            ->call('submit')
+            ->assertSee('Não aprovado')
+            ->assertSee('Você obteve 0% de aproveitamento.')
+            ->assertSee('Tentar Novamente')
+            ->assertDontSee('Aprovado')
+            ->assertDontSee('Finalizar e Ver Resultado'); // Sticky bar oculta após envio
+
+        // Cenário 2: Aprovação (retry e seleciona correta)
+        Livewire::test(QuizRunner::class, ['quiz' => $quiz])
+            ->call('retry')
+            ->assertDontSee('Não aprovado')
+            ->assertDontSee('Aprovado')
+            ->assertSee('Finalizar e Ver Resultado') // Sticky bar reaparece
+            ->call('selectOption', $question->id, $correctOption->id)
+            ->call('submit')
+            ->assertSee('Aprovado')
+            ->assertSee('Você obteve 100% de aproveitamento.')
+            ->assertSee('Voltar ao Curso')
+            ->assertDontSee('Não aprovado')
+            ->assertDontSee('Tentar Novamente')
+            ->assertDontSee('Finalizar e Ver Resultado');
+    }
+
+    public function test_quiz_runner_explanation_box_presence_after_submission(): void
+    {
+        $company = Company::create(['name' => 'Empresa Alfa', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Roberto',
+            'email' => 'roberto@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Aluno Marcos',
+            'email' => 'marcos@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Comunicação Corporativa',
+            'slug' => 'comunicacao-corporativa',
+            'status' => 'published',
+        ]);
+
+        $quiz = Quiz::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'title' => 'Quiz Comunicação',
+            'passing_score' => 70,
+        ]);
+
+        $questionWithExp = QuizQuestion::create([
+            'company_id' => $company->id,
+            'quiz_id' => $quiz->id,
+            'question_text' => 'Questão com explicação detalhada',
+            'explanation' => 'Esta é a justificativa pedagógica fundamental.',
+            'order' => 1,
+        ]);
+
+        $optA = QuizOption::create([
+            'quiz_question_id' => $questionWithExp->id,
+            'option_text' => 'Alternativa 1',
+            'is_correct' => true,
+        ]);
+
+        $questionWithoutExp = QuizQuestion::create([
+            'company_id' => $company->id,
+            'quiz_id' => $quiz->id,
+            'question_text' => 'Questão sem explicação',
+            'explanation' => null,
+            'order' => 2,
+        ]);
+
+        $optB = QuizOption::create([
+            'quiz_question_id' => $questionWithoutExp->id,
+            'option_text' => 'Alternativa 2',
+            'is_correct' => true,
+        ]);
+
+        $this->actingAs($student);
+
+        // Antes do envio, a justificativa não deve aparecer
+        $test = Livewire::test(QuizRunner::class, ['quiz' => $quiz])
+            ->assertDontSee('Justificativa')
+            ->assertDontSee('Esta é a justificativa pedagógica fundamental.');
+
+        // Após envio, exibe a justificativa apenas da questão que a possui
+        $test->call('selectOption', $questionWithExp->id, $optA->id)
+            ->call('selectOption', $questionWithoutExp->id, $optB->id)
+            ->call('submit')
+            ->assertSee('Justificativa')
+            ->assertSee('Esta é a justificativa pedagógica fundamental.');
+    }
+
+    public function test_quiz_runner_option_styles_present_after_submission(): void
+    {
+        $company = Company::create(['name' => 'Empresa Alfa', 'status' => 'active']);
+
+        $instructor = User::create([
+            'name' => 'Instrutor Roberto',
+            'email' => 'roberto@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::INSTRUCTOR,
+        ]);
+
+        $student = User::create([
+            'name' => 'Aluno Marcos',
+            'email' => 'marcos@alfa.com',
+            'password' => bcrypt('password'),
+            'company_id' => $company->id,
+            'role' => UserRole::STUDENT,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Gestão Visual de Estilos',
+            'slug' => 'gestao-visual-de-estilos',
+            'status' => 'published',
+        ]);
+
+        $quiz = Quiz::create([
+            'company_id' => $company->id,
+            'course_id' => $course->id,
+            'title' => 'Quiz de Estilos',
+            'passing_score' => 70,
+        ]);
+
+        $question = QuizQuestion::create([
+            'company_id' => $company->id,
+            'quiz_id' => $quiz->id,
+            'question_text' => 'Verificação de estilos de gabarito',
+            'order' => 1,
+        ]);
+
+        $correctOption = QuizOption::create([
+            'quiz_question_id' => $question->id,
+            'option_text' => 'Opção Verdadeira',
+            'is_correct' => true,
+        ]);
+
+        $wrongSelectedOption = QuizOption::create([
+            'quiz_question_id' => $question->id,
+            'option_text' => 'Opção Errada Selecionada',
+            'is_correct' => false,
+        ]);
+
+        $wrongUnselectedOption = QuizOption::create([
+            'quiz_question_id' => $question->id,
+            'option_text' => 'Opção Errada Não Selecionada',
+            'is_correct' => false,
+        ]);
+
+        $this->actingAs($student);
+
+        Livewire::test(QuizRunner::class, ['quiz' => $quiz])
+            ->call('selectOption', $question->id, $wrongSelectedOption->id)
+            ->call('submit')
+            // Verifica estilo da correta: emerald-50 e emerald-200
+            ->assertSeeHtml('border-emerald-200 bg-emerald-50')
+            // Verifica estilo da errada selecionada: rose-50 e rose-200
+            ->assertSeeHtml('border-rose-200 bg-rose-50')
+            // Verifica estilo neutro não selecionado: opacity-60
+            ->assertSeeHtml('opacity-60');
+    }
 }

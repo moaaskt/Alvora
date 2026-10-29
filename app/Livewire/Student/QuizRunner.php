@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.student', ['showHeroBand' => false, 'showAiTutor' => false, 'title' => 'Alvora — Avaliação'])]
 class QuizRunner extends Component
 {
     public Quiz $quiz;
