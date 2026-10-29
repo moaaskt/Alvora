@@ -83,6 +83,10 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
             return redirect()->route('student.dashboard');
         }
 
+        if (auth()->user()->isAlvoraAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+
         $user = auth()->user();
         $isGlobalAdmin = $user->isAlvoraAdmin();
         $companyId = $user->company_id;
@@ -201,6 +205,11 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
     Route::redirect('/empresa/sala-de-situacao', '/instrutor/sala-de-situacao');
     Route::redirect('/empresa/insights-executivos', '/instrutor/insights-executivos');
     Route::redirect('/empresa/certificados/templates', '/instrutor/certificados/templates');
+
+    // Super Admin Alvora - Dashboard e Governança Global
+    Route::get('/admin/dashboard', \App\Livewire\Admin\Dashboard::class)
+        ->middleware('role:admin_alvora')
+        ->name('admin.dashboard');
 
     // Super Admin Alvora - Faturamento Global B2B
     Route::get('/admin/faturamento', AdminBilling::class)
