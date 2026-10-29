@@ -15,10 +15,10 @@
     'aria-label' => 'Aula atual',
     'class' => 'shrink-0',
 ]) }}>
-    {{-- Background Track --}}
+    {{-- Background Track (fundo cinza/azul claro da circunferência) --}}
     <circle cx="12" cy="12" r="{{ $radius }}" stroke="var(--color-edtech-blue-border, #BFDBFE)" stroke-width="2.5" fill="none" class="stroke-edtech-blue-border" />
 
-    {{-- Progress Arc (rotates from 12 o'clock clockwise as video advances) --}}
+    {{-- Progress Arc (gira no sentido horário a partir das 12h conforme o vídeo avança) --}}
     @if ($alpineModel)
         <circle cx="12" cy="12" r="{{ $radius }}"
                 stroke="var(--color-edtech-blue, #2563EB)"
@@ -27,10 +27,9 @@
                 fill="none"
                 stroke-dasharray="{{ $circumference }}"
                 :stroke-dashoffset="{{ $circumference }} * (1 - (Math.min(100, Math.max(0, {{ $alpineModel }})) / 100))"
-                :style="'stroke-dashoffset: ' + (59.7 * (1 - (Math.min(100, Math.max(0, ' + {{ $alpineModel }} + ')) / 100))) + '; opacity: ' + (' + {{ $alpineModel }} + ' > 0 ? 1 : 0) + ';'"
+                :style="{ strokeDashoffset: ({{ $circumference }} * (1 - (Math.min(100, Math.max(0, {{ $alpineModel }})) / 100))) + 'px' }"
                 transform="rotate(-90 12 12)"
-                :class="{{ $alpineModel }} > 0 ? 'opacity-100' : 'opacity-0'"
-                class="stroke-edtech-blue transition-all duration-200" />
+                class="stroke-edtech-blue transition-all duration-300" />
     @else
         @if ($pct > 0)
             <circle cx="12" cy="12" r="{{ $radius }}"
@@ -40,6 +39,7 @@
                     fill="none"
                     stroke-dasharray="{{ $circumference }}"
                     stroke-dashoffset="{{ $offset }}"
+                    style="stroke-dashoffset: {{ $offset }}px;"
                     transform="rotate(-90 12 12)"
                     class="stroke-edtech-blue transition-all duration-300" />
         @endif

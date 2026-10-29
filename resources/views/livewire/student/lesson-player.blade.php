@@ -2,38 +2,37 @@
      x-data="{
         currentLessonPercent: {{ (int) $currentLessonPercent }},
         isCompleted: {{ $isCompleted ? 'true' : 'false' }},
-        lastReportedPercent: 0,
+        lastReportedPercent: {{ (int) $currentLessonPercent }},
         ytPlayer: null,
-        ytPollInterval: null,
-        ytHandshakeInterval: null,
+        ytTicker: null,
         vimeoPlayer: null,
         ytDuration: {{ (int) (($currentLesson->duration_minutes ?? 10) * 60) }},
-        ytCurrentTime: 0,
         isPlaying: false,
 
         init() {
             this.$nextTick(() => this.initPlayer());
-            window.addEventListener('message', this.handleYTMessage.bind(this));
-            
-            // Detect when user clicks into the video iframe
-            window.addEventListener('blur', () => {
-                setTimeout(() => {
-                    if (document.activeElement && document.activeElement.id === 'alvora-yt-iframe') {
-                        console.log('[Alvora Player] User clicked video iframe, starting polling');
-                        this.sendYTHandshake();
-                        this.startYTPolling();
-                    }
-                }, 100);
+
+            this.$watch('$wire.currentLessonPercent', (val) => {
+                if (val !== undefined && Math.abs(val - this.currentLessonPercent) > 5) {
+                    this.currentLessonPercent = val;
+                }
             });
         },
 
         initPlayer() {
             this.cleanup();
-            const ytIframe = document.getElementById('alvora-yt-iframe');
-            if (ytIframe) {
-                this.setupYouTube(ytIframe);
-                return;
+            this.currentLessonPercent = {{ (int) $currentLessonPercent }};
+            this.lastReportedPercent = {{ (int) $currentLessonPercent }};
+
+            const ytContainer = document.getElementById('alvora-yt-container');
+            if (ytContainer) {
+                const videoId = ytContainer.getAttribute('data-video-id');
+                if (videoId) {
+                    this.setupYouTube(videoId);
+                    return;
+                }
             }
+
             const vimeoIframe = document.getElementById('alvora-vimeo-iframe');
             if (vimeoIframe) {
                 this.setupVimeo(vimeoIframe);
@@ -41,98 +40,82 @@
             }
         },
 
-        sendYTHandshake() {
-            const iframe = document.getElementById('alvora-yt-iframe');
-            if (iframe && iframe.contentWindow) {
-                iframe.contentWindow.postMessage(JSON.stringify({ event: 'listening' }), '*');
-                iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onStateChange'] }), '*');
-                iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'getCurrentTime', args: [] }), '*');
-                iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'getDuration', args: [] }), '*');
-            }
-        },
-
-        setupYouTube(iframe) {
-            // Send handshakes immediately and periodically
-            this.sendYTHandshake();
-            if (this.ytHandshakeInterval) clearInterval(this.ytHandshakeInterval);
-            this.ytHandshakeInterval = setInterval(() => {
-                this.sendYTHandshake();
-            }, 1000);
-
-            // Also load YouTube Iframe API if available
-            const initYT = () => {
+        setupYouTube(videoId) {
+            const createPlayer = () => {
                 try {
-                    if (window.YT && window.YT.Player) {
-                        this.ytPlayer = new window.YT.Player('alvora-yt-iframe', {
-                            events: {
-                                onReady: (e) => {
-                                    if (e.target && typeof e.target.getDuration === 'function') {
-                                        const d = e.target.getDuration();
-                                        if (d > 0) this.ytDuration = d;
-                                    }
-                                },
-                                onStateChange: (event) => {
-                                    console.log('[Alvora Player] YT onStateChange:', event.data);
-                                    if (event.data === 1) { // PLAYING
-                                        this.isPlaying = true;
-                                        this.startYTPolling();
-                                    } else if (event.data === 2) { // PAUSED
-                                        this.isPlaying = false;
-                                        this.stopYTPolling();
-                                    } else if (event.data === 0) { // ENDED
-                                        this.isPlaying = false;
-                                        this.stopYTPolling();
-                                        this.currentLessonPercent = 100;
-                                        if (!this.isCompleted) {
-                                            $wire.toggleComplete();
-                                        }
+                    if (this.ytPlayer && typeof this.ytPlayer.destroy === 'function') {
+                        this.ytPlayer.destroy();
+                    }
+
+                    const container = document.getElementById('alvora-yt-container');
+                    if (!container) return;
+                    container.innerHTML = '<div id=\"alvora-yt-target\" class=\"w-full h-full\"></div>';
+
+                    this.ytPlayer = new window.YT.Player('alvora-yt-target', {
+                        width: '100%',
+                        height: '100%',
+                        videoId: videoId,
+                        playerVars: {
+                            autoplay: 0,
+                            playsinline: 1,
+                            rel: 0,
+                            modestbranding: 1,
+                            origin: window.location.origin
+                        },
+                        events: {
+                            onReady: (event) => {
+                                const d = event.target.getDuration();
+                                if (d > 0) this.ytDuration = d;
+                            },
+                            onStateChange: (event) => {
+                                if (event.data === 1) { // PLAYING
+                                    this.isPlaying = true;
+                                    this.startYTTicker();
+                                } else if (event.data === 2) { // PAUSED
+                                    this.isPlaying = false;
+                                    this.stopYTTicker();
+                                } else if (event.data === 0) { // ENDED
+                                    this.isPlaying = false;
+                                    this.stopYTTicker();
+                                    this.currentLessonPercent = 100;
+                                    if (!this.isCompleted) {
+                                        $wire.toggleComplete();
                                     }
                                 }
                             }
-                        });
-                    }
+                        }
+                    });
                 } catch (e) {
-                    console.warn('[Alvora Player] YT Player init exception:', e);
+                    console.warn('[Alvora YT] Erro ao instanciar YT.Player:', e);
+                    this.renderFallbackIframe(videoId);
                 }
             };
 
-            if (!window.YT || !window.YT.Player) {
-                if (!document.getElementById('yt-iframe-api')) {
-                    const tag = document.createElement('script');
-                    tag.id = 'yt-iframe-api';
-                    tag.src = 'https://www.youtube.com/iframe_api';
-                    document.head.appendChild(tag);
-                }
-                const oldCallback = window.onYouTubeIframeAPIReady;
-                window.onYouTubeIframeAPIReady = () => {
-                    if (typeof oldCallback === 'function') oldCallback();
-                    initYT();
-                };
+            if (window.YT && window.YT.Player) {
+                createPlayer();
             } else {
-                initYT();
+                const oldCb = window.onYouTubeIframeAPIReady;
+                window.onYouTubeIframeAPIReady = () => {
+                    if (typeof oldCb === 'function') oldCb();
+                    createPlayer();
+                };
+
+                setTimeout(() => {
+                    if (!this.ytPlayer && (!window.YT || !window.YT.Player)) {
+                        this.renderFallbackIframe(videoId);
+                    }
+                }, 2500);
             }
         },
 
-        startYTPolling() {
-            this.stopYTPolling();
-            this.sendYTHandshake();
-
-            // Poll YouTube iframe every 250ms
-            this.ytPollInterval = setInterval(() => {
-                const iframe = document.getElementById('alvora-yt-iframe');
-                if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'getCurrentTime', args: [] }), '*');
-                    iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'getDuration', args: [] }), '*');
-                }
-
-                // If official YT.Player instance is connected:
+        startYTTicker() {
+            this.stopYTTicker();
+            this.ytTicker = setInterval(() => {
                 if (this.ytPlayer && typeof this.ytPlayer.getCurrentTime === 'function') {
                     try {
                         const current = this.ytPlayer.getCurrentTime() || 0;
-                        const duration = this.ytPlayer.getDuration() || 0;
+                        const duration = this.ytPlayer.getDuration() || this.ytDuration || 1;
                         if (duration > 0) {
-                            this.ytDuration = duration;
-                            this.ytCurrentTime = current;
                             this.calcAndApplyProgress(current, duration);
                         }
                     } catch (e) {}
@@ -140,84 +123,23 @@
             }, 250);
         },
 
-        stopYTPolling() {
-            if (this.ytPollInterval) {
-                clearInterval(this.ytPollInterval);
-                this.ytPollInterval = null;
+        stopYTTicker() {
+            if (this.ytTicker) {
+                clearInterval(this.ytTicker);
+                this.ytTicker = null;
             }
         },
 
-        handleYTMessage(event) {
-            if (!event || !event.data) return;
-            let data;
-            try {
-                data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-            } catch (e) {
-                return;
-            }
-            if (!data) return;
-
-            // 1. YouTube infoDelivery packet
-            if (data.event === 'infoDelivery' && data.info) {
-                if (data.info.duration !== undefined && data.info.duration > 0) {
-                    this.ytDuration = data.info.duration;
-                }
-                if (data.info.currentTime !== undefined) {
-                    this.ytCurrentTime = data.info.currentTime;
-                }
-                if (data.info.playerState !== undefined) {
-                    if (data.info.playerState === 1) { // PLAYING
-                        this.isPlaying = true;
-                        if (!this.ytPollInterval) this.startYTPolling();
-                    } else if (data.info.playerState === 2) { // PAUSED
-                        this.isPlaying = false;
-                        this.stopYTPolling();
-                    } else if (data.info.playerState === 0) { // ENDED
-                        this.isPlaying = false;
-                        this.stopYTPolling();
-                        this.currentLessonPercent = 100;
-                        if (!this.isCompleted) {
-                            $wire.toggleComplete();
-                        }
-                    }
-                }
-            }
-
-            // 2. onStateChange event
-            if (data.event === 'onStateChange' && data.info !== undefined) {
-                if (data.info === 1) { // PLAYING
-                    this.isPlaying = true;
-                    if (!this.ytPollInterval) this.startYTPolling();
-                } else if (data.info === 2) { // PAUSED
-                    this.isPlaying = false;
-                    this.stopYTPolling();
-                } else if (data.info === 0) { // ENDED
-                    this.isPlaying = false;
-                    this.stopYTPolling();
-                    this.currentLessonPercent = 100;
-                    if (!this.isCompleted) {
-                        $wire.toggleComplete();
-                    }
-                }
-            }
-
-            // 3. Direct response from getCurrentTime command
-            if (typeof data.info === 'number') {
-                this.ytCurrentTime = data.info;
-            }
-
-            // Update percentage
-            const dur = this.ytDuration || ({{ (int) (($currentLesson->duration_minutes ?? 10) * 60) }});
-            if (dur > 0 && this.ytCurrentTime !== undefined && this.ytCurrentTime > 0) {
-                this.calcAndApplyProgress(this.ytCurrentTime, dur);
-            }
+        renderFallbackIframe(videoId) {
+            const container = document.getElementById('alvora-yt-container');
+            if (!container) return;
+            container.innerHTML = `<iframe id=\"alvora-yt-iframe\" class=\"w-full h-full\" src=\"https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}&rel=0&modestbranding=1\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>`;
         },
 
         calcAndApplyProgress(current, duration) {
             const pct = Math.min(100, Math.round((current / duration) * 100));
             this.currentLessonPercent = pct;
-            
-            // Sync with Livewire in background every 5%
+
             if (pct >= this.lastReportedPercent + 5 || (pct >= 90 && this.lastReportedPercent < 90)) {
                 this.lastReportedPercent = pct;
                 $wire.updateLessonProgress(Math.round(current), pct);
@@ -275,11 +197,7 @@
         },
 
         cleanup() {
-            this.stopYTPolling();
-            if (this.ytHandshakeInterval) {
-                clearInterval(this.ytHandshakeInterval);
-                this.ytHandshakeInterval = null;
-            }
+            this.stopYTTicker();
             if (this.ytPlayer) {
                 try {
                     if (typeof this.ytPlayer.destroy === 'function') {
@@ -400,13 +318,9 @@
 
                     @if ($isYoutube)
                         @if ($youtubeId)
-                            <iframe id="alvora-yt-iframe"
-                                    class="w-full h-full"
-                                    src="https://www.youtube.com/embed/{{ $youtubeId }}?enablejsapi=1&origin={{ request()->getSchemeAndHttpHost() }}&widget_referrer={{ request()->getSchemeAndHttpHost() }}&rel=0&modestbranding=1"
-                                    title="{{ $currentLesson->title }}"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                    allowfullscreen></iframe>
+                            <div id="alvora-yt-container" class="w-full h-full relative" data-video-id="{{ $youtubeId }}">
+                                <div id="alvora-yt-target" class="w-full h-full"></div>
+                            </div>
                         @else
                             <div class="text-center p-8 space-y-2 text-slate-300">
                                 <x-icon name="alert-triangle" class="w-8 h-8 text-edtech-amber mx-auto" />
