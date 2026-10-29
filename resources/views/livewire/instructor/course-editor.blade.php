@@ -2,7 +2,7 @@
     <!-- SUB-NAV / BREADCRUMBS & STATUS TOP BAR -->
     <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
-            <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.index') : route('instructor.courses.index')) }}" 
+            <a href="{{ route('instructor.courses.index') }}" 
                class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
                 <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"></path>
@@ -23,11 +23,11 @@
                     ID: #{{ $courseId }}
                 </span>
                 @if($status === 'published')
-                    <span class="inline-flex items-center rounded-md bg-emerald-600 px-2.5 py-0.5 text-xs font-semibold text-white shadow-sm">
+                    <span class="inline-flex items-center rounded-md bg-emerald-600 px-2.5 py-0.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700">
                         Publicado
                     </span>
                 @elseif($status === 'draft')
-                    <span class="inline-flex items-center rounded-md bg-amber-500 px-2.5 py-0.5 text-xs font-semibold text-white shadow-sm">
+                    <span class="inline-flex items-center rounded-md bg-amber-500 px-2.5 py-0.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-amber-600">
                         Rascunho
                     </span>
                 @else
@@ -55,13 +55,13 @@
         </div>
 
         <div class="flex items-center gap-2.5 shrink-0">
-            <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.index') : route('instructor.courses.index')) }}" 
+            <a href="{{ route('instructor.courses.index') }}" 
                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-xs font-semibold">
-                Cancelar
+                Descartar Alterações
             </a>
 
             @if($courseId)
-                <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.curriculum', $courseId) : route('instructor.courses.curriculum', $courseId)) }}" 
+                <a href="{{ route('instructor.courses.curriculum', $courseId) }}" 
                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-colors text-xs font-semibold border border-slate-200 shadow-2xs">
                     <svg class="w-4 h-4 text-slate-500 shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"></path>
@@ -103,7 +103,7 @@
 
         <!-- Aba 2: Grade Curricular -->
         @if($courseId)
-            <a href="{{ (auth()->user()?->isAlvoraAdmin() ? route('admin.courses.curriculum', $courseId) : route('instructor.courses.curriculum', $courseId)) }}" 
+            <a href="{{ route('instructor.courses.curriculum', $courseId) }}" 
                class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-800 border-b-2 border-transparent transition-colors shrink-0">
                 <span class="flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-500 text-xs font-bold">2</span>
                 <span>Grade Curricular</span>
@@ -199,30 +199,8 @@
                         @enderror
                     </div>
 
-                    <!-- Grid: Instrutor Titular & Categoria -->
+                    <!-- Grid: Categoria Principal & Instrutor Responsável -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-xs font-semibold text-slate-700" for="course-instructor">
-                                Instrutor Responsável *
-                            </label>
-                            <div class="relative">
-                                <select id="course-instructor" 
-                                        wire:model="instructor_id"
-                                        class="w-full h-10 pl-3.5 pr-8 rounded-xl bg-white border @error('instructor_id') border-rose-500 @else border-slate-200 @enderror text-slate-800 text-xs font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer shadow-2xs">
-                                    <option value="">Selecione o instrutor titular...</option>
-                                    @foreach($instructors as $inst)
-                                        <option value="{{ $inst->id }}">{{ $inst->name }} ({{ $inst->email }})</option>
-                                    @endforeach
-                                </select>
-                                <svg class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path d="m19.5 8.25-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                </svg>
-                            </div>
-                            @error('instructor_id')
-                                <span class="text-rose-500 text-xs">{{ $message }}</span>
-                            @enderror
-                        </div>
-
                         <div class="flex flex-col gap-1.5">
                             <label class="text-xs font-semibold text-slate-700" for="course-category">
                                 Categoria do Treinamento
@@ -247,6 +225,28 @@
                                 <span class="text-rose-500 text-xs">{{ $message }}</span>
                             @enderror
                         </div>
+
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-semibold text-slate-700" for="course-instructor">
+                                Instrutor Responsável *
+                            </label>
+                            <div class="relative">
+                                <select id="course-instructor" 
+                                        wire:model="instructor_id"
+                                        class="w-full h-10 pl-3.5 pr-8 rounded-xl bg-white border @error('instructor_id') border-rose-500 @else border-slate-200 @enderror text-slate-800 text-xs font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer shadow-2xs">
+                                    <option value="">Selecione o instrutor titular...</option>
+                                    @foreach($instructors as $inst)
+                                        <option value="{{ $inst->id }}">{{ $inst->name }} ({{ $inst->email }})</option>
+                                    @endforeach
+                                </select>
+                                <svg class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="m19.5 8.25-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </div>
+                            @error('instructor_id')
+                                <span class="text-rose-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
                     </div>
 
                     <!-- Descrição Completa com Estilo Stitch -->
@@ -265,9 +265,20 @@
 
                         <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs bg-white">
                             <div class="flex items-center gap-1 px-3 py-2 bg-slate-50 border-b border-slate-200 text-slate-600 flex-wrap">
-                                <span class="p-1 rounded font-bold text-xs">B</span>
-                                <span class="p-1 rounded italic text-xs">I</span>
-                                <span class="p-1 rounded underline text-xs">U</span>
+                                <span class="p-1 rounded font-bold text-xs select-none">B</span>
+                                <span class="p-1 rounded italic text-xs select-none">I</span>
+                                <span class="p-1 rounded underline text-xs select-none">U</span>
+                                <span class="w-px h-4 bg-slate-200 mx-1"></span>
+                                <span class="p-1 rounded text-xs select-none flex items-center">
+                                    <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"></path>
+                                    </svg>
+                                </span>
+                                <span class="p-1 rounded text-xs select-none flex items-center">
+                                    <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"></path>
+                                    </svg>
+                                </span>
                                 <span class="w-px h-4 bg-slate-200 mx-1"></span>
                                 <span class="text-[11px] text-slate-400 ml-auto font-mono">Texto & Markdown Suportado</span>
                             </div>
@@ -335,14 +346,14 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- COLUNA DIREITA: RESUMO, SAÚDE & PUBLICATÓRIO (4 COLUNAS) -->
                 <!-- ALERTAS DE VALIDAÇÃO & BARRA DE AÇÃO INFERIOR -->
                 @if($errors->any())
                     <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex flex-col gap-1 shadow-xs">
                         <span class="font-bold flex items-center gap-1.5 text-rose-700">
-                            <svg class="w-4 h-4 shrink-0 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 7.5h.008v.008H12v-.008Z"></path></svg>
+                            <svg class="w-4 h-4 shrink-0 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 7.5h.008v.008H12v-.008Z"></path>
+                            </svg>
                             Não foi possível salvar o treinamento. Verifique as pendências:
                         </span>
                         <ul class="list-disc list-inside space-y-0.5 mt-1 text-rose-700 font-medium">
@@ -353,14 +364,14 @@
                     </div>
                 @endif
 
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex items-center justify-between">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <span class="text-xs text-slate-500">
                         {{ $courseId ? 'Todas as alterações são salvas e auditadas no sistema.' : 'Após criar, você será direcionado para adicionar módulos e aulas.' }}
                     </span>
                     <button type="button" 
                             wire:click="save" 
                             wire:loading.attr="disabled"
-                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all text-xs font-semibold shadow-sm cursor-pointer disabled:opacity-50">
+                            class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all text-xs font-semibold shadow-sm cursor-pointer disabled:opacity-50 shrink-0">
                         <span wire:loading.remove wire:target="save" class="flex items-center gap-1.5">
                             <svg class="w-4 h-4 shrink-0 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path>
@@ -378,6 +389,7 @@
                 </div>
             </div>
 
+            <!-- COLUNA DIREITA: RESUMO, SAÚDE & PARÂMETROS (4 COLUNAS) -->
             <div class="lg:col-span-4 flex flex-col gap-6">
                 <!-- CARD RESUMO & SAÚDE DO CURSO -->
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col gap-4">
@@ -385,10 +397,15 @@
                         Resumo Rápido & Saúde do Curso
                     </h2>
 
-                    <!-- Thumbnail Preview -->
-                    <div class="relative rounded-xl overflow-hidden border border-slate-200 shadow-2xs group aspect-video bg-slate-100 flex items-center justify-center">
+                    <!-- Thumbnail Preview (Compact h-36) -->
+                    <div class="relative rounded-xl overflow-hidden border border-slate-200 shadow-2xs group h-36 bg-slate-100 flex items-center justify-center">
                         @if($thumbnail)
                             <img alt="Capa do Curso" class="w-full h-full object-cover" src="{{ $thumbnail }}">
+                            <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <a href="#course-thumbnail" class="px-3 py-1.5 rounded-lg bg-white/90 text-slate-800 text-xs font-semibold shadow hover:bg-white transition-colors">
+                                    Alterar Capa
+                                </a>
+                            </div>
                         @else
                             <div class="flex flex-col items-center justify-center text-slate-400 gap-1">
                                 <svg class="w-8 h-8 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -399,7 +416,7 @@
                         @endif
                     </div>
 
-                    <!-- 4 Métricas em Grid -->
+                    <!-- 4 Métricas em Grid 2x2 -->
                     <div class="grid grid-cols-2 gap-2.5">
                         <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/60">
                             <span class="text-[11px] text-slate-400 font-medium block">Matrículas Ativas</span>
