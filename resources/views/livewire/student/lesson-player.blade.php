@@ -57,20 +57,20 @@
                 }
             };
 
+            const prevYTReady = window.onYouTubeIframeAPIReady;
             window.onYouTubeIframeAPIReady = () => {
+                if (typeof prevYTReady === 'function') prevYTReady();
                 window.initYT();
             };
+
+            if (window.YT && window.YT.Player) {
+                window.initYT();
+            }
 
             this.$nextTick(() => {
                 this.initPlayer();
                 if (window.YT && window.YT.Player) {
                     window.initYT();
-                }
-            });
-
-            this.$watch('$wire.currentLessonPercent', (val) => {
-                if (val !== undefined && Math.abs(val - this.currentLessonPercent) > 5) {
-                    this.currentLessonPercent = val;
                 }
             });
         },
