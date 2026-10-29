@@ -2,10 +2,14 @@
 
 namespace App\Livewire\Instructor;
 
+use App\Models\Category;
+use App\Models\Company;
 use App\Models\Course;
+use App\Models\Quiz;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class CourseEditor extends Component
@@ -17,6 +21,7 @@ class CourseEditor extends Component
     public string $thumbnail = '';
     public string $status = 'draft';
     public ?int $instructor_id = null;
+    public ?int $category_id = null;
     public string $activeTab = 'basic'; // 'basic' | 'quizzes' | 'publish'
 
     protected $queryString = [
@@ -32,6 +37,7 @@ class CourseEditor extends Component
             'thumbnail' => 'nullable|string|max:2048',
             'status' => 'required|in:draft,published,archived',
             'instructor_id' => 'required|exists:users,id',
+            'category_id' => 'nullable|exists:categories,id',
         ];
     }
 
@@ -39,6 +45,7 @@ class CourseEditor extends Component
         'title.required' => 'O título do treinamento é obrigatório.',
         'title.min' => 'O título deve ter no mínimo 3 caracteres.',
         'instructor_id.required' => 'Selecione o professor/instrutor responsável.',
+        'category_id.exists' => 'A categoria selecionada é inválida.',
     ];
 
     public function mount(?Course $course = null): void
@@ -54,8 +61,11 @@ class CourseEditor extends Component
             $this->thumbnail = $course->thumbnail ?? '';
             $this->status = $course->status;
             $this->instructor_id = $course->instructor_id;
+            $this->category_id = $course->category_id;
         } else {
             $this->instructor_id = Auth::id() ?: User::whereIn('role', ['instructor', 'company_admin', 'admin_alvora'])->value('id');
+            // Categoria padrão opcional (primeira de desenvolvimento ou vazia)
+            $this->category_id = Category::value('id');
         }
     }
 
@@ -75,10 +85,16 @@ class CourseEditor extends Component
 
     public function save()
     {
-        $validated = $this->validate();
+        try {
+            $validated = $this->validate();
+        } catch (ValidationException $e) {
+            $firstError = collect($e->validator->errors()->all())->first();
+            $this->dispatch('toast', message: $firstError ?: 'Corrija os erros do formulário.', type: 'error');
+            throw $e;
+        }
 
         $user = Auth::user();
-        $companyId = $user->company_id;
+        $companyId = $user?->company_id;
 
         if (!$companyId) {
             if (!empty($validated['instructor_id'])) {
@@ -86,7 +102,7 @@ class CourseEditor extends Component
                 $companyId = $instructorUser?->company_id;
             }
             if (!$companyId) {
-                $companyId = \App\Models\Company::first()?->id ?? 1;
+                $companyId = Company::first()?->id ?? 1;
             }
         }
 
@@ -115,6 +131,7 @@ class CourseEditor extends Component
                 'thumbnail' => $validated['thumbnail'] ?: null,
                 'status' => $validated['status'],
                 'instructor_id' => $validated['instructor_id'],
+                'category_id' => $validated['category_id'] ?: null,
             ]);
 
             $this->dispatch('toast', message: 'Informações do curso atualizadas com sucesso!', type: 'success');
@@ -128,6 +145,7 @@ class CourseEditor extends Component
                 'thumbnail' => $validated['thumbnail'] ?: null,
                 'status' => $validated['status'],
                 'instructor_id' => $validated['instructor_id'],
+                'category_id' => $validated['category_id'] ?: null,
             ]);
 
             $this->dispatch('toast', message: 'Curso criado com sucesso! Agora adicione os módulos e aulas.', type: 'success');
@@ -141,7 +159,7 @@ class CourseEditor extends Component
             return;
         }
 
-        $quiz = \App\Models\Quiz::where('course_id', $this->courseId)->findOrFail($quizId);
+        $quiz = Quiz::where('course_id', $this->courseId)->findOrFail($quizId);
         $title = $quiz->title;
         $quiz->delete();
 
@@ -161,6 +179,9 @@ class CourseEditor extends Component
             $instructors = collect([$user]);
         }
 
+        // Categorias hierárquicas reais da plataforma
+        $categories = Category::with('subcategories')->root()->active()->orderBy('order')->orderBy('name')->get();
+
         $course = $this->courseId 
             ? Course::withCount(['modules', 'lessons', 'quizzes'])
                 ->with(['quizzes.questions', 'quizzes.module'])
@@ -169,6 +190,7 @@ class CourseEditor extends Component
 
         return view('livewire.instructor.course-editor', [
             'instructors' => $instructors,
+            'categories' => $categories,
             'course' => $course,
         ])->layout('layouts.instructor', [
             'title' => ($this->courseId ? 'Atualizar: ' . $this->title : 'Criar Novo Treinamento') . ' — ALVORA',

@@ -46,7 +46,7 @@
                 </a>
 
                 <!-- Categorias -->
-                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('admin.categories.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('admin.dashboard') }}#categorias" title="Módulo de Categorias">
+                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('admin.categories.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('admin.categories.index') }}" title="Gestão de Categorias e Subcategorias">
                     <div class="flex items-center gap-space-sm">
                         <svg class="w-5 h-5 shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.386l5.411-3.184c.827-.486 1.096-1.528.61-2.355l-9.581-9.581A2.25 2.25 0 0 0 9.568 3Z"></path>
@@ -54,7 +54,9 @@
                         </svg>
                         <span>Categorias</span>
                     </div>
-                    <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/60 px-1.5 py-0.5 rounded">Novo</span>
+                    <span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm {{ request()->routeIs('admin.categories.*') ? 'bg-white/20 text-white font-semibold' : 'bg-surface-container text-on-surface-variant font-semibold' }}">
+                        {{ \App\Models\Category::root()->count() }}
+                    </span>
                 </a>
 
                 <!-- Matrículas (Com Sublinks) -->

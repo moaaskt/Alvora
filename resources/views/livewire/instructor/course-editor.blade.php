@@ -228,17 +228,24 @@
                                 Categoria do Treinamento
                             </label>
                             <div class="relative">
-                                <select id="course-category" class="w-full h-10 pl-3.5 pr-8 rounded-xl bg-white border border-slate-200 text-slate-800 text-xs font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer shadow-2xs">
-                                    <option selected>Tecnologia e Engenharia de Software</option>
-                                    <option>Liderança & Gestão de Pessoas</option>
-                                    <option>Analytics & Inteligência de Dados</option>
-                                    <option>Design & Experiência do Usuário</option>
-                                    <option>Compliance & Boas Práticas B2B</option>
+                                <select id="course-category" 
+                                        wire:model="category_id"
+                                        class="w-full h-10 pl-3.5 pr-8 rounded-xl bg-white border @error('category_id') border-rose-500 @else border-slate-200 @enderror text-slate-800 text-xs font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer shadow-2xs">
+                                    <option value="">Selecione uma categoria...</option>
+                                    @foreach($categories as $cat)
+                                        <option value="{{ $cat->id }}" class="font-bold">{{ $cat->name }} (Principal)</option>
+                                        @foreach($cat->subcategories as $sub)
+                                            <option value="{{ $sub->id }}">&nbsp;&nbsp;↳ {{ $sub->name }}</option>
+                                        @endforeach
+                                    @endforeach
                                 </select>
                                 <svg class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path d="m19.5 8.25-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
                                 </svg>
                             </div>
+                            @error('category_id')
+                                <span class="text-rose-500 text-xs">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 

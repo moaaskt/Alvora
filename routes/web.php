@@ -211,6 +211,11 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
         ->middleware('role:admin_alvora')
         ->name('admin.dashboard');
 
+    // Super Admin Alvora - Gestão de Categorias e Subcategorias
+    Route::get('/admin/categorias', \App\Livewire\Admin\CategoryManager::class)
+        ->middleware('role:admin_alvora')
+        ->name('admin.categories.index');
+
     // Super Admin Alvora - Faturamento Global B2B
     Route::get('/admin/faturamento', AdminBilling::class)
         ->middleware('role:admin_alvora')
