@@ -5,9 +5,7 @@
     <div x-show="showToast" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 translate-y-2"
-         x-transition:enter-end="opacity-100 translate-y-0"
          x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100 translate-y-0"
          x-transition:leave-end="opacity-0 translate-y-2"
          class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-white text-sm font-medium"
          :class="{
@@ -71,7 +69,7 @@
                     <span>Exportar Relatório</span>
                 </button>
 
-                <!-- Botão Primário Matricular Aluno (Página Própria) -->
+                <!-- Botão Primário Matricular Aluno -->
                 <a href="{{ route('admin.enrollments.create') }}" 
                    wire:click.prevent="switchToCreate"
                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:bg-blue-800 transition-all shadow-sm shadow-blue-500/25 cursor-pointer">
@@ -407,7 +405,7 @@
 
     @else
         <!-- ================================================================= -->
-        <!-- MODO FORMULÁRIO DEDICADO: MATRICULAR ALUNO INTEGRADO NO PAINEL    -->
+        <!-- MODO DEDICADO: NOVA MATRÍCULA DE ALUNO (STITCH UX REDESIGN)       -->
         <!-- ================================================================= -->
 
         <!-- 1. SUB-HEADER COM BREADCRUMB & VOLTAR -->
@@ -426,77 +424,93 @@
                 <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
-                <span class="text-blue-600 font-semibold">Matricular Aluno</span>
+                <span class="text-blue-600 font-semibold">Nova Matrícula</span>
             </nav>
 
-            <!-- Botão Voltar ao Histórico -->
+            <!-- Botão Voltar para a Lista -->
             <div>
                 <a href="{{ route('admin.enrollments.index') }}" 
                    wire:click.prevent="switchToHistory"
-                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-xs font-semibold hover:bg-slate-50 hover:text-slate-900 transition-colors cursor-pointer">
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-semibold hover:bg-slate-50 hover:text-slate-900 transition-colors cursor-pointer shadow-2xs">
                     <span class="material-symbols-outlined text-base">arrow_back</span>
-                    <span>Voltar ao Histórico de Matrículas</span>
+                    <span>Voltar para Matrículas</span>
                 </a>
             </div>
         </div>
 
-        <!-- 2. TÍTULO DA PÁGINA -->
+        <!-- 2. TÍTULO AMIGÁVEL DA PÁGINA -->
         <div>
-            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Atribuição Manual de Matrícula</h1>
-            <p class="text-sm text-slate-500 mt-1">Conceda acesso manual a treinamentos corporativos com registro imediato de auditoria e governança de licenças.</p>
+            <div class="flex items-center gap-2 text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">
+                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                <span>Atribuição Direta de Treinamento Corporativo</span>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Nova Matrícula de Aluno</h1>
+            <p class="text-sm text-slate-500 mt-1">Dê acesso a um treinamento para um colaborador em 3 passos simples com governança de licenças.</p>
         </div>
 
-        <!-- 3. GRID PRINCIPAL (FORMULÁRIO + RESUMO EM TEMPO REAL) -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- 3. GRID PRINCIPAL (WIZARD ~68% / RESUMO ~32%) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            <!-- Coluna Principal (Formulário) - 8 Cols -->
-            <div class="lg:col-span-8 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs space-y-6">
+            <!-- Coluna da Esquerda: Wizard 3 Passos (8 Cols) -->
+            <div class="lg:col-span-8 space-y-6">
                 
-                <!-- Bloco 1: Seleção do Aluno -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        1. Selecionar Aluno Corporativo <span class="text-rose-600">*</span>
-                    </label>
+                <!-- PASSO 1: Quem vai fazer o curso? -->
+                <section class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center shadow-xs">1</span>
+                            <div>
+                                <h2 class="text-base font-bold text-slate-900">Quem vai fazer o curso?</h2>
+                                <p class="text-xs text-slate-500">Selecione o colaborador que receberá a licença corporativa.</p>
+                            </div>
+                        </div>
+                        @if($selectedStudent)
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="material-symbols-outlined text-xs">check_circle</span> Aluno Selecionado
+                            </span>
+                        @endif
+                    </div>
 
                     @if($selectedStudent)
-                        <!-- Aluno já Selecionado (Card Elegante) -->
-                        <div class="flex items-center justify-between p-4 bg-blue-50/60 border border-blue-200/90 rounded-2xl">
+                        <!-- Card do Aluno Selecionado (Active State no Stitch) -->
+                        <div class="p-4 rounded-xl border-2 border-blue-500 bg-blue-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
                             <div class="flex items-center gap-3.5">
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-base shadow-sm ring-2 ring-white shrink-0">
                                     {{ strtoupper(substr($selectedStudent->name, 0, 2)) }}
                                 </div>
-                                <div>
-                                    <p class="text-sm font-bold text-slate-900 leading-tight">{{ $selectedStudent->name }}</p>
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="text-sm font-bold text-slate-900 leading-tight">{{ $selectedStudent->name }}</h3>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white uppercase tracking-wide">Colaborador Ativo</span>
+                                    </div>
                                     <p class="text-xs text-slate-500 font-mono mt-0.5">{{ $selectedStudent->email }}</p>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white text-slate-700 text-[11px] font-medium border border-blue-100">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                    <div class="mt-1.5 flex items-center gap-2">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white text-slate-700 text-xs font-medium border border-slate-200 shadow-2xs">
+                                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
                                             {{ $selectedStudent->company?->name ?? 'Global HQ' }}
                                         </span>
-                                        <span class="text-[11px] text-slate-400 capitalize">Perfil: {{ $selectedStudent->role->value ?? 'Aluno' }}</span>
                                     </div>
                                 </div>
                             </div>
                             <button wire:click="$set('selectedUserId', null)" 
                                     type="button" 
-                                    class="px-3 py-1.5 rounded-lg border border-blue-200 bg-white text-blue-700 text-xs font-bold hover:bg-blue-50 transition-colors cursor-pointer">
-                                Alterar Aluno
+                                    class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-blue-600 hover:text-white hover:bg-blue-600 bg-white border border-blue-200 rounded-lg shadow-2xs transition-colors self-start sm:self-center cursor-pointer">
+                                <span class="material-symbols-outlined text-base">edit</span>
+                                <span>Trocar aluno</span>
                             </button>
                         </div>
                     @else
-                        <!-- Busca com autocomplete de alunos -->
+                        <!-- Busca com autocomplete amigável de alunos -->
                         <div class="space-y-3">
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <span class="material-symbols-outlined text-lg">search</span>
-                                </div>
+                                <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
                                 <input wire:model.live.debounce.250ms="studentSearch" 
                                        type="text" 
-                                       placeholder="Digite o nome ou e-mail do colaborador para localizar..." 
-                                       class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all" />
+                                       placeholder="Buscar por nome ou e-mail do colaborador..." 
+                                       class="w-full h-11 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all" />
                             </div>
 
-                            <!-- Lista de Resultados -->
+                            <!-- Lista de Resultados de Alunos -->
                             <div class="border border-slate-200 rounded-xl overflow-hidden max-h-56 overflow-y-auto divide-y divide-slate-100 bg-white">
                                 @forelse($availableStudents as $student)
                                     <button wire:click="selectStudent({{ $student->id }})" 
@@ -521,7 +535,7 @@
                                 @empty
                                     <div class="p-6 text-center text-xs text-slate-500">
                                         <span class="material-symbols-outlined text-2xl text-slate-300 block mb-1">person_search</span>
-                                        Nenhum estudante encontrado com o termo digitado. Digite para pesquisar.
+                                        Nenhum aluno encontrado. Digite um nome ou e-mail para pesquisar.
                                     </div>
                                 @endforelse
                             </div>
@@ -529,55 +543,152 @@
                     @endif
 
                     @error('selectedUserId')
-                        <p class="text-xs text-rose-600 font-medium mt-1.5">{{ $message }}</p>
+                        <p class="text-xs text-rose-600 font-medium mt-1">{{ $message }}</p>
                     @enderror
-                </div>
+                </section>
 
-                <!-- Bloco 2: Seleção do Treinamento Corporativo -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        2. Selecionar Curso do Catálogo <span class="text-rose-600">*</span>
-                    </label>
-                    <div class="relative">
-                        <select wire:model.live="selectedCourseId" 
-                                class="w-full h-12 pl-3.5 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 cursor-pointer appearance-none">
-                            <option value="">-- Escolha um treinamento corporativo publicado --</option>
-                            @foreach($availableCourses as $c)
-                                <option value="{{ $c->id }}">{{ $c->title }} ({{ $c->category?->name ?? 'Sem Categoria' }})</option>
-                            @endforeach
-                        </select>
-                        <span class="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xl pointer-events-none">expand_more</span>
-                    </div>
-                    @error('selectedCourseId')
-                        <p class="text-xs text-rose-600 font-medium mt-1.5">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Bloco 3: Vigência e Tipo de Acesso -->
-                <div class="p-5 bg-slate-50/80 border border-slate-200 rounded-2xl space-y-4">
-                    <div class="flex items-center justify-between">
+                <!-- PASSO 2: Qual curso ele vai assistir? -->
+                <section class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-                                <span class="material-symbols-outlined text-2xl">workspace_premium</span>
-                            </div>
+                            <span class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center shadow-xs">2</span>
                             <div>
-                                <p class="text-sm font-bold text-slate-900">Acesso Vitalício Corporativo</p>
-                                <p class="text-xs text-slate-500">Sem data limite de expiração estipulada para este colaborador.</p>
+                                <h2 class="text-base font-bold text-slate-900">Qual curso ele vai assistir?</h2>
+                                <p class="text-xs text-slate-500">Escolha o conteúdo cadastrado no catálogo corporativo B2B.</p>
                             </div>
                         </div>
-                        
-                        <!-- Toggle Switch -->
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input wire:model.live="isLifetime" type="checkbox" class="sr-only peer">
-                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
+                        @if($selectedCourse)
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="material-symbols-outlined text-xs">check_circle</span> Curso Selecionado
+                            </span>
+                        @endif
                     </div>
 
-                    <!-- Data Limite de Expiração se NÃO vitalício -->
+                    @if($selectedCourse)
+                        <!-- Curso Selecionado em Destaque (Card Ativo do Stitch) -->
+                        <div class="p-4 rounded-xl border-2 border-blue-500 bg-blue-50/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex items-start sm:items-center gap-3.5">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                                    <span class="material-symbols-outlined text-2xl">school</span>
+                                </div>
+                                <div>
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <h3 class="text-sm font-bold text-slate-900">{{ $selectedCourse->title }}</h3>
+                                        <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">
+                                            {{ $selectedCourse->category?->name ?? 'Geral' }}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">
+                                        {{ $selectedCourse->description ?? 'Treinamento prático de capacitação corporativa.' }}
+                                    </p>
+                                    <div class="mt-1.5 flex items-center gap-3 text-xs text-slate-500 font-medium">
+                                        @if($selectedCourse->duration_hours)
+                                            <span class="flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-sm text-slate-400">schedule</span>
+                                                {{ $selectedCourse->duration_hours }} Horas
+                                            </span>
+                                            <span>•</span>
+                                        @endif
+                                        <span class="flex items-center gap-1 text-emerald-700 font-semibold">
+                                            <span class="material-symbols-outlined text-sm text-emerald-600">verified</span>
+                                            Certificado Incluso
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 self-end sm:self-center">
+                                <span class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-base">check</span>
+                                </span>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Seletor / Dropdown de Cursos -->
+                    <div class="pt-1">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">
+                            {{ $selectedCourse ? 'Ou selecione outro curso do catálogo:' : 'Selecione o treinamento corporativo:' }}
+                        </label>
+                        <div class="relative">
+                            <select wire:model.live="selectedCourseId" 
+                                    class="w-full h-11 pl-3.5 pr-9 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 cursor-pointer appearance-none">
+                                <option value="">-- Escolha um curso do portfólio corporativo --</option>
+                                @foreach($availableCourses as $c)
+                                    <option value="{{ $c->id }}">{{ $c->title }} ({{ $c->category?->name ?? 'Geral' }})</option>
+                                @endforeach
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">swap_vert</span>
+                        </div>
+                    </div>
+
+                    @error('selectedCourseId')
+                        <p class="text-xs text-rose-600 font-medium mt-1">{{ $message }}</p>
+                    @enderror
+                </section>
+
+                <!-- PASSO 3: Por quanto tempo ele terá acesso? -->
+                <section class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs space-y-5">
+                    <div class="pb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center shadow-xs">3</span>
+                            <div>
+                                <h2 class="text-base font-bold text-slate-900">Por quanto tempo ele terá acesso?</h2>
+                                <p class="text-xs text-slate-500">Configure as regras de vigência e validade da licença atribuída.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Duas Opções Visuais Lado a Lado (Cards Selecionáveis do Stitch) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Opção A: Acesso Ilimitado -->
+                        <div wire:click="$set('isLifetime', true)" 
+                             class="relative p-5 rounded-xl border-2 cursor-pointer transition-all hover:shadow-2xs {{ $isLifetime ? 'border-blue-600 bg-blue-50/50' : 'border-slate-200 bg-white opacity-80 hover:opacity-100' }}">
+                            <div class="flex items-start justify-between">
+                                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mb-3">
+                                    <span class="material-symbols-outlined text-2xl">all_inclusive</span>
+                                </div>
+                                <div class="w-5 h-5 rounded-full {{ $isLifetime ? 'bg-blue-600 text-white flex items-center justify-center' : 'border-2 border-slate-300' }}">
+                                    @if($isLifetime)
+                                        <span class="material-symbols-outlined text-xs">check</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5 font-bold text-slate-900 text-sm">
+                                <span>🌟 Acesso Ilimitado</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white uppercase">Recomendado</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                                O aluno terá acesso vitalício e poderá assistir quando quiser, sem prazo de expiração ou bloqueio de trilha.
+                            </p>
+                        </div>
+
+                        <!-- Opção B: Definir Prazo de Acesso -->
+                        <div wire:click="$set('isLifetime', false)" 
+                             class="relative p-5 rounded-xl border-2 cursor-pointer transition-all hover:shadow-2xs {{ !$isLifetime ? 'border-blue-600 bg-blue-50/50' : 'border-slate-200 bg-white opacity-80 hover:opacity-100' }}">
+                            <div class="flex items-start justify-between">
+                                <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center mb-3">
+                                    <span class="material-symbols-outlined text-2xl">calendar_today</span>
+                                </div>
+                                <div class="w-5 h-5 rounded-full {{ !$isLifetime ? 'bg-blue-600 text-white flex items-center justify-center' : 'border-2 border-slate-300' }}">
+                                    @if(!$isLifetime)
+                                        <span class="material-symbols-outlined text-xs">check</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="font-bold text-slate-900 text-sm">
+                                <span>📅 Definir Prazo de Acesso</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                                Defina uma data limite específica (ex: 30, 90 ou 180 dias) para término do treinamento e revogação da licença.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Campo da Data quando Opção B estiver ativa -->
                     @if(!$isLifetime)
-                        <div class="pt-4 border-t border-slate-200 space-y-1.5">
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 animate-in fade-in duration-200">
                             <label class="block text-xs font-bold text-slate-700">
-                                Data Limite de Vigência do Acesso <span class="text-rose-600">*</span>
+                                Data Limite de Expiração do Acesso <span class="text-rose-600">*</span>
                             </label>
                             <input wire:model="expiresAt" 
                                    type="date" 
@@ -589,111 +700,140 @@
                             @enderror
                         </div>
                     @endif
-                </div>
 
-                <!-- Bloco 4: Opções de Notificação -->
-                <div class="flex items-start gap-3.5 p-4 bg-white border border-slate-200 rounded-xl">
-                    <input wire:model="notifyStudent" 
-                           id="notifyStudentCheckbox" 
-                           type="checkbox" 
-                           class="mt-1 h-4 w-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer" />
-                    <label for="notifyStudentCheckbox" class="cursor-pointer">
-                        <span class="block text-xs font-bold text-slate-900">Disparar e-mail de confirmação ao colaborador</span>
-                        <span class="block text-xs text-slate-500 mt-0.5">O colaborador receberá notificação oficial de matrícula corporativa em seu endereço de e-mail cadastrado.</span>
-                    </label>
-                </div>
-
-                <!-- Botões de Ação do Formulário -->
-                <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                    <button wire:click="switchToHistory" 
-                            type="button" 
-                            class="px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors cursor-pointer">
-                        Cancelar
-                    </button>
-                    <button wire:click="enrollStudent" 
-                            wire:loading.attr="disabled"
-                            type="button" 
-                            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm shadow-blue-500/25 cursor-pointer disabled:opacity-50">
-                        <span wire:loading.remove wire:target="enrollStudent" class="material-symbols-outlined text-lg">check</span>
-                        <span wire:loading wire:target="enrollStudent" class="material-symbols-outlined text-lg animate-spin">progress_activity</span>
-                        <span>Confirmar Matrícula</span>
-                    </button>
-                </div>
-
-            </div>
-
-            <!-- Coluna Lateral (Resumo da Atribuição & Auditoria) - 4 Cols -->
-            <div class="lg:col-span-4 space-y-5">
-                
-                <!-- Card de Resumo Dinâmico -->
-                <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-2xs space-y-4">
-                    <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-                        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-lg">assignment_turned_in</span>
-                        </div>
-                        <h3 class="text-sm font-bold text-slate-900">Resumo da Atribuição</h3>
-                    </div>
-
-                    <!-- Detalhe Aluno -->
-                    <div class="space-y-1">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Colaborador:</span>
-                        @if($selectedStudent)
-                            <p class="text-xs font-semibold text-slate-800">{{ $selectedStudent->name }}</p>
-                            <p class="text-[11px] text-slate-500 font-mono">{{ $selectedStudent->email }}</p>
-                        @else
-                            <p class="text-xs text-slate-400 italic">Nenhum aluno selecionado</p>
-                        @endif
-                    </div>
-
-                    <!-- Detalhe Treinamento -->
-                    <div class="space-y-1 pt-2 border-t border-slate-100">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Treinamento Corporativo:</span>
-                        @if($selectedCourse)
-                            <p class="text-xs font-semibold text-slate-800">{{ $selectedCourse->title }}</p>
-                            <span class="inline-block mt-0.5 text-[10px] px-2 py-0.5 rounded bg-slate-100 font-medium text-slate-600">
-                                {{ $selectedCourse->category?->name ?? 'Geral' }}
+                    <!-- Notificação por E-mail -->
+                    <div class="p-4 rounded-xl bg-slate-50/80 border border-slate-200 flex items-start gap-3">
+                        <input wire:model="notifyStudent" 
+                               id="ssoNotifyCheckbox" 
+                               type="checkbox" 
+                               class="mt-1 h-5 w-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer" />
+                        <label class="cursor-pointer select-none" for="ssoNotifyCheckbox">
+                            <span class="block text-xs font-bold text-slate-900">
+                                Disparar e-mail de boas-vindas com credenciais automáticas (Recomendado)
                             </span>
-                        @else
-                            <p class="text-xs text-slate-400 italic">Nenhum curso selecionado</p>
-                        @endif
+                            <span class="block text-xs text-slate-500 mt-0.5 leading-relaxed">
+                                O colaborador receberá convite imediato com o link de acesso direto à primeira aula do curso.
+                            </span>
+                        </label>
                     </div>
-
-                    <!-- Detalhe Vigência -->
-                    <div class="space-y-1 pt-2 border-t border-slate-100">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Licença & Vigência:</span>
-                        @if($isLifetime)
-                            <p class="text-xs font-semibold text-purple-700 flex items-center gap-1">
-                                <span class="material-symbols-outlined text-sm">all_inclusive</span>
-                                Acesso Vitalício
-                            </p>
-                        @else
-                            <p class="text-xs font-semibold text-amber-700 flex items-center gap-1">
-                                <span class="material-symbols-outlined text-sm">schedule</span>
-                                Expira em: {{ $expiresAt ? \Carbon\Carbon::parse($expiresAt)->format('d/m/Y') : 'Não definido' }}
-                            </p>
-                        @endif
-                    </div>
-
-                    <!-- Responsável Auditável -->
-                    <div class="space-y-1 pt-2 border-t border-slate-100">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Auditado por:</span>
-                        <p class="text-xs font-semibold text-slate-800">{{ auth()->user()->name ?? 'Super Admin' }}</p>
-                        <p class="text-[10px] text-slate-400">Governança Central Alvora</p>
-                    </div>
-                </div>
-
-                <!-- Card de Boas Práticas & Segurança -->
-                <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 text-xs text-slate-600 space-y-2">
-                    <div class="flex items-center gap-2 font-bold text-blue-900">
-                        <span class="material-symbols-outlined text-base text-blue-600">verified_user</span>
-                        <span>Auditoria & Segurança Multi-Tenant</span>
-                    </div>
-                    <p class="leading-relaxed text-[11px]">
-                        Ao confirmar a matrícula, o acesso do colaborador ao conteúdo programático, aulas e quizzes é ativado imediatamente, preservando a segregação lógica da empresa parceira.
-                    </p>
-                </div>
+                </section>
 
             </div>
+
+            <!-- Coluna da Direita: Resumo da Matrícula (Sticky Card ~32% do Stitch) -->
+            <aside class="lg:col-span-4 lg:sticky lg:top-24 space-y-4">
+                <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-2xs space-y-5">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-blue-600 text-xl">receipt_long</span>
+                            <h3 class="text-base font-bold text-slate-900 tracking-tight">Resumo da Matrícula</h3>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700 uppercase">
+                            Prévia
+                        </span>
+                    </div>
+
+                    <!-- Dados do Aluno no Resumo -->
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Colaborador</span>
+                        @if($selectedStudent)
+                            <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200/60">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+                                    {{ strtoupper(substr($selectedStudent->name, 0, 2)) }}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-bold text-slate-900 truncate leading-tight">{{ $selectedStudent->name }}</p>
+                                    <p class="text-[11px] text-slate-500 truncate font-mono">{{ $selectedStudent->email }}</p>
+                                </div>
+                            </div>
+                        @else
+                            <div class="p-3 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-center">
+                                <p class="text-xs text-slate-400 italic">Nenhum aluno selecionado</p>
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Dados do Curso no Resumo -->
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Treinamento Selecionado</span>
+                        @if($selectedCourse)
+                            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/60 space-y-1.5">
+                                <p class="text-xs font-bold text-slate-900 leading-snug">
+                                    {{ $selectedCourse->title }}
+                                </p>
+                                <div class="flex items-center gap-2 text-[11px] text-slate-500 font-medium">
+                                    <span class="material-symbols-outlined text-sm text-slate-400">play_circle</span>
+                                    <span>{{ $selectedCourse->category?->name ?? 'Geral' }}</span>
+                                </div>
+                            </div>
+                        @else
+                            <div class="p-3 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-center">
+                                <p class="text-xs text-slate-400 italic">Nenhum curso selecionado</p>
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Vigência e Licença -->
+                    <div class="space-y-3 pt-1 border-t border-slate-100 text-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-slate-500 font-medium">Regime de Acesso:</span>
+                            @if($isLifetime)
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                    <span class="material-symbols-outlined text-xs">all_inclusive</span>
+                                    Acesso Ilimitado Vitalício
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                    <span class="material-symbols-outlined text-xs">schedule</span>
+                                    Expira em: {{ $expiresAt ? \Carbon\Carbon::parse($expiresAt)->format('d/m/Y') : 'A definir' }}
+                                </span>
+                            @endif
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-slate-500 font-medium">Empresa (Tenant):</span>
+                            <span class="text-xs font-semibold text-slate-800 truncate max-w-[150px]">
+                                {{ $selectedStudent?->company?->name ?? 'Global HQ' }}
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-slate-500 font-medium">Certificação:</span>
+                            <span class="text-xs font-semibold text-emerald-700">Habilitada ao término</span>
+                        </div>
+                    </div>
+
+                    <!-- Selo de Governança e Auditoria -->
+                    <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-2.5">
+                        <span class="material-symbols-outlined text-emerald-700 text-lg shrink-0 mt-0.5">verified_user</span>
+                        <div class="text-[11px] text-emerald-800 leading-snug">
+                            <strong class="font-bold block text-emerald-900">Auditoria LGPD & Concessão Registrada</strong>
+                            Ação com trilha de auditoria para o gestor de RH. {{ auth()->user()->name ?? 'Super Admin' }} será registrado como outorgante.
+                        </div>
+                    </div>
+
+                    <!-- Ações do Resumo -->
+                    <div class="space-y-2.5 pt-2">
+                        <button wire:click="enrollStudent" 
+                                wire:loading.attr="disabled"
+                                type="button" 
+                                class="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-[0.99] cursor-pointer disabled:opacity-50">
+                            <span wire:loading.remove wire:target="enrollStudent" class="material-symbols-outlined text-xl">check</span>
+                            <span wire:loading wire:target="enrollStudent" class="material-symbols-outlined text-xl animate-spin">progress_activity</span>
+                            <span>Confirmar Matrícula do Aluno</span>
+                        </button>
+                        <a href="{{ route('admin.enrollments.index') }}" 
+                           wire:click.prevent="switchToHistory"
+                           class="w-full h-10 bg-transparent hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-xl font-medium text-xs flex items-center justify-center transition-colors cursor-pointer">
+                            Cancelar e Voltar
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Cartão Informativo de Apoio -->
+                <div class="p-4 rounded-xl bg-blue-50/70 border border-blue-100 flex items-center gap-3 text-xs text-slate-600">
+                    <span class="material-symbols-outlined text-lg text-blue-600 shrink-0">info</span>
+                    <span>Dúvidas na concessão? O colaborador receberá confirmação por e-mail com as instruções de acesso.</span>
+                </div>
+            </aside>
 
         </div>
 
