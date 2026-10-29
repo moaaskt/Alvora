@@ -24,6 +24,7 @@ class LessonPlayer extends Component
     public string $noteContent = '';
     public string $activeTab = 'notes'; // 'notes', 'materials', 'overview'
     public int $progressPercent = 0;
+    public int $currentLessonPercent = 0;
     public array $completedLessonIds = [];
 
     /**
@@ -102,6 +103,15 @@ class LessonPlayer extends Component
 
             $this->isCompleted = (bool) ($progress && $progress->completed_at);
 
+            if ($this->isCompleted) {
+                $this->currentLessonPercent = 100;
+            } elseif ($progress && $progress->last_watched_second > 0 && ($this->currentLesson->duration_minutes ?? 0) > 0) {
+                $totalSec = $this->currentLesson->duration_minutes * 60;
+                $this->currentLessonPercent = min(99, (int) round(($progress->last_watched_second / $totalSec) * 100));
+            } else {
+                $this->currentLessonPercent = 0;
+            }
+
             $note = LessonNote::where('user_id', $user->id)
                 ->where('lesson_id', $this->currentLesson->id)
                 ->first();
@@ -109,10 +119,46 @@ class LessonPlayer extends Component
             $this->noteContent = $note?->content ?? '';
         } else {
             $this->isCompleted = false;
+            $this->currentLessonPercent = 0;
             $this->noteContent = '';
         }
 
         $this->progressPercent = $this->enrollment->progress_percent;
+    }
+
+    /**
+     * Persist video playback progress in real time.
+     */
+    public function updateLessonProgress(int $watchedSeconds, int $percent): void
+    {
+        if (!$this->currentLesson) {
+            return;
+        }
+
+        $user = Auth::user();
+        if (!$user) {
+            return;
+        }
+
+        $this->currentLessonPercent = max(0, min(100, $percent));
+
+        $progress = LessonProgress::firstOrNew([
+            'company_id' => $user->company_id,
+            'user_id' => $user->id,
+            'lesson_id' => $this->currentLesson->id,
+        ]);
+
+        $progress->last_watched_second = max((int) ($progress->last_watched_second ?? 0), $watchedSeconds);
+
+        if ($percent >= 90 && !$progress->completed_at) {
+            $progress->completed_at = now();
+            $this->isCompleted = true;
+            $progress->save();
+            $this->progressPercent = $this->enrollment->recalculateProgress();
+            $this->loadLessonState();
+        } else {
+            $progress->save();
+        }
     }
 
     /**

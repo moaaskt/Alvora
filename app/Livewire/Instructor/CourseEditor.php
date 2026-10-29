@@ -55,7 +55,7 @@ class CourseEditor extends Component
             $this->status = $course->status;
             $this->instructor_id = $course->instructor_id;
         } else {
-            $this->instructor_id = Auth::id();
+            $this->instructor_id = Auth::id() ?: User::whereIn('role', ['instructor', 'company_admin', 'admin_alvora'])->value('id');
         }
     }
 
@@ -79,6 +79,16 @@ class CourseEditor extends Component
 
         $user = Auth::user();
         $companyId = $user->company_id;
+
+        if (!$companyId) {
+            if (!empty($validated['instructor_id'])) {
+                $instructorUser = User::find($validated['instructor_id']);
+                $companyId = $instructorUser?->company_id;
+            }
+            if (!$companyId) {
+                $companyId = \App\Models\Company::first()?->id ?? 1;
+            }
+        }
 
         // Auto-generate slug if empty
         if (empty($validated['slug'])) {
@@ -143,7 +153,8 @@ class CourseEditor extends Component
         $user = Auth::user();
         $instructors = User::where(function ($q) {
             $q->where('role', 'instructor')
-              ->orWhere('role', 'company_admin');
+              ->orWhere('role', 'company_admin')
+              ->orWhere('role', 'admin_alvora');
         })->get();
 
         if ($instructors->isEmpty()) {

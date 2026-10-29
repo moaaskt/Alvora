@@ -1,4 +1,26 @@
-<div class="w-full">
+<div class="w-full"
+     x-data="{
+        currentLessonPercent: @entangle('currentLessonPercent'),
+        isCompleted: @entangle('isCompleted'),
+        lastReportedPercent: 0,
+        onTimeUpdate(e) {
+            const video = e.target;
+            if (video && video.duration > 0) {
+                const pct = Math.min(100, Math.round((video.currentTime / video.duration) * 100));
+                this.currentLessonPercent = pct;
+                if (pct >= this.lastReportedPercent + 5 || (pct >= 90 && this.lastReportedPercent < 90)) {
+                    this.lastReportedPercent = pct;
+                    $wire.updateLessonProgress(Math.round(video.currentTime), pct);
+                }
+            }
+        },
+        onVideoEnded() {
+            this.currentLessonPercent = 100;
+            if (!this.isCompleted) {
+                $wire.toggleComplete();
+            }
+        }
+     }">
     {{-- 1. COURSE TOP BAR (White card, rounded-2xl, non-sticky to prevent header collision) --}}
     <div class="bg-edtech-surface rounded-2xl p-4 sm:p-5 border border-edtech-border shadow-card flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         {{-- Left: Back to Dashboard Button & Course Metadata --}}
@@ -130,7 +152,7 @@
                     @if ($isYoutube)
                         @if ($youtubeId)
                             <iframe class="w-full h-full"
-                                    src="https://www.youtube-nocookie.com/embed/{{ $youtubeId }}?rel=0&modestbranding=1"
+                                    src="https://www.youtube-nocookie.com/embed/{{ $youtubeId }}?rel=0&modestbranding=1&enablejsapi=1"
                                     title="{{ $currentLesson->title }}"
                                     frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -159,7 +181,9 @@
                         <video class="w-full h-full object-contain"
                                controls
                                controlsList="nodownload"
-                               src="{{ $currentLesson->video_url }}">
+                               src="{{ $currentLesson->video_url }}"
+                               @timeupdate="onTimeUpdate($event)"
+                               @ended="onVideoEnded()">
                             Seu navegador não suporta a tag de vídeo.
                         </video>
                     @endif
@@ -419,7 +443,7 @@
                                         @if ($isDone)
                                             <x-icon name="check-circle" class="w-5 h-5 text-alvora-emerald mt-0.5 shrink-0" />
                                         @elseif ($isCurrent)
-                                            <x-progress-ring :percent="0" class="mt-0.5 shrink-0" />
+                                            <x-progress-ring :percent="$currentLessonPercent" alpine-model="currentLessonPercent" class="mt-0.5 shrink-0" />
                                         @else
                                             <svg class="w-5 h-5 mt-0.5 shrink-0 stroke-edtech-border fill-none" viewBox="0 0 24 24" aria-hidden="true">
                                                 <circle cx="12" cy="12" r="9.5" stroke-width="1.5"></circle>
