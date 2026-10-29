@@ -87,3 +87,4 @@ class Dashboard extends Component
         ]);
     }
 }
+
