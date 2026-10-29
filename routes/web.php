@@ -12,7 +12,9 @@ use App\Livewire\Instructor\CurriculumBuilder;
 use App\Livewire\Instructor\QuizEditor;
 use App\Livewire\Student\Dashboard as StudentDashboard;
 use App\Livewire\Student\LessonPlayer;
+use App\Livewire\Student\Catalog as StudentCatalog;
 use App\Livewire\Student\QuizRunner;
+use App\Livewire\Student\Tracks as StudentTracks;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -155,6 +157,8 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
 
     // Portal do Aluno / Colaborador
     Route::get('/aluno/dashboard', StudentDashboard::class)->name('student.dashboard');
+    Route::get('/aluno/trilhas', StudentTracks::class)->name('student.tracks');
+    Route::get('/aluno/catalogo', StudentCatalog::class)->name('student.catalog');
     Route::get('/aluno/cursos/{course:slug}/aulas/{lesson?}', LessonPlayer::class)->name('student.player');
     Route::get('/aluno/cursos/{course:slug}/certificado', [CertificateController::class, 'download'])->name('student.certificate');
     Route::get('/aluno/quizzes/{quiz}', QuizRunner::class)->name('student.quiz');

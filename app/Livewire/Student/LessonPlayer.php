@@ -7,13 +7,14 @@ use App\Models\Enrollment;
 use App\Models\Lesson;
 use App\Models\LessonNote;
 use App\Models\LessonProgress;
+use App\Models\Quiz;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.student', ['showHeroBand' => false, 'showAiTutor' => false])]
 class LessonPlayer extends Component
 {
     public Course $course;
@@ -32,8 +33,8 @@ class LessonPlayer extends Component
     {
         $user = Auth::user();
 
-        // Eager load modules with lessons and attachments
-        $this->course = $course->load(['modules.lessons.attachments']);
+        // Eager load modules with lessons, attachments and quizzes
+        $this->course = $course->load(['modules.lessons.attachments', 'quizzes']);
 
         // Find or create enrollment for student
         $this->enrollment = Enrollment::firstOrCreate(
@@ -182,6 +183,8 @@ class LessonPlayer extends Component
                 'content' => $this->noteContent,
             ]
         );
+
+        $this->dispatch('note-saved');
     }
 
     /**
@@ -242,6 +245,26 @@ class LessonPlayer extends Component
     }
 
     /**
+     * Find the first pending quiz for this course that the student has not passed.
+     */
+    public function getPendingQuiz(): ?Quiz
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return null;
+        }
+
+        $quizzes = $this->course->quizzes->sortBy('id');
+        foreach ($quizzes as $quiz) {
+            if (!$quiz->hasUserPassed($user->id)) {
+                return $quiz;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Render the lesson player view.
      */
     public function render(): View
@@ -257,6 +280,7 @@ class LessonPlayer extends Component
         return view('livewire.student.lesson-player', [
             'hasPrevious' => $hasPrevious,
             'hasNext' => $hasNext,
+            'pendingQuiz' => $this->getPendingQuiz(),
         ]);
     }
 }

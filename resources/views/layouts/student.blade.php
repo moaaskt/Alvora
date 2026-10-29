@@ -1,3 +1,13 @@
+@props([
+    'showHeroBand' => true,
+    'bandHeight' => 340,
+    'showAiTutor' => true,
+    'title' => null,
+    'active' => 'dashboard',
+])
+@php
+    $hasTracks = \App\Helpers\StudentNavHelper::hasTracks();
+@endphp
 <!DOCTYPE html>
 <html lang="pt-BR" class="light scroll-smooth">
 <head>
@@ -36,12 +46,18 @@
 
                 <!-- Navigation Links -->
                 <nav aria-label="Navegação Principal" class="hidden md:flex items-center gap-2 ml-2">
-                    <a href="#meu-aprendizado"
-                       class="px-4 py-2 rounded-lg text-sm font-semibold text-edtech-blue bg-edtech-blue-light transition-colors">
+                    <a href="{{ route('student.dashboard') }}"
+                       class="px-4 py-2 rounded-lg text-sm transition-colors duration-200 {{ request()->routeIs('student.dashboard') ? 'text-edtech-blue bg-edtech-blue-light font-semibold' : 'text-edtech-muted hover:text-edtech-blue hover:bg-edtech-blue-light/60 font-medium' }}">
                         Meu Aprendizado
                     </a>
-                    <a href="#catalogo"
-                       class="px-4 py-2 rounded-lg text-sm font-medium text-edtech-muted hover:text-edtech-text hover:bg-edtech-border-light transition-colors">
+                    @if($hasTracks)
+                        <a href="{{ route('student.tracks') }}"
+                           class="px-4 py-2 rounded-lg text-sm transition-colors duration-200 {{ request()->routeIs('student.tracks') ? 'text-edtech-blue bg-edtech-blue-light font-semibold' : 'text-edtech-muted hover:text-edtech-blue hover:bg-edtech-blue-light/60 font-medium' }}">
+                            Minhas Trilhas
+                        </a>
+                    @endif
+                    <a href="{{ route('student.catalog') }}"
+                       class="px-4 py-2 rounded-lg text-sm transition-colors duration-200 {{ request()->routeIs('student.catalog') ? 'text-edtech-blue bg-edtech-blue-light font-semibold' : 'text-edtech-muted hover:text-edtech-blue hover:bg-edtech-blue-light/60 font-medium' }}">
                         Catálogo de Cursos
                     </a>
                 </nav>
@@ -75,10 +91,12 @@
         </div>
     </header>
 
-    <!-- HERO BACKGROUND BAND (340px tall, linear vertical gradient, clean straight bottom edge) -->
-    <div class="absolute top-20 left-0 right-0 h-[340px] w-full pointer-events-none z-0"
-         style="background: linear-gradient(180deg, var(--color-edtech-bg) 0%, var(--color-edtech-hero-mid) 45%, var(--color-edtech-hero-end) 100%);"
-         aria-hidden="true"></div>
+    @if($showHeroBand ?? true)
+        <!-- HERO BACKGROUND BAND (linear vertical gradient, clean straight bottom edge) -->
+        <div class="absolute top-20 left-0 right-0 w-full pointer-events-none z-0"
+             style="height: {{ $bandHeight ?? 340 }}px; background: linear-gradient(180deg, var(--color-edtech-bg) 0%, var(--color-edtech-hero-mid) 45%, var(--color-edtech-hero-end) 100%);"
+             aria-hidden="true"></div>
+    @endif
 
     <!-- MAIN WRAPPER -->
     <main class="relative z-10 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 lg:pt-8 pb-20 flex-1">
@@ -113,7 +131,7 @@
     </div>
 
     @auth
-        @if(auth()->user()->isStudent())
+        @if(auth()->user()->isStudent() && ($showAiTutor ?? true))
             @livewire('student.ai-tutor-drawer')
         @endif
     @endauth
@@ -121,4 +139,3 @@
     @livewireScripts
 </body>
 </html>
-

@@ -183,6 +183,8 @@ class TrackManager extends Component
             $trackEnrollment->updateConsolidatedProgress();
         }
 
+        TrackEnrollment::where('track_id', $track->id)->each(fn ($te) => $te->updateConsolidatedProgress());
+
         $this->showModal = false;
         $this->dispatch('toast', message: 'Trilha corporativa salva com sucesso!', type: 'success');
     }
