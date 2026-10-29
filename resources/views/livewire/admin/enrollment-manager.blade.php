@@ -503,7 +503,9 @@
                         <!-- Busca com autocomplete amigável de alunos -->
                         <div class="space-y-3">
                             <div class="relative">
-                                <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <span class="material-symbols-outlined text-lg leading-none">search</span>
+                                </div>
                                 <input wire:model.live.debounce.250ms="studentSearch" 
                                        type="text" 
                                        placeholder="Buscar por nome ou e-mail do colaborador..." 
