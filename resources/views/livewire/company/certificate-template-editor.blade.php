@@ -268,8 +268,7 @@
 
                 <!-- Publicar Versão -->
                 <button type="button"
-                        wire:click="publishVersion"
-                        wire:confirm="Deseja publicar a versão v{{ $versionNumber }}? Ela se tornará a versão oficial ativa para novos certificados emitidos e não poderá mais ser alterada."
+                        x-on:click="AlvoraSwal.fire({ icon: 'warning', title: 'Tem certeza?', text: 'Deseja publicar a versão v{{ $versionNumber }}? Ela se tornará a versão oficial ativa para novos certificados emitidos e não poderá mais ser alterada.', showCancelButton: true, confirmButtonColor: '#2563EB', confirmButtonText: 'Confirmar', cancelButtonText: 'Cancelar' }).then(r => { if (r.isConfirmed) $wire.publishVersion() })"
                         wire:loading.attr="disabled"
                         class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-all shadow-sm cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -589,8 +588,7 @@
                                 </label>
 
                                 <button type="button"
-                                        wire:click="removeBackgroundImage"
-                                        wire:confirm="Deseja desvincular a arte de fundo deste rascunho?"
+                                        x-on:click="AlvoraSwal.fire({ icon: 'warning', title: 'Tem certeza?', text: 'Deseja desvincular a arte de fundo deste rascunho?', showCancelButton: true, confirmButtonColor: '#2563EB', confirmButtonText: 'Confirmar', cancelButtonText: 'Cancelar' }).then(r => { if (r.isConfirmed) $wire.removeBackgroundImage() })"
                                         class="px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200 transition-colors cursor-pointer">
                                     Remover Arte
                                 </button>

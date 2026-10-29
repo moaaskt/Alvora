@@ -168,8 +168,7 @@
                             <span>Editar Trilha</span>
                         </button>
 
-                        <button wire:click="deleteTrack({{ $track->id }})" 
-                                wire:confirm="Tem certeza de que deseja remover a trilha '{{ $track->title }}'?"
+                        <button x-on:click="AlvoraSwal.fire({ icon: 'warning', title: 'Tem certeza?', text: 'Tem certeza de que deseja remover a trilha \'{{ $track->title }}\'?', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'Sim, excluir', cancelButtonText: 'Cancelar' }).then(r => { if (r.isConfirmed) $wire.deleteTrack({{ $track->id }}) })"
                                 type="button" 
                                 class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
                                 title="Excluir Trilha">

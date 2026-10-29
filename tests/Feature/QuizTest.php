@@ -603,10 +603,10 @@ class QuizTest extends TestCase
         Livewire::test(QuizRunner::class, ['quiz' => $quiz])
             ->call('selectOption', $question->id, $wrongSelectedOption->id)
             ->call('submit')
-            // Verifica estilo da correta: emerald-50 e emerald-200
-            ->assertSeeHtml('border-emerald-200 bg-emerald-50')
-            // Verifica estilo da errada selecionada: rose-50 e rose-200
-            ->assertSeeHtml('border-rose-200 bg-rose-50')
+            // Verifica estilo da correta: bg-green-50 e border-green-200
+            ->assertSeeHtml('bg-green-50 border border-green-200 text-green-700')
+            // Verifica estilo da errada selecionada: bg-red-50 e border-red-200
+            ->assertSeeHtml('bg-red-50 border border-red-200 text-red-600')
             // Verifica estilo neutro não selecionado: opacity-60
             ->assertSeeHtml('opacity-60');
     }

@@ -204,33 +204,20 @@
     </div>
 
     <!-- Container Global de Toasts do Livewire -->
-    <div x-data="{ toasts: [] }" 
+    <div x-data
          x-on:toast.window="
-            const id = Date.now();
-            toasts.push({ id, message: $event.detail.message, type: $event.detail.type || 'success' });
-            setTimeout(() => { toasts = toasts.filter(t => t.id !== id) }, 4000);
-         " 
-         class="fixed bottom-5 right-5 z-50 flex flex-col space-y-3 pointer-events-none">
-        <template x-for="t in toasts" :key="t.id">
-            <div class="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-medium transition-all transform duration-300 border backdrop-blur-md bg-white"
-                 :class="{
-                    'border-emerald-500 text-emerald-800 shadow-emerald-500/10': t.type === 'success',
-                    'border-rose-500 text-rose-800 shadow-rose-500/10': t.type === 'error',
-                    'border-blue-500 text-blue-800 shadow-blue-500/10': t.type === 'info'
-                 }">
-                <template x-if="t.type === 'success'">
-                    <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                </template>
-                <template x-if="t.type === 'error'">
-                    <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </template>
-                <template x-if="t.type === 'info'">
-                    <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </template>
-                <span x-text="t.message"></span>
-            </div>
-        </template>
-    </div>
+            const d = ($event.detail && typeof $event.detail === 'object') ? (Array.isArray($event.detail) ? $event.detail[0] : $event.detail) : { message: $event.detail };
+            AlvoraSwal.fire({
+                icon: d.type ?? 'info',
+                title: d.title ?? '',
+                text: d.message ?? '',
+                toast: true,
+                position: 'top-end',
+                timer: 2500,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+         "></div>
 
     @livewireScripts
 </body>

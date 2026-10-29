@@ -15,29 +15,11 @@
         </div>
 
         <!-- Flash Messages -->
-        @if (session('success'))
-            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between shadow-xs">
-                <div class="flex items-center gap-2.5">
-                    <x-icon name="check-circle" class="w-5 h-5 text-alvora-emerald shrink-0" />
-                    <span class="font-medium">{{ session('success') }}</span>
-                </div>
-                <button type="button" @click="$el.parentElement.remove()" aria-label="Fechar mensagem" class="p-1 text-emerald-700 hover:text-emerald-950 rounded-lg transition-colors cursor-pointer">
-                    <x-icon name="x" class="w-4 h-4" />
-                </button>
-            </div>
-        @endif
-
-        @if (session('warning'))
-            <div class="p-4 rounded-2xl bg-edtech-amber-light/60 border border-edtech-amber/40 text-amber-900 text-sm flex items-center justify-between shadow-xs">
-                <div class="flex items-center gap-2.5">
-                    <x-icon name="alert-triangle" class="w-5 h-5 text-edtech-amber-dark shrink-0" />
-                    <span class="font-medium">{{ session('warning') }}</span>
-                </div>
-                <button type="button" @click="$el.parentElement.remove()" aria-label="Fechar aviso" class="p-1 text-amber-800 hover:text-amber-950 rounded-lg transition-colors cursor-pointer">
-                    <x-icon name="x" class="w-4 h-4" />
-                </button>
-            </div>
-        @endif
+        <div x-data x-init="
+            @if(session('success')) AlvoraSwal.fire({ icon: 'success', title: 'Pronto!', text: '{{ session('success') }}', toast: true, position: 'top-end', timer: 2500, timerProgressBar: true, showConfirmButton: false }); @endif
+            @if(session('error')) AlvoraSwal.fire({ icon: 'error', title: 'Erro', text: '{{ session('error') }}', confirmButtonText: 'Fechar' }); @endif
+            @if(session('warning')) AlvoraSwal.fire({ icon: 'warning', title: 'Atenção', text: '{{ session('warning') }}', confirmButtonText: 'Entendi' }); @endif
+        "></div>
 
         @if ($totalCompanyCourses === 0)
             <!-- Empty State: Company has no published courses -->

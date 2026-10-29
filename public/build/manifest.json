@@ -1,32 +1,4 @@
 {
-  "_fonts-C9MNnjVw.css": {
-    "file": "assets/fonts-C9MNnjVw.css",
-    "src": "_fonts-C9MNnjVw.css"
-  },
-  "_instrument-sans-400-normal-D1W7dsQl.woff": {
-    "file": "assets/instrument-sans-400-normal-D1W7dsQl.woff",
-    "src": "_instrument-sans-400-normal-D1W7dsQl.woff"
-  },
-  "_instrument-sans-400-normal-DRC__1Mx.woff2": {
-    "file": "assets/instrument-sans-400-normal-DRC__1Mx.woff2",
-    "src": "_instrument-sans-400-normal-DRC__1Mx.woff2"
-  },
-  "_instrument-sans-500-normal-Dk9ku72i.woff2": {
-    "file": "assets/instrument-sans-500-normal-Dk9ku72i.woff2",
-    "src": "_instrument-sans-500-normal-Dk9ku72i.woff2"
-  },
-  "_instrument-sans-500-normal-Z6ESRlEs.woff": {
-    "file": "assets/instrument-sans-500-normal-Z6ESRlEs.woff",
-    "src": "_instrument-sans-500-normal-Z6ESRlEs.woff"
-  },
-  "_instrument-sans-600-normal-B7fBEWYG.woff2": {
-    "file": "assets/instrument-sans-600-normal-B7fBEWYG.woff2",
-    "src": "_instrument-sans-600-normal-B7fBEWYG.woff2"
-  },
-  "_instrument-sans-600-normal-B9e8oLYv.woff": {
-    "file": "assets/instrument-sans-600-normal-B9e8oLYv.woff",
-    "src": "_instrument-sans-600-normal-B9e8oLYv.woff"
-  },
   "node_modules/@fontsource-variable/geist/files/geist-cyrillic-ext-wght-normal.woff2": {
     "file": "assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2",
     "src": "node_modules/@fontsource-variable/geist/files/geist-cyrillic-ext-wght-normal.woff2"
@@ -48,7 +20,7 @@
     "src": "node_modules/@fontsource-variable/geist/files/geist-vietnamese-wght-normal.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-QPVj1C4i.css",
+    "file": "assets/app-CgvdRwqq.css",
     "name": "app",
     "names": [
       "app.css"
@@ -64,7 +36,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-BvRk9kiK.js",
+    "file": "assets/app-DDmBmJil.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

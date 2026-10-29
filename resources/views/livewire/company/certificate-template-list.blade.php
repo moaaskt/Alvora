@@ -24,38 +24,12 @@
     </div>
 
     <!-- FLASH MESSAGES -->
-    @if (session()->has('success'))
-        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center justify-between shadow-2xs">
-            <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
-                </svg>
-                <span>{{ session('success') }}</span>
-            </div>
-        </div>
-    @endif
-
-    @if (session()->has('warning'))
-        <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium flex items-center justify-between shadow-2xs">
-            <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"></path>
-                </svg>
-                <span>{{ session('warning') }}</span>
-            </div>
-        </div>
-    @endif
-
-    @if (session()->has('info'))
-        <div class="p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs font-medium flex items-center justify-between shadow-2xs">
-            <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"></path>
-                </svg>
-                <span>{{ session('info') }}</span>
-            </div>
-        </div>
-    @endif
+    <div x-data x-init="
+        @if(session('success')) AlvoraSwal.fire({ icon: 'success', title: 'Pronto!', text: '{{ session('success') }}', toast: true, position: 'top-end', timer: 2500, timerProgressBar: true, showConfirmButton: false }); @endif
+        @if(session('error')) AlvoraSwal.fire({ icon: 'error', title: 'Erro', text: '{{ session('error') }}', confirmButtonText: 'Fechar' }); @endif
+        @if(session('warning')) AlvoraSwal.fire({ icon: 'warning', title: 'Atenção', text: '{{ session('warning') }}', confirmButtonText: 'Entendi' }); @endif
+        @if(session('info')) AlvoraSwal.fire({ icon: 'info', title: 'Informação', text: '{{ session('info') }}', toast: true, position: 'top-end', timer: 2500, timerProgressBar: true, showConfirmButton: false }); @endif
+    "></div>
 
     <!-- HEADER DA PÁGINA COM AÇÕES -->
     <header class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-slate-200/70">
@@ -290,8 +264,7 @@
                                 <!-- ARQUIVAR TEMPLATE -->
                                 @if($template->status !== 'archived')
                                     <button type="button"
-                                            wire:click="archiveTemplate({{ $template->id }})"
-                                            wire:confirm="Tem certeza de que deseja arquivar este template? Ele deixará de ser emitido para novos certificados."
+                                            x-on:click="AlvoraSwal.fire({ icon: 'warning', title: 'Tem certeza?', text: 'Tem certeza de que deseja arquivar este template? Ele deixará de ser emitido para novos certificados.', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'Sim, excluir', cancelButtonText: 'Cancelar' }).then(r => { if (r.isConfirmed) $wire.archiveTemplate({{ $template->id }}) })"
                                             wire:loading.attr="disabled"
                                             class="p-1.5 text-xs text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                                             title="Arquivar template">

@@ -27,31 +27,25 @@
         </section>
 
         <!-- Flash Warnings / Notifications -->
-        @if (session('warning'))
-            <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-[14px] flex items-center justify-between shadow-xs">
-                <div class="flex items-center gap-2.5">
-                    <x-icon name="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0" />
-                    <span class="font-medium">{{ session('warning') }}</span>
-                </div>
-                <button type="button" @click="$el.parentElement.remove()" class="p-1 text-amber-700 hover:text-amber-950 rounded-lg transition-colors cursor-pointer" aria-label="Fechar">
-                    <x-icon name="x" class="w-4 h-4" />
-                </button>
-            </div>
-        @endif
+        <div x-data x-init="
+            @if(session('success')) AlvoraSwal.fire({ icon: 'success', title: 'Pronto!', text: '{{ session('success') }}', toast: true, position: 'top-end', timer: 2500, timerProgressBar: true, showConfirmButton: false }); @endif
+            @if(session('error')) AlvoraSwal.fire({ icon: 'error', title: 'Erro', text: '{{ session('error') }}', confirmButtonText: 'Fechar' }); @endif
+            @if(session('warning')) AlvoraSwal.fire({ icon: 'warning', title: 'Atenção', text: '{{ session('warning') }}', confirmButtonText: 'Entendi' }); @endif
+        "></div>
 
         <!-- 2. RESULT BANNER (Rendered only after submission) -->
         @if ($submitted)
             <section class="space-y-4">
                 @if ($passed)
                     <!-- PASS BANNER -->
-                    <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="bg-green-50 border border-green-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="flex items-start sm:items-center gap-3.5">
-                            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-alvora-emerald shrink-0">
-                                <x-icon name="check-circle" class="w-6 h-6 text-alvora-emerald" />
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 shrink-0">
+                                <x-icon name="check-circle" class="w-6 h-6 text-green-700" />
                             </div>
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[20px] font-semibold text-emerald-700 leading-tight">Aprovado</span>
+                                    <span class="text-[20px] font-semibold text-green-700 leading-tight">Aprovado</span>
                                 </div>
                                 <p class="text-[14px] text-edtech-muted mt-0.5">
                                     Você obteve {{ $score }}% de aproveitamento.
@@ -60,20 +54,20 @@
                         </div>
 
                         <a href="{{ route('student.player', ['course' => $quiz->course->slug]) }}"
-                           class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl border border-emerald-600 text-emerald-700 bg-white hover:bg-emerald-50 font-medium text-[14px] transition-colors shrink-0">
+                           class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl border border-green-600 text-green-700 bg-white hover:bg-green-50 font-medium text-[14px] transition-colors shrink-0">
                             Voltar ao Curso
                         </a>
                     </div>
                 @else
                     <!-- FAIL BANNER -->
-                    <div class="bg-rose-50 border border-rose-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="bg-red-50 border border-red-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="flex items-start sm:items-center gap-3.5">
-                            <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 shrink-0">
-                                <x-icon name="x-circle" class="w-6 h-6 text-rose-600" />
+                            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
+                                <x-icon name="x-circle" class="w-6 h-6 text-red-600" />
                             </div>
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[20px] font-semibold text-rose-600 leading-tight">Não aprovado</span>
+                                    <span class="text-[20px] font-semibold text-red-600 leading-tight">Não aprovado</span>
                                 </div>
                                 <p class="text-[14px] text-edtech-muted mt-0.5">
                                     Você obteve {{ $score }}% de aproveitamento.
@@ -140,30 +134,30 @@
                             @else
                                 {{-- Post-submission option (Correction mode) --}}
                                 @if ($isCorrect)
-                                    {{-- Correct Option: #F0FDF4 bg, #BBF7D0 border, check icon green, text green semibold --}}
-                                    <div class="flex items-center min-h-[44px] p-4 rounded-2xl border border-emerald-200 bg-emerald-50">
-                                        <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center mr-3.5 shrink-0">
-                                            <x-icon name="check" class="w-3.5 h-3.5 stroke-[2.5]" />
+                                    {{-- Correct Option: bg-green-50 border border-green-200 text-green-700 --}}
+                                    <div class="flex items-center min-h-[44px] p-4 rounded-2xl bg-green-50 border border-green-200 text-green-700">
+                                        <div class="w-6 h-6 rounded-full flex items-center justify-center mr-3.5 shrink-0 text-green-600">
+                                            <x-icon name="check" class="w-4 h-4 stroke-[2.5]" />
                                         </div>
-                                        <span class="text-[15px] font-semibold text-emerald-800 leading-normal">
+                                        <span class="text-[15px] font-semibold text-green-700 leading-normal">
                                             {{ $option->option_text }}
                                         </span>
                                     </div>
                                 @elseif ($isSelected && !$isCorrect)
-                                    {{-- Selected Wrong Option: #FEF2F2 bg, #FECACA border, x icon red, text red --}}
-                                    <div class="flex items-center min-h-[44px] p-4 rounded-2xl border border-rose-200 bg-rose-50">
-                                        <div class="w-6 h-6 rounded-full bg-rose-500 text-white flex items-center justify-center mr-3.5 shrink-0">
-                                            <x-icon name="x" class="w-3.5 h-3.5 stroke-[2.5]" />
+                                    {{-- Selected Wrong Option: bg-red-50 border border-red-200 text-red-600 --}}
+                                    <div class="flex items-center min-h-[44px] p-4 rounded-2xl bg-red-50 border border-red-200 text-red-600">
+                                        <div class="w-6 h-6 rounded-full flex items-center justify-center mr-3.5 shrink-0 text-red-500">
+                                            <x-icon name="x" class="w-4 h-4 stroke-[2.5]" />
                                         </div>
-                                        <span class="text-[15px] font-medium text-rose-700 leading-normal">
+                                        <span class="text-[15px] font-medium text-red-600 leading-normal">
                                             {{ $option->option_text }}
                                         </span>
                                     </div>
                                 @else
-                                    {{-- Unselected Neutral Option: white bg, no icon, text slate dimmed --}}
-                                    <div class="flex items-center min-h-[44px] p-4 rounded-2xl border border-edtech-border bg-edtech-surface opacity-60">
+                                    {{-- Unselected Neutral Option: bg-white border border-edtech-border text-edtech-muted opacity-60 --}}
+                                    <div class="flex items-center min-h-[44px] p-4 rounded-2xl bg-white border border-edtech-border text-edtech-muted opacity-60">
                                         <div class="w-6 h-6 mr-3.5 shrink-0"></div>
-                                        <span class="text-[15px] text-edtech-muted leading-normal">
+                                        <span class="text-[15px] leading-normal">
                                             {{ $option->option_text }}
                                         </span>
                                     </div>

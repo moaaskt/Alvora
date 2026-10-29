@@ -29,14 +29,11 @@
     </div>
 
     <!-- Feedback Message / Session Flash -->
-    @if (session()->has('success'))
-        <div class="p-4 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary/20 text-body-md font-medium flex items-center gap-3 shadow-sm">
-            <svg class="w-5 h-5 flex-shrink-0 text-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{{ session('success') }}</span>
-        </div>
-    @endif
+    <div x-data x-init="
+        @if(session('success')) AlvoraSwal.fire({ icon: 'success', title: 'Pronto!', text: '{{ session('success') }}', toast: true, position: 'top-end', timer: 2500, timerProgressBar: true, showConfirmButton: false }); @endif
+        @if(session('error')) AlvoraSwal.fire({ icon: 'error', title: 'Erro', text: '{{ session('error') }}', confirmButtonText: 'Fechar' }); @endif
+        @if(session('warning')) AlvoraSwal.fire({ icon: 'warning', title: 'Atenção', text: '{{ session('warning') }}', confirmButtonText: 'Entendi' }); @endif
+    "></div>
 
     <!-- Grid de Métricas / KPIs (Executive KPI Tiles) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">

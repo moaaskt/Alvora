@@ -268,8 +268,7 @@
                                                 class="h-8 px-2.5 rounded-md bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-label-md font-medium transition-colors">
                                             Reenviar
                                         </button>
-                                        <button wire:click="revokeInvitation({{ $invitation->id }})"
-                                                wire:confirm="Tem certeza de que deseja revogar este convite para {{ $invitation->email }}?"
+                                        <button x-on:click="AlvoraSwal.fire({ icon: 'warning', title: 'Tem certeza?', text: 'Tem certeza de que deseja revogar este convite para {{ $invitation->email }}?', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'Sim, excluir', cancelButtonText: 'Cancelar' }).then(r => { if (r.isConfirmed) $wire.revokeInvitation({{ $invitation->id }}) })"
                                                 type="button"
                                                 class="h-8 px-2 rounded-md hover:bg-error-container text-secondary hover:text-error font-label-md text-label-md transition-colors"
                                                 title="Revogar convite">

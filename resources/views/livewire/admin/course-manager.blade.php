@@ -343,8 +343,7 @@
                                     </a>
 
                                     <!-- Excluir -->
-                                    <button wire:click="deleteCourse({{ $c->id }})" 
-                                            wire:confirm="Tem certeza de que deseja remover este curso do catálogo?"
+                                    <button x-on:click="AlvoraSwal.fire({ icon: 'warning', title: 'Tem certeza?', text: 'Tem certeza de que deseja remover este curso do catálogo?', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'Sim, excluir', cancelButtonText: 'Cancelar' }).then(r => { if (r.isConfirmed) $wire.deleteCourse({{ $c->id }}) })"
                                             type="button" 
                                             title="Excluir Curso" 
                                             class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer">

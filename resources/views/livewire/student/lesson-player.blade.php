@@ -3,6 +3,150 @@
         currentLessonPercent: @entangle('currentLessonPercent'),
         isCompleted: @entangle('isCompleted'),
         lastReportedPercent: 0,
+        ytPlayer: null,
+        ytPollInterval: null,
+        vimeoPlayer: null,
+
+        init() {
+            this.$nextTick(() => this.initPlayer());
+            window.addEventListener('message', this.handleYTMessage.bind(this));
+        },
+
+        initPlayer() {
+            this.cleanup();
+            const ytIframe = document.getElementById('alvora-yt-iframe');
+            if (ytIframe) {
+                this.setupYouTube(ytIframe);
+                return;
+            }
+            const vimeoIframe = document.getElementById('alvora-vimeo-iframe');
+            if (vimeoIframe) {
+                this.setupVimeo(vimeoIframe);
+                return;
+            }
+        },
+
+        setupYouTube(iframe) {
+            const initYT = () => {
+                try {
+                    if (window.YT && window.YT.Player) {
+                        this.ytPlayer = new window.YT.Player('alvora-yt-iframe', {
+                            events: {
+                                onStateChange: (event) => {
+                                    if (event.data === 1) { // PLAYING
+                                        this.startYTPolling();
+                                    } else {
+                                        this.stopYTPolling();
+                                    }
+                                    if (event.data === 0) { // ENDED
+                                        this.currentLessonPercent = 100;
+                                        if (!this.isCompleted) {
+                                            $wire.toggleComplete();
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.warn('YT player init:', e);
+                }
+            };
+
+            if (!window.YT || !window.YT.Player) {
+                if (!document.getElementById('yt-iframe-api')) {
+                    const tag = document.createElement('script');
+                    tag.id = 'yt-iframe-api';
+                    tag.src = 'https://www.youtube.com/iframe_api';
+                    document.head.appendChild(tag);
+                }
+                const oldCallback = window.onYouTubeIframeAPIReady;
+                window.onYouTubeIframeAPIReady = () => {
+                    if (typeof oldCallback === 'function') oldCallback();
+                    initYT();
+                };
+            } else {
+                initYT();
+            }
+        },
+
+        startYTPolling() {
+            this.stopYTPolling();
+            this.ytPollInterval = setInterval(() => {
+                if (this.ytPlayer && typeof this.ytPlayer.getCurrentTime === 'function') {
+                    try {
+                        const current = this.ytPlayer.getCurrentTime() || 0;
+                        const duration = this.ytPlayer.getDuration() || 0;
+                        if (duration > 0) {
+                            const pct = Math.min(100, Math.round((current / duration) * 100));
+                            this.currentLessonPercent = pct;
+                            if (pct >= this.lastReportedPercent + 5 || (pct >= 90 && this.lastReportedPercent < 90)) {
+                                this.lastReportedPercent = pct;
+                                $wire.updateLessonProgress(Math.round(current), pct);
+                            }
+                        }
+                    } catch (e) {}
+                }
+            }, 250);
+        },
+
+        stopYTPolling() {
+            if (this.ytPollInterval) {
+                clearInterval(this.ytPollInterval);
+                this.ytPollInterval = null;
+            }
+        },
+
+        handleYTMessage(event) {
+            if (!event || !event.data) return;
+            try {
+                const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+                if (data.event === 'infoDelivery' && data.info) {
+                    const current = data.info.currentTime;
+                    const duration = data.info.duration;
+                    if (current !== undefined && duration !== undefined && duration > 0) {
+                        const pct = Math.min(100, Math.round((current / duration) * 100));
+                        this.currentLessonPercent = pct;
+                        if (pct >= this.lastReportedPercent + 5 || (pct >= 90 && this.lastReportedPercent < 90)) {
+                            this.lastReportedPercent = pct;
+                            $wire.updateLessonProgress(Math.round(current), pct);
+                        }
+                    }
+                }
+            } catch (e) {}
+        },
+
+        setupVimeo(iframe) {
+            if (!window.Vimeo) {
+                const script = document.createElement('script');
+                script.src = 'https://player.vimeo.com/api/player.js';
+                script.onload = () => this.createVimeoPlayer(iframe);
+                document.head.appendChild(script);
+            } else {
+                this.createVimeoPlayer(iframe);
+            }
+        },
+
+        createVimeoPlayer(iframe) {
+            try {
+                this.vimeoPlayer = new Vimeo.Player(iframe);
+                this.vimeoPlayer.on('timeupdate', (data) => {
+                    const pct = Math.min(100, Math.round(data.percent * 100));
+                    this.currentLessonPercent = pct;
+                    if (pct >= this.lastReportedPercent + 5 || (pct >= 90 && this.lastReportedPercent < 90)) {
+                        this.lastReportedPercent = pct;
+                        $wire.updateLessonProgress(Math.round(data.seconds), pct);
+                    }
+                });
+                this.vimeoPlayer.on('ended', () => {
+                    this.currentLessonPercent = 100;
+                    if (!this.isCompleted) {
+                        $wire.toggleComplete();
+                    }
+                });
+            } catch (e) {}
+        },
+
         onTimeUpdate(e) {
             const video = e.target;
             if (video && video.duration > 0) {
@@ -14,10 +158,31 @@
                 }
             }
         },
+
         onVideoEnded() {
             this.currentLessonPercent = 100;
             if (!this.isCompleted) {
                 $wire.toggleComplete();
+            }
+        },
+
+        cleanup() {
+            this.stopYTPolling();
+            if (this.ytPlayer) {
+                try {
+                    if (typeof this.ytPlayer.destroy === 'function') {
+                        this.ytPlayer.destroy();
+                    }
+                } catch (e) {}
+                this.ytPlayer = null;
+            }
+            if (this.vimeoPlayer) {
+                try {
+                    if (typeof this.vimeoPlayer.destroy === 'function') {
+                        this.vimeoPlayer.destroy();
+                    }
+                } catch (e) {}
+                this.vimeoPlayer = null;
             }
         }
      }">
@@ -90,48 +255,20 @@
     </div>
 
     {{-- 2. FLASH NOTIFICATIONS (Dismissible) --}}
-    @if (session('success'))
-        <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between shadow-xs">
-            <div class="flex items-center gap-2.5">
-                <x-icon name="check-circle" class="w-4 h-4 text-alvora-emerald shrink-0" />
-                <span class="font-medium">{{ session('success') }}</span>
-            </div>
-            <button type="button" @click="$el.parentElement.remove()" class="p-1 text-emerald-700 hover:text-emerald-950 rounded-lg transition-colors cursor-pointer" title="Fechar notificação">
-                <x-icon name="x" class="w-4 h-4" />
-            </button>
-        </div>
-    @endif
-
-    @if (session('warning'))
-        <div class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-center justify-between shadow-xs">
-            <div class="flex items-center gap-2.5">
-                <x-icon name="alert-triangle" class="w-4 h-4 text-edtech-amber shrink-0" />
-                <span class="font-medium">{{ session('warning') }}</span>
-            </div>
-            <button type="button" @click="$el.parentElement.remove()" class="p-1 text-amber-700 hover:text-amber-950 rounded-lg transition-colors cursor-pointer" title="Fechar notificação">
-                <x-icon name="x" class="w-4 h-4" />
-            </button>
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-center justify-between shadow-xs">
-            <div class="flex items-center gap-2.5">
-                <x-icon name="alert-triangle" class="w-4 h-4 text-rose-600 shrink-0" />
-                <span class="font-medium">{{ session('error') }}</span>
-            </div>
-            <button type="button" @click="$el.parentElement.remove()" class="p-1 text-rose-700 hover:text-rose-950 rounded-lg transition-colors cursor-pointer" title="Fechar notificação">
-                <x-icon name="x" class="w-4 h-4" />
-            </button>
-        </div>
-    @endif
+    <div x-data x-init="
+        @if(session('success')) AlvoraSwal.fire({ icon: 'success', title: 'Pronto!', text: '{{ session('success') }}', toast: true, position: 'top-end', timer: 2500, timerProgressBar: true, showConfirmButton: false }); @endif
+        @if(session('error')) AlvoraSwal.fire({ icon: 'error', title: 'Erro', text: '{{ session('error') }}', confirmButtonText: 'Fechar' }); @endif
+        @if(session('warning')) AlvoraSwal.fire({ icon: 'warning', title: 'Atenção', text: '{{ session('warning') }}', confirmButtonText: 'Entendi' }); @endif
+    "></div>
 
     {{-- 3. TWO-COLUMN WORKSPACE (Left: Player & Tabs, Right: Curriculum Sidebar) --}}
     <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
         {{-- LEFT COLUMN: Media Player, Actions & Tabs --}}
         <div class="flex-1 w-full min-w-0">
             {{-- Video / Media Area (16:9, rounded-2xl, native controls only) --}}
-            <div class="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-card flex items-center justify-center border border-edtech-border/60">
+            <div wire:key="media-player-container-{{ $currentLesson->id ?? 0 }}"
+                 x-init="$nextTick(() => initPlayer())"
+                 class="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-card flex items-center justify-center border border-edtech-border/60">
                 @if ($currentLesson && $currentLesson->video_url)
                     @php
                         $url = trim($currentLesson->video_url);
@@ -151,8 +288,9 @@
 
                     @if ($isYoutube)
                         @if ($youtubeId)
-                            <iframe class="w-full h-full"
-                                    src="https://www.youtube-nocookie.com/embed/{{ $youtubeId }}?rel=0&modestbranding=1&enablejsapi=1"
+                            <iframe id="alvora-yt-iframe"
+                                    class="w-full h-full"
+                                    src="https://www.youtube-nocookie.com/embed/{{ $youtubeId }}?rel=0&modestbranding=1&enablejsapi=1&origin={{ urlencode(request()->getSchemeAndHttpHost()) }}"
                                     title="{{ $currentLesson->title }}"
                                     frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -165,7 +303,8 @@
                         @endif
                     @elseif ($isVimeo)
                         @if ($vimeoId)
-                            <iframe class="w-full h-full"
+                            <iframe id="alvora-vimeo-iframe"
+                                    class="w-full h-full"
                                     src="https://player.vimeo.com/video/{{ $vimeoId }}?title=0&byline=0&portrait=0"
                                     frameborder="0"
                                     allow="autoplay; fullscreen; picture-in-picture"

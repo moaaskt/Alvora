@@ -7,6 +7,7 @@ use App\Livewire\Admin\CategoryManager;
 use App\Livewire\Admin\CourseManager;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\EnrollmentManager;
+use App\Livewire\Admin\UserManager;
 use App\Livewire\Company\CertificateTemplateList;
 use App\Livewire\Company\CompanyBilling;
 use App\Livewire\Company\EmployeeManager;
@@ -223,6 +224,10 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
         Route::get('/cursos/{course}/editar', CourseEditor::class)->name('courses.edit');
         Route::get('/cursos/{course}/curriculo', CurriculumBuilder::class)->name('courses.curriculum');
         Route::get('/certificados', CertificateTemplateList::class)->name('certificates.index');
+        Route::get('/usuarios', UserManager::class)->name('users.index');
+        Route::get('/usuarios/administradores', UserManager::class)->name('users.admins');
+        Route::get('/usuarios/instrutores', UserManager::class)->name('users.instructors');
+        Route::get('/usuarios/estudantes', UserManager::class)->name('users.students');
     });
 
     // Rotas de Gestão de Conteúdo (Instrutor / RH)

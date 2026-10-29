@@ -61,12 +61,11 @@
             </div>
         </section>
 
-        @if (session()->has('success'))
-            <div class="p-4 rounded-xl bg-tertiary-fixed/30 border border-tertiary-fixed text-on-tertiary-fixed-variant text-body-sm font-medium flex items-center gap-3">
-                <span class="material-symbols-outlined text-tertiary text-[20px]">check_circle</span>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
+        <div x-data x-init="
+            @if(session('success')) AlvoraSwal.fire({ icon: 'success', title: 'Pronto!', text: '{{ session('success') }}', toast: true, position: 'top-end', timer: 2500, timerProgressBar: true, showConfirmButton: false }); @endif
+            @if(session('error')) AlvoraSwal.fire({ icon: 'error', title: 'Erro', text: '{{ session('error') }}', confirmButtonText: 'Fechar' }); @endif
+            @if(session('warning')) AlvoraSwal.fire({ icon: 'warning', title: 'Atenção', text: '{{ session('warning') }}', confirmButtonText: 'Entendi' }); @endif
+        "></div>
 
         <!-- 2. GRID DE 4 KPIS EXECUTIVOS -->
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
