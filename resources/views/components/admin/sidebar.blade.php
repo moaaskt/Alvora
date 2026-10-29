@@ -78,10 +78,10 @@
                         </div>
                     </button>
                     <div x-show="openMenu === 'matriculas'" x-collapse class="pl-9 pr-2 py-1 flex flex-col gap-1 text-sm text-slate-600">
-                        <a href="{{ route('admin.enrollments.index') }}" class="px-2 py-1.5 rounded transition-colors flex items-center justify-between {{ request()->routeIs('admin.enrollments.*') && request('action') !== 'create' ? 'bg-blue-50 text-blue-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900' }}">
+                        <a href="{{ route('admin.enrollments.index') }}" class="px-2 py-1.5 rounded transition-colors flex items-center justify-between {{ request()->routeIs('admin.enrollments.index') ? 'bg-blue-50 text-blue-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900' }}">
                             <span>Histórico de Matrículas</span>
                         </a>
-                        <a href="{{ route('admin.enrollments.index', ['action' => 'create']) }}" class="px-2 py-1.5 rounded transition-colors flex items-center justify-between {{ request('action') === 'create' ? 'bg-blue-50 text-blue-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900' }}">
+                        <a href="{{ route('admin.enrollments.create') }}" class="px-2 py-1.5 rounded transition-colors flex items-center justify-between {{ request()->routeIs('admin.enrollments.create') ? 'bg-blue-50 text-blue-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900' }}">
                             <span>Matricular Aluno</span>
                         </a>
                     </div>

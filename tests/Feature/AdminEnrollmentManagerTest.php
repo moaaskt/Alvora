@@ -108,6 +108,17 @@ class AdminEnrollmentManagerTest extends TestCase
         $response->assertSee('Matricular Aluno');
     }
 
+    public function test_super_admin_can_access_enrollment_create_screen(): void
+    {
+        $response = $this->actingAs($this->superAdmin)->get('/admin/matriculas/novo');
+        $response->assertStatus(200);
+        $response->assertSeeLivewire(EnrollmentManager::class);
+        $response->assertSee('Atribuição Manual de Matrícula');
+        $response->assertSee('1. Selecionar Aluno Corporativo');
+        $response->assertSee('2. Selecionar Curso do Catálogo');
+        $response->assertSee('Resumo da Atribuição');
+    }
+
     public function test_super_admin_can_enroll_student_with_lifetime_access(): void
     {
         Livewire::actingAs($this->superAdmin)

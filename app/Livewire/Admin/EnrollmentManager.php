@@ -21,8 +21,8 @@ class EnrollmentManager extends Component
     public string $statusFilter = 'all';
     public string $periodFilter = 'all';
 
-    // Modal de Atribuição Manual de Matrícula
-    public bool $showCreateModal = false;
+    // Modo de Exibição da Página: 'history' (Histórico) ou 'create' (Atribuição Manual no Painel)
+    public string $viewMode = 'history';
     public string $studentSearch = '';
     public ?int $selectedUserId = null;
     public ?int $selectedCourseId = null;
@@ -43,9 +43,40 @@ class EnrollmentManager extends Component
 
     public function mount(): void
     {
-        if (request()->query('action') === 'create') {
-            $this->openCreateModal();
+        if (request()->routeIs('admin.enrollments.create') || request()->query('action') === 'create') {
+            $this->switchToCreate();
+        } else {
+            $this->viewMode = 'history';
         }
+    }
+
+    public function switchToCreate(): void
+    {
+        $this->resetValidation();
+        $this->selectedUserId = null;
+        $this->selectedCourseId = null;
+        $this->studentSearch = '';
+        $this->isLifetime = true;
+        $this->expiresAt = now()->addMonths(6)->format('Y-m-d');
+        $this->notifyStudent = true;
+        $this->viewMode = 'create';
+    }
+
+    public function switchToHistory(): void
+    {
+        $this->resetValidation();
+        $this->viewMode = 'history';
+    }
+
+    // Mantido para compatibilidade
+    public function openCreateModal(): void
+    {
+        $this->switchToCreate();
+    }
+
+    public function closeCreateModal(): void
+    {
+        $this->switchToHistory();
     }
 
     public function updatingSearch(): void
@@ -75,24 +106,6 @@ class EnrollmentManager extends Component
         $this->statusFilter = 'all';
         $this->periodFilter = 'all';
         $this->resetPage();
-    }
-
-    public function openCreateModal(): void
-    {
-        $this->resetValidation();
-        $this->selectedUserId = null;
-        $this->selectedCourseId = null;
-        $this->studentSearch = '';
-        $this->isLifetime = true;
-        $this->expiresAt = now()->addMonths(6)->format('Y-m-d');
-        $this->notifyStudent = true;
-        $this->showCreateModal = true;
-    }
-
-    public function closeCreateModal(): void
-    {
-        $this->showCreateModal = false;
-        $this->resetValidation();
     }
 
     public function selectStudent(int $userId): void
@@ -330,9 +343,9 @@ class EnrollmentManager extends Component
 
         $enrollments = $query->latest('id')->paginate(10);
 
-        // 3. Dados para o Modal de Matrícula Manual
+        // 3. Dados para Atribuição Manual de Matrícula (Página Dedicada)
         $availableStudents = collect();
-        if ($this->showCreateModal) {
+        if ($this->viewMode === 'create') {
             $studentQuery = User::withoutGlobalScopes()
                 ->where(function ($q) {
                     $q->where('role', 'student')
@@ -351,7 +364,7 @@ class EnrollmentManager extends Component
             $availableStudents = $studentQuery->with('company')->take(20)->get();
         }
 
-        $availableCourses = $this->showCreateModal 
+        $availableCourses = $this->viewMode === 'create' 
             ? Course::withoutGlobalScopes()->where('status', 'published')->orderBy('title')->get() 
             : collect();
 

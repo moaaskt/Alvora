@@ -216,6 +216,7 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
         Route::get('/dashboard', AdminDashboard::class)->name('dashboard');
         Route::get('/categorias', CategoryManager::class)->name('categories.index');
         Route::get('/matriculas', EnrollmentManager::class)->name('enrollments.index');
+        Route::get('/matriculas/novo', EnrollmentManager::class)->name('enrollments.create');
         Route::get('/faturamento', AdminBilling::class)->name('billing');
         Route::get('/cursos', CourseManager::class)->name('courses.index');
         Route::get('/cursos/novo', CourseEditor::class)->name('courses.create');
