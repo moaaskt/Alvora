@@ -18,7 +18,7 @@
 
         <!-- Quick Actions Buttons -->
         <div class="flex items-center gap-2.5 shrink-0">
-            <a href="{{ route('instructor.courses.create') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-container shadow-sm transition-all hover:shadow">
+            <a href="{{ route('admin.courses.create') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-container shadow-sm transition-all hover:shadow">
                 <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
                 </svg>
@@ -153,7 +153,7 @@
                         <h2 class="text-base font-bold text-slate-900 leading-tight">Cursos Recentes da Plataforma</h2>
                         <p class="text-xs text-slate-500 mt-0.5">Últimos treinamentos corporativos criados</p>
                     </div>
-                    <a href="{{ route('instructor.courses.index') }}" class="text-xs font-semibold text-primary hover:text-primary-container transition-colors">
+                    <a href="{{ route('admin.courses.index') }}" class="text-xs font-semibold text-primary hover:text-primary-container transition-colors">
                         Ver todos &rarr;
                     </a>
                 </div>
@@ -170,7 +170,7 @@
                                     </div>
                                 @endif
                                 <div class="min-w-0">
-                                    <a href="{{ route('instructor.courses.edit', $course) }}" class="text-sm font-semibold text-slate-900 hover:text-primary transition-colors truncate block">
+                                    <a href="{{ route('admin.courses.edit', $course) }}" class="text-sm font-semibold text-slate-900 hover:text-primary transition-colors truncate block">
                                         {{ $course->title }}
                                     </a>
                                     <div class="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
@@ -192,7 +192,7 @@
                                         Rascunho
                                     </span>
                                 @endif
-                                <a href="{{ route('instructor.courses.edit', $course) }}" class="p-1.5 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100" title="Editar">
+                                <a href="{{ route('admin.courses.edit', $course) }}" class="p-1.5 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100" title="Editar">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path></svg>
                                 </a>
                             </div>

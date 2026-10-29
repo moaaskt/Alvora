@@ -16,7 +16,7 @@
         </div>
 
         <!-- Navigation Links -->
-        <div class="px-space-md py-space-xs" x-data="{ openMenu: null }">
+        <div class="px-space-md py-space-xs" x-data="{ openMenu: {{ request()->routeIs('admin.enrollments.*') ? "'matriculas'" : "null" }} }">
             <div class="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 Governança & LMS
             </div>
@@ -33,20 +33,20 @@
                 </a>
 
                 <!-- Cursos -->
-                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('instructor.courses.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('instructor.courses.index') }}">
+                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('admin.courses.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('admin.courses.index') }}">
                     <div class="flex items-center gap-space-sm">
                         <svg class="w-5 h-5 shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"></path>
                         </svg>
                         <span>Cursos</span>
                     </div>
-                    <span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant font-semibold">
+                    <span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm {{ request()->routeIs('admin.courses.*') ? 'bg-white/20 text-white font-semibold' : 'bg-surface-container text-on-surface-variant font-semibold' }}">
                         {{ \App\Models\Course::count() }}
                     </span>
                 </a>
 
                 <!-- Categorias -->
-                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('admin.categories.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('admin.dashboard') }}#categorias" title="Módulo de Categorias">
+                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('admin.categories.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('admin.categories.index') }}" title="Gestão de Categorias e Subcategorias">
                     <div class="flex items-center gap-space-sm">
                         <svg class="w-5 h-5 shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.386l5.411-3.184c.827-.486 1.096-1.528.61-2.355l-9.581-9.581A2.25 2.25 0 0 0 9.568 3Z"></path>
@@ -54,27 +54,34 @@
                         </svg>
                         <span>Categorias</span>
                     </div>
-                    <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/60 px-1.5 py-0.5 rounded">Novo</span>
+                    <span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm {{ request()->routeIs('admin.categories.*') ? 'bg-white/20 text-white font-semibold' : 'bg-surface-container text-on-surface-variant font-semibold' }}">
+                        {{ \App\Models\Category::root()->count() }}
+                    </span>
                 </a>
 
                 <!-- Matrículas (Com Sublinks) -->
                 <div class="flex flex-col">
-                    <button type="button" @click="openMenu = (openMenu === 'matriculas' ? null : 'matriculas')" class="w-full flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors">
+                    <button type="button" @click="openMenu = (openMenu === 'matriculas' ? null : 'matriculas')" class="w-full flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('admin.enrollments.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}">
                         <div class="flex items-center gap-space-sm">
                             <svg class="w-5 h-5 shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"></path>
                             </svg>
                             <span>Matrículas</span>
                         </div>
-                        <svg class="w-4 h-4 text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': openMenu === 'matriculas' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm {{ request()->routeIs('admin.enrollments.*') ? 'bg-white/20 text-white font-semibold' : 'bg-surface-container text-on-surface-variant font-semibold' }}">
+                                {{ \App\Models\Enrollment::withoutGlobalScopes()->count() }}
+                            </span>
+                            <svg class="w-4 h-4 transition-transform duration-200 {{ request()->routeIs('admin.enrollments.*') ? 'text-white' : 'text-slate-400' }}" :class="{ 'rotate-180': openMenu === 'matriculas' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
                     </button>
                     <div x-show="openMenu === 'matriculas'" x-collapse class="pl-9 pr-2 py-1 flex flex-col gap-1 text-sm text-slate-600">
-                        <a href="{{ route('admin.dashboard') }}#matriculas-historico" class="px-2 py-1.5 rounded hover:bg-slate-100 hover:text-slate-900 transition-colors flex items-center justify-between">
+                        <a href="{{ route('admin.enrollments.index') }}" class="px-2 py-1.5 rounded transition-colors flex items-center justify-between {{ request()->routeIs('admin.enrollments.index') ? 'bg-blue-50 text-blue-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900' }}">
                             <span>Histórico de Matrículas</span>
                         </a>
-                        <a href="{{ route('admin.dashboard') }}#matricular-aluno" class="px-2 py-1.5 rounded hover:bg-slate-100 hover:text-slate-900 transition-colors flex items-center justify-between">
+                        <a href="{{ route('admin.enrollments.create') }}" class="px-2 py-1.5 rounded transition-colors flex items-center justify-between {{ request()->routeIs('admin.enrollments.create') ? 'bg-blue-50 text-blue-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900' }}">
                             <span>Matricular Aluno</span>
                         </a>
                     </div>
@@ -148,7 +155,7 @@
                 </a>
 
                 <!-- Templates de Certificados -->
-                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('instructor.certificate-templates.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('instructor.certificate-templates.index') }}">
+                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('admin.certificates.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('admin.certificates.index') }}">
                     <div class="flex items-center gap-space-sm">
                         <svg class="w-5 h-5 shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"></path>

@@ -21,6 +21,7 @@ class Course extends Model
     protected $fillable = [
         'company_id',
         'instructor_id',
+        'category_id',
         'title',
         'slug',
         'description',
@@ -66,6 +67,14 @@ class Course extends Model
         }
 
         return $slug;
+    }
+
+    /**
+     * Categoria vinculada ao curso.
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     /**

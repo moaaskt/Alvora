@@ -31,6 +31,14 @@ class CertificateTemplateList extends Component
         'newTemplateName.max' => 'O nome não pode exceder 255 caracteres.',
     ];
 
+    public function mount(): mixed
+    {
+        if (Auth::user()?->isAlvoraAdmin() && request()->routeIs('instructor.certificate-templates.*')) {
+            return redirect()->route('admin.certificates.index');
+        }
+        return null;
+    }
+
     public function openCreateModal(): void
     {
         $this->resetValidation();
@@ -231,13 +239,15 @@ class CertificateTemplateList extends Component
             ->where('is_default', true)
             ->first();
 
+        $layout = Auth::user()?->isAlvoraAdmin() ? 'layouts.admin' : 'layouts.instructor';
+
         return view('livewire.company.certificate-template-list', [
             'templates' => $templates,
             'activeVersionInUse' => $activeVersionInUse,
             'templateInUse' => $templateInUse,
             'isUsingGlobalDefault' => $isUsingGlobalDefault,
             'globalTemplate' => $globalTemplate,
-        ])->layout('layouts.instructor', [
+        ])->layout($layout, [
             'title' => 'Gestão de Templates de Certificados — ALVORA',
             'breadcrumb' => 'Templates de Certificados',
         ]);

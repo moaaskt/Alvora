@@ -12,6 +12,14 @@ class CourseList extends Component
     use WithPagination;
 
     public string $search = '';
+
+    public function mount(): mixed
+    {
+        if (Auth::user()?->isAlvoraAdmin()) {
+            return redirect()->route('admin.courses.index');
+        }
+        return null;
+    }
     public string $statusFilter = 'all';
 
     public function updatingSearch(): void

@@ -130,5 +130,20 @@
         @case('pencil')
             <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
             @break
+
+        @case('check')
+            <polyline points="20 6 9 17 4 12"></polyline>
+            @break
+
+        @case('x-circle')
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+            @break
+
+        @case('award')
+            <circle cx="12" cy="8" r="7"></circle>
+            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+            @break
     @endswitch
 </svg>

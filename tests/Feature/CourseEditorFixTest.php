@@ -65,5 +65,44 @@ class CourseEditorFixTest extends TestCase
         $this->assertNotNull($course);
         $this->assertEquals($company->id, $course->company_id);
     }
+
+    public function test_instructor_course_editor_screen_renders_stitch_layout_faithfully(): void
+    {
+        $company = Company::create(['name' => 'Empresa Teste Layout', 'status' => 'active']);
+        $instructor = User::create([
+            'name' => 'Prof. Carlos Eduardo',
+            'email' => 'carlos_layout_' . uniqid() . '@empresa.com',
+            'password' => bcrypt('password'),
+            'role' => UserRole::INSTRUCTOR,
+            'company_id' => $company->id,
+        ]);
+
+        $course = Course::create([
+            'company_id' => $company->id,
+            'instructor_id' => $instructor->id,
+            'title' => 'Inteligência Artificial Corporativa',
+            'slug' => 'inteligencia-artificial-corporativa-' . uniqid(),
+            'description' => 'Curso completo de IA para negócios.',
+            'status' => 'published',
+        ]);
+
+        $response = $this->actingAs($instructor)
+            ->get(route('instructor.courses.edit', $course));
+
+        $response->assertStatus(200);
+        $response->assertSee('Atualizar: Inteligência Artificial Corporativa');
+        $response->assertSee('Dados Gerais do Treinamento');
+        $response->assertSee('Objetivos de Aprendizagem');
+        $response->assertSee('Competências');
+        $response->assertSee('Resumo Rápido');
+        $response->assertSee('Saúde do Curso');
+        $response->assertSee('Parâmetros de Acesso');
+        $response->assertSee('Publicação');
+        $response->assertSee('Alvora Copilot Insights');
+        $response->assertSee('Matrículas Ativas');
+        $response->assertSee('Total de Aulas');
+        $response->assertSee('lg:col-span-8');
+        $response->assertSee('lg:col-span-4');
+    }
 }
 
