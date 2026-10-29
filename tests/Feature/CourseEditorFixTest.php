@@ -66,3 +66,4 @@ class CourseEditorFixTest extends TestCase
         $this->assertEquals($company->id, $course->company_id);
     }
 }
+

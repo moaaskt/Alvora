@@ -95,3 +95,4 @@ class LessonProgressRingTest extends TestCase
         $this->assertNotNull($progressRecord->completed_at);
     }
 }
+
