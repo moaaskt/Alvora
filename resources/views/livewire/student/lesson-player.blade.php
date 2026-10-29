@@ -1,8 +1,8 @@
 <div class="w-full"
      x-data="{
-        currentLessonPercent: {{ (int) $currentLessonPercent }},
+        currentLessonPercent: 0,
         isCompleted: {{ $isCompleted ? 'true' : 'false' }},
-        lastReportedPercent: {{ (int) $currentLessonPercent }},
+        lastReportedPercent: 0,
         ytPlayer: null,
         ytTicker: null,
         vimeoPlayer: null,
@@ -10,7 +10,63 @@
         isPlaying: false,
 
         init() {
-            this.$nextTick(() => this.initPlayer());
+            window._alvoraPlayer = this;
+
+            window.initYT = () => {
+                const vm = window._alvoraPlayer;
+                if (!vm) return;
+                const iframe = document.getElementById('alvora-yt-iframe');
+                if (!iframe) return;
+
+                if (vm.ytPlayer) {
+                    try {
+                        if (typeof vm.ytPlayer.destroy === 'function') {
+                            vm.ytPlayer.destroy();
+                        }
+                    } catch(e) {}
+                    vm.ytPlayer = null;
+                }
+
+                try {
+                    vm.ytPlayer = new window.YT.Player('alvora-yt-iframe', {
+                        events: {
+                            onReady: (event) => {
+                                const d = event.target.getDuration();
+                                if (d > 0) vm.ytDuration = d;
+                            },
+                            onStateChange: (event) => {
+                                if (event.data === 1) { // PLAYING
+                                    vm.isPlaying = true;
+                                    vm.startYTTicker();
+                                } else if (event.data === 2) { // PAUSED
+                                    vm.isPlaying = false;
+                                    vm.stopYTTicker();
+                                } else if (event.data === 0) { // ENDED
+                                    vm.isPlaying = false;
+                                    vm.stopYTTicker();
+                                    vm.currentLessonPercent = 100;
+                                    if (!vm.isCompleted) {
+                                        $wire.toggleComplete();
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } catch(e) {
+                    console.warn('[Alvora YT] Erro initYT:', e);
+                }
+            };
+
+            window.onYouTubeIframeAPIReady = () => {
+                window.initYT();
+            };
+
+            this.$nextTick(() => {
+                this.initPlayer();
+                if (window.YT && window.YT.Player) {
+                    window.initYT();
+                }
+            });
 
             this.$watch('$wire.currentLessonPercent', (val) => {
                 if (val !== undefined && Math.abs(val - this.currentLessonPercent) > 5) {
@@ -21,90 +77,13 @@
 
         initPlayer() {
             this.cleanup();
-            this.currentLessonPercent = {{ (int) $currentLessonPercent }};
-            this.lastReportedPercent = {{ (int) $currentLessonPercent }};
-
-            const ytContainer = document.getElementById('alvora-yt-container');
-            if (ytContainer) {
-                const videoId = ytContainer.getAttribute('data-video-id');
-                if (videoId) {
-                    this.setupYouTube(videoId);
-                    return;
-                }
-            }
+            this.currentLessonPercent = 0;
+            this.lastReportedPercent = 0;
 
             const vimeoIframe = document.getElementById('alvora-vimeo-iframe');
             if (vimeoIframe) {
                 this.setupVimeo(vimeoIframe);
                 return;
-            }
-        },
-
-        setupYouTube(videoId) {
-            const createPlayer = () => {
-                try {
-                    if (this.ytPlayer && typeof this.ytPlayer.destroy === 'function') {
-                        this.ytPlayer.destroy();
-                    }
-
-                    const container = document.getElementById('alvora-yt-container');
-                    if (!container) return;
-                    container.innerHTML = '<div id=\"alvora-yt-target\" class=\"w-full h-full\"></div>';
-
-                    this.ytPlayer = new window.YT.Player('alvora-yt-target', {
-                        width: '100%',
-                        height: '100%',
-                        videoId: videoId,
-                        playerVars: {
-                            autoplay: 0,
-                            playsinline: 1,
-                            rel: 0,
-                            modestbranding: 1,
-                            origin: window.location.origin
-                        },
-                        events: {
-                            onReady: (event) => {
-                                const d = event.target.getDuration();
-                                if (d > 0) this.ytDuration = d;
-                            },
-                            onStateChange: (event) => {
-                                if (event.data === 1) { // PLAYING
-                                    this.isPlaying = true;
-                                    this.startYTTicker();
-                                } else if (event.data === 2) { // PAUSED
-                                    this.isPlaying = false;
-                                    this.stopYTTicker();
-                                } else if (event.data === 0) { // ENDED
-                                    this.isPlaying = false;
-                                    this.stopYTTicker();
-                                    this.currentLessonPercent = 100;
-                                    if (!this.isCompleted) {
-                                        $wire.toggleComplete();
-                                    }
-                                }
-                            }
-                        }
-                    });
-                } catch (e) {
-                    console.warn('[Alvora YT] Erro ao instanciar YT.Player:', e);
-                    this.renderFallbackIframe(videoId);
-                }
-            };
-
-            if (window.YT && window.YT.Player) {
-                createPlayer();
-            } else {
-                const oldCb = window.onYouTubeIframeAPIReady;
-                window.onYouTubeIframeAPIReady = () => {
-                    if (typeof oldCb === 'function') oldCb();
-                    createPlayer();
-                };
-
-                setTimeout(() => {
-                    if (!this.ytPlayer && (!window.YT || !window.YT.Player)) {
-                        this.renderFallbackIframe(videoId);
-                    }
-                }, 2500);
             }
         },
 
@@ -128,12 +107,6 @@
                 clearInterval(this.ytTicker);
                 this.ytTicker = null;
             }
-        },
-
-        renderFallbackIframe(videoId) {
-            const container = document.getElementById('alvora-yt-container');
-            if (!container) return;
-            container.innerHTML = `<iframe id=\"alvora-yt-iframe\" class=\"w-full h-full\" src=\"https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}&rel=0&modestbranding=1\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>`;
         },
 
         calcAndApplyProgress(current, duration) {
@@ -297,7 +270,7 @@
         <div class="flex-1 w-full min-w-0">
             {{-- Video / Media Area (16:9, rounded-2xl, native controls only) --}}
             <div wire:key="media-player-container-{{ $currentLesson->id ?? 0 }}"
-                 x-init="$nextTick(() => initPlayer())"
+                 x-init="$nextTick(() => { initPlayer(); if (window.initYT && window.YT && window.YT.Player) window.initYT(); })"
                  class="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-card flex items-center justify-center border border-edtech-border/60">
                 @if ($currentLesson && $currentLesson->video_url)
                     @php
@@ -318,9 +291,13 @@
 
                     @if ($isYoutube)
                         @if ($youtubeId)
-                            <div id="alvora-yt-container" class="w-full h-full relative" data-video-id="{{ $youtubeId }}">
-                                <div id="alvora-yt-target" class="w-full h-full"></div>
-                            </div>
+                            <iframe id="alvora-yt-iframe"
+                                    class="w-full h-full"
+                                    src="https://www.youtube.com/embed/{{ $youtubeId }}?enablejsapi=1&origin={{ request()->getSchemeAndHttpHost() }}&widget_referrer={{ request()->getSchemeAndHttpHost() }}&rel=0&modestbranding=1"
+                                    title="{{ $currentLesson->title }}"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
                         @else
                             <div class="text-center p-8 space-y-2 text-slate-300">
                                 <x-icon name="alert-triangle" class="w-8 h-8 text-edtech-amber mx-auto" />
