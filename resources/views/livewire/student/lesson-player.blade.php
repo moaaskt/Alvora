@@ -28,7 +28,7 @@
                 }
 
                 try {
-                    vm.ytPlayer = new window.YT.Player('alvora-yt-iframe', {
+                    vm.ytPlayer = new window.YT.Player(iframe, {
                         events: {
                             onReady: (event) => {
                                 const d = event.target.getDuration();
