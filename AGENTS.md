@@ -74,7 +74,7 @@ Alvora é uma plataforma de treinamento corporativo (B2B) onde empresas contrata
 
 ## Project Skills
 
-No project skills found. Add skills to any of: `.agents/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.
+- [trello-sync-skill](.agents/skills/trello-sync-skill/SKILL.md): Sincroniza tarefas e pendências do sistema Alvora com o quadro do Trello de forma automática usando comandos como `/trello-sync-skill` ou pedidos diretos de anotação.
 <!-- GSD:skills-end -->
 
 <!-- GSD:workflow-start source:GSD defaults -->
