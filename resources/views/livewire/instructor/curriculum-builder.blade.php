@@ -320,8 +320,7 @@
                             </button>
 
                             <!-- Excluir Módulo -->
-                            <button wire:click="deleteModule({{ $module->id }})" 
-                                    wire:confirm="Tem certeza de que deseja excluir o módulo '{{ $module->title }}' e todas as suas lições?"
+                            <button x-on:click="AlvoraSwal.fire({ icon: 'warning', title: 'Tem certeza?', text: 'Tem certeza de que deseja excluir o módulo \'{{ $module->title }}\' e todas as suas lições?', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'Sim, excluir', cancelButtonText: 'Cancelar' }).then(r => { if (r.isConfirmed) $wire.deleteModule({{ $module->id }}) })"
                                     type="button" 
                                     class="p-1.5 rounded-lg bg-white border border-slate-200 hover:bg-rose-50 text-rose-500 text-xs shadow-2xs" title="Remover Módulo">
                                 <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -389,8 +388,7 @@
                                             </button>
 
                                             <!-- Excluir Aula -->
-                                            <button wire:click="deleteLesson({{ $lesson->id }})" 
-                                                    wire:confirm="Excluir a aula '{{ $lesson->title }}'?"
+                                            <button x-on:click="AlvoraSwal.fire({ icon: 'warning', title: 'Tem certeza?', text: 'Excluir a aula \'{{ $lesson->title }}\'?', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'Sim, excluir', cancelButtonText: 'Cancelar' }).then(r => { if (r.isConfirmed) $wire.deleteLesson({{ $lesson->id }}) })"
                                                     type="button" 
                                                     class="p-1 text-slate-400 hover:text-rose-500 text-xs">
                                                 ✕

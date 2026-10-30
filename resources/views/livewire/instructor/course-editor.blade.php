@@ -563,8 +563,7 @@
                                        class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors">
                                         Editar Questões
                                     </a>
-                                    <button wire:click="deleteQuiz({{ $quiz->id }})" 
-                                            wire:confirm="Tem certeza de que deseja excluir a avaliação '{{ $quiz->title }}'?"
+                                    <button x-on:click="AlvoraSwal.fire({ icon: 'warning', title: 'Tem certeza?', text: 'Tem certeza de que deseja excluir a avaliação \'{{ $quiz->title }}\'?', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'Sim, excluir', cancelButtonText: 'Cancelar' }).then(r => { if (r.isConfirmed) $wire.deleteQuiz({{ $quiz->id }}) })" 
                                             type="button" 
                                             class="p-1 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors">
                                         <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
