@@ -13,46 +13,47 @@
             window._alvoraPlayer = this;
 
             window.initYT = () => {
-                const vm = window._alvoraPlayer;
-                if (!vm) return;
+                if (!window._alvoraPlayer) return;
                 const iframe = document.getElementById('alvora-yt-iframe');
                 if (!iframe) return;
 
-                if (vm.ytPlayer) {
-                    try {
-                        if (typeof vm.ytPlayer.destroy === 'function') {
-                            vm.ytPlayer.destroy();
-                        }
-                    } catch(e) {}
-                    vm.ytPlayer = null;
+                if (window._alvoraPlayer.ytPlayer) {
+                    try { window._alvoraPlayer.ytPlayer.destroy(); } catch(e) {}
+                    window._alvoraPlayer.ytPlayer = null;
                 }
 
                 try {
-                    vm.ytPlayer = new window.YT.Player(iframe, {
+                    const player = new window.YT.Player(iframe, {
                         events: {
                             onReady: (event) => {
+                                console.log('[Alvora] onReady!');
                                 const d = event.target.getDuration();
-                                if (d > 0) vm.ytDuration = d;
+                                if (d > 0 && window._alvoraPlayer) window._alvoraPlayer.ytDuration = d;
+                                if (window._alvoraPlayer) window._alvoraPlayer.ytPlayer = player;
                             },
                             onStateChange: (event) => {
-                                if (event.data === 1) { // PLAYING
-                                    vm.isPlaying = true;
-                                    vm.startYTTicker();
-                                } else if (event.data === 2) { // PAUSED
-                                    vm.isPlaying = false;
-                                    vm.stopYTTicker();
-                                } else if (event.data === 0) { // ENDED
-                                    vm.isPlaying = false;
-                                    vm.stopYTTicker();
-                                    vm.currentLessonPercent = 100;
-                                    if (!vm.isCompleted) {
-                                        $wire.toggleComplete();
+                                console.log('[Alvora] state:', event.data);
+                                if (!window._alvoraPlayer) return;
+                                if (event.data === 1) {
+                                    window._alvoraPlayer.isPlaying = true;
+                                    window._alvoraPlayer.startYTTicker();
+                                } else if (event.data === 2) {
+                                    window._alvoraPlayer.isPlaying = false;
+                                    window._alvoraPlayer.stopYTTicker();
+                                } else if (event.data === 0) {
+                                    window._alvoraPlayer.isPlaying = false;
+                                    window._alvoraPlayer.stopYTTicker();
+                                    window._alvoraPlayer.currentLessonPercent = 100;
+                                    if (!window._alvoraPlayer.isCompleted) {
+                                        window._alvoraPlayer.$wire.toggleComplete();
                                     }
                                 }
                             }
                         }
                     });
-                } catch(e) {
+
+                    console.log('[Alvora] player criado:', player);
+                } catch (e) {
                     console.warn('[Alvora YT] Erro initYT:', e);
                 }
             };
