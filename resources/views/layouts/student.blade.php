@@ -111,24 +111,20 @@
     </footer>
 
     <!-- Container Global de Toasts -->
-    <div x-data="{ toasts: [] }"
+    <div x-data
          x-on:toast.window="
-            const id = Date.now();
-            toasts.push({ id, message: $event.detail.message, type: $event.detail.type || 'success' });
-            setTimeout(() => { toasts = toasts.filter(t => t.id !== id) }, 4000);
-         "
-         class="fixed bottom-5 right-5 z-50 flex flex-col space-y-3 pointer-events-none">
-        <template x-for="t in toasts" :key="t.id">
-            <div class="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-medium transition-all transform duration-300 border backdrop-blur-md bg-edtech-surface"
-                 :class="{
-                    'border-alvora-emerald text-edtech-text': t.type === 'success',
-                    'border-rose-500 text-rose-700': t.type === 'error',
-                    'border-edtech-blue text-edtech-blue': t.type === 'info'
-                 }">
-                <span x-text="t.message"></span>
-            </div>
-        </template>
-    </div>
+            const d = ($event.detail && typeof $event.detail === 'object') ? (Array.isArray($event.detail) ? $event.detail[0] : $event.detail) : { message: $event.detail };
+            AlvoraSwal.fire({
+                icon: d.type ?? 'info',
+                title: d.title ?? '',
+                text: d.message ?? '',
+                toast: true,
+                position: 'top-end',
+                timer: 2500,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+         "></div>
 
     @auth
         @if(auth()->user()->isStudent() && ($showAiTutor ?? true))

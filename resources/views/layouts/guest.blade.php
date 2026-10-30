@@ -185,30 +185,20 @@
     @endif
 
     <!-- Container Global de Toasts (D-16) -->
-    <div x-data="{ toasts: [] }" 
+    <div x-data
          x-on:toast.window="
-            const id = Date.now();
-            toasts.push({ id, message: $event.detail.message, type: $event.detail.type || 'success' });
-            setTimeout(() => { toasts = toasts.filter(t => t.id !== id) }, 4000);
-         " 
-         class="fixed bottom-5 right-5 z-50 flex flex-col space-y-3 pointer-events-none">
-        <template x-for="t in toasts" :key="t.id">
-            <div class="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-medium transition-all transform duration-300 border backdrop-blur-md"
-                 :class="{
-                    'bg-slate-900/90 border-emerald-500/50 text-emerald-300 shadow-emerald-950/40': t.type === 'success',
-                    'bg-slate-900/90 border-rose-500/50 text-rose-300 shadow-rose-950/40': t.type === 'error',
-                    'bg-slate-900/90 border-indigo-500/50 text-indigo-300 shadow-indigo-950/40': t.type === 'info'
-                 }">
-                <template x-if="t.type === 'success'">
-                    <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                </template>
-                <template x-if="t.type === 'error'">
-                    <svg class="w-5 h-5 text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </template>
-                <span x-text="t.message"></span>
-            </div>
-        </template>
-    </div>
+            const d = ($event.detail && typeof $event.detail === 'object') ? (Array.isArray($event.detail) ? $event.detail[0] : $event.detail) : { message: $event.detail };
+            AlvoraSwal.fire({
+                icon: d.type ?? 'info',
+                title: d.title ?? '',
+                text: d.message ?? '',
+                toast: true,
+                position: 'top-end',
+                timer: 2500,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+         "></div>
 
     @livewireScripts
 </body>
