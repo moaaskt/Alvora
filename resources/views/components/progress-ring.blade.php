@@ -27,6 +27,7 @@
                 fill="none"
                 stroke-dasharray="{{ $circumference }}"
                 :stroke-dashoffset="{{ $circumference }} * (1 - (Math.min(100, Math.max(0, {{ $alpineModel }})) / 100))"
+                :style="'stroke-dashoffset: ' + (59.7 * (1 - (Math.min(100, Math.max(0, ' + {{ $alpineModel }} + ')) / 100))) + '; opacity: ' + (' + {{ $alpineModel }} + ' > 0 ? 1 : 0) + ';'"
                 transform="rotate(-90 12 12)"
                 :class="{{ $alpineModel }} > 0 ? 'opacity-100' : 'opacity-0'"
                 class="stroke-edtech-blue transition-all duration-200" />

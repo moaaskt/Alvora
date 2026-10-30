@@ -1,15 +1,30 @@
 <div class="w-full"
      x-data="{
-        currentLessonPercent: @entangle('currentLessonPercent'),
-        isCompleted: @entangle('isCompleted'),
+        currentLessonPercent: {{ (int) $currentLessonPercent }},
+        isCompleted: {{ $isCompleted ? 'true' : 'false' }},
         lastReportedPercent: 0,
         ytPlayer: null,
         ytPollInterval: null,
+        ytHandshakeInterval: null,
         vimeoPlayer: null,
+        ytDuration: {{ (int) (($currentLesson->duration_minutes ?? 10) * 60) }},
+        ytCurrentTime: 0,
+        isPlaying: false,
 
         init() {
             this.$nextTick(() => this.initPlayer());
             window.addEventListener('message', this.handleYTMessage.bind(this));
+            
+            // Detect when user clicks into the video iframe
+            window.addEventListener('blur', () => {
+                setTimeout(() => {
+                    if (document.activeElement && document.activeElement.id === 'alvora-yt-iframe') {
+                        console.log('[Alvora Player] User clicked video iframe, starting polling');
+                        this.sendYTHandshake();
+                        this.startYTPolling();
+                    }
+                }, 100);
+            });
         },
 
         initPlayer() {
@@ -26,19 +41,47 @@
             }
         },
 
+        sendYTHandshake() {
+            const iframe = document.getElementById('alvora-yt-iframe');
+            if (iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage(JSON.stringify({ event: 'listening' }), '*');
+                iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onStateChange'] }), '*');
+                iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'getCurrentTime', args: [] }), '*');
+                iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'getDuration', args: [] }), '*');
+            }
+        },
+
         setupYouTube(iframe) {
+            // Send handshakes immediately and periodically
+            this.sendYTHandshake();
+            if (this.ytHandshakeInterval) clearInterval(this.ytHandshakeInterval);
+            this.ytHandshakeInterval = setInterval(() => {
+                this.sendYTHandshake();
+            }, 1000);
+
+            // Also load YouTube Iframe API if available
             const initYT = () => {
                 try {
                     if (window.YT && window.YT.Player) {
                         this.ytPlayer = new window.YT.Player('alvora-yt-iframe', {
                             events: {
-                                onStateChange: (event) => {
-                                    if (event.data === 1) { // PLAYING
-                                        this.startYTPolling();
-                                    } else {
-                                        this.stopYTPolling();
+                                onReady: (e) => {
+                                    if (e.target && typeof e.target.getDuration === 'function') {
+                                        const d = e.target.getDuration();
+                                        if (d > 0) this.ytDuration = d;
                                     }
-                                    if (event.data === 0) { // ENDED
+                                },
+                                onStateChange: (event) => {
+                                    console.log('[Alvora Player] YT onStateChange:', event.data);
+                                    if (event.data === 1) { // PLAYING
+                                        this.isPlaying = true;
+                                        this.startYTPolling();
+                                    } else if (event.data === 2) { // PAUSED
+                                        this.isPlaying = false;
+                                        this.stopYTPolling();
+                                    } else if (event.data === 0) { // ENDED
+                                        this.isPlaying = false;
+                                        this.stopYTPolling();
                                         this.currentLessonPercent = 100;
                                         if (!this.isCompleted) {
                                             $wire.toggleComplete();
@@ -49,7 +92,7 @@
                         });
                     }
                 } catch (e) {
-                    console.warn('YT player init:', e);
+                    console.warn('[Alvora Player] YT Player init exception:', e);
                 }
             };
 
@@ -72,18 +115,25 @@
 
         startYTPolling() {
             this.stopYTPolling();
+            this.sendYTHandshake();
+
+            // Poll YouTube iframe every 250ms
             this.ytPollInterval = setInterval(() => {
+                const iframe = document.getElementById('alvora-yt-iframe');
+                if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'getCurrentTime', args: [] }), '*');
+                    iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'getDuration', args: [] }), '*');
+                }
+
+                // If official YT.Player instance is connected:
                 if (this.ytPlayer && typeof this.ytPlayer.getCurrentTime === 'function') {
                     try {
                         const current = this.ytPlayer.getCurrentTime() || 0;
                         const duration = this.ytPlayer.getDuration() || 0;
                         if (duration > 0) {
-                            const pct = Math.min(100, Math.round((current / duration) * 100));
-                            this.currentLessonPercent = pct;
-                            if (pct >= this.lastReportedPercent + 5 || (pct >= 90 && this.lastReportedPercent < 90)) {
-                                this.lastReportedPercent = pct;
-                                $wire.updateLessonProgress(Math.round(current), pct);
-                            }
+                            this.ytDuration = duration;
+                            this.ytCurrentTime = current;
+                            this.calcAndApplyProgress(current, duration);
                         }
                     } catch (e) {}
                 }
@@ -99,21 +149,79 @@
 
         handleYTMessage(event) {
             if (!event || !event.data) return;
+            let data;
             try {
-                const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-                if (data.event === 'infoDelivery' && data.info) {
-                    const current = data.info.currentTime;
-                    const duration = data.info.duration;
-                    if (current !== undefined && duration !== undefined && duration > 0) {
-                        const pct = Math.min(100, Math.round((current / duration) * 100));
-                        this.currentLessonPercent = pct;
-                        if (pct >= this.lastReportedPercent + 5 || (pct >= 90 && this.lastReportedPercent < 90)) {
-                            this.lastReportedPercent = pct;
-                            $wire.updateLessonProgress(Math.round(current), pct);
+                data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+            } catch (e) {
+                return;
+            }
+            if (!data) return;
+
+            // 1. YouTube infoDelivery packet
+            if (data.event === 'infoDelivery' && data.info) {
+                if (data.info.duration !== undefined && data.info.duration > 0) {
+                    this.ytDuration = data.info.duration;
+                }
+                if (data.info.currentTime !== undefined) {
+                    this.ytCurrentTime = data.info.currentTime;
+                }
+                if (data.info.playerState !== undefined) {
+                    if (data.info.playerState === 1) { // PLAYING
+                        this.isPlaying = true;
+                        if (!this.ytPollInterval) this.startYTPolling();
+                    } else if (data.info.playerState === 2) { // PAUSED
+                        this.isPlaying = false;
+                        this.stopYTPolling();
+                    } else if (data.info.playerState === 0) { // ENDED
+                        this.isPlaying = false;
+                        this.stopYTPolling();
+                        this.currentLessonPercent = 100;
+                        if (!this.isCompleted) {
+                            $wire.toggleComplete();
                         }
                     }
                 }
-            } catch (e) {}
+            }
+
+            // 2. onStateChange event
+            if (data.event === 'onStateChange' && data.info !== undefined) {
+                if (data.info === 1) { // PLAYING
+                    this.isPlaying = true;
+                    if (!this.ytPollInterval) this.startYTPolling();
+                } else if (data.info === 2) { // PAUSED
+                    this.isPlaying = false;
+                    this.stopYTPolling();
+                } else if (data.info === 0) { // ENDED
+                    this.isPlaying = false;
+                    this.stopYTPolling();
+                    this.currentLessonPercent = 100;
+                    if (!this.isCompleted) {
+                        $wire.toggleComplete();
+                    }
+                }
+            }
+
+            // 3. Direct response from getCurrentTime command
+            if (typeof data.info === 'number') {
+                this.ytCurrentTime = data.info;
+            }
+
+            // Update percentage
+            const dur = this.ytDuration || ({{ (int) (($currentLesson->duration_minutes ?? 10) * 60) }});
+            if (dur > 0 && this.ytCurrentTime !== undefined && this.ytCurrentTime > 0) {
+                this.calcAndApplyProgress(this.ytCurrentTime, dur);
+            }
+        },
+
+        calcAndApplyProgress(current, duration) {
+            const pct = Math.min(100, Math.round((current / duration) * 100));
+            this.currentLessonPercent = pct;
+            
+            // Sync with Livewire in background every 5%
+            if (pct >= this.lastReportedPercent + 5 || (pct >= 90 && this.lastReportedPercent < 90)) {
+                this.lastReportedPercent = pct;
+                $wire.updateLessonProgress(Math.round(current), pct);
+            }
         },
 
         setupVimeo(iframe) {
@@ -168,6 +276,10 @@
 
         cleanup() {
             this.stopYTPolling();
+            if (this.ytHandshakeInterval) {
+                clearInterval(this.ytHandshakeInterval);
+                this.ytHandshakeInterval = null;
+            }
             if (this.ytPlayer) {
                 try {
                     if (typeof this.ytPlayer.destroy === 'function') {
@@ -290,7 +402,7 @@
                         @if ($youtubeId)
                             <iframe id="alvora-yt-iframe"
                                     class="w-full h-full"
-                                    src="https://www.youtube-nocookie.com/embed/{{ $youtubeId }}?rel=0&modestbranding=1&enablejsapi=1&origin={{ urlencode(request()->getSchemeAndHttpHost()) }}"
+                                    src="https://www.youtube.com/embed/{{ $youtubeId }}?enablejsapi=1&origin={{ request()->getSchemeAndHttpHost() }}&widget_referrer={{ request()->getSchemeAndHttpHost() }}&rel=0&modestbranding=1"
                                     title="{{ $currentLesson->title }}"
                                     frameborder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
