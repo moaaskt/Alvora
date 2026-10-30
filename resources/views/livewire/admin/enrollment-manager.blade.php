@@ -360,8 +360,7 @@
                                             </button>
                                         @endif
 
-                                        <button wire:confirm="Tem certeza que deseja excluir permanentemente o registro desta matrícula?"
-                                                wire:click="deleteEnrollmentPermanently({{ $enrollment->id }})" 
+                                        <button x-on:click="AlvoraSwal.fire({ icon: 'warning', title: 'Tem certeza?', text: 'Tem certeza que deseja excluir permanentemente o registro desta matrícula?', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'Sim, excluir', cancelButtonText: 'Cancelar' }).then(r => { if (r.isConfirmed) $wire.deleteEnrollmentPermanently({{ $enrollment->id }}) })"
                                                 type="button"
                                                 class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-700 transition-colors cursor-pointer" 
                                                 title="Excluir Registro">
