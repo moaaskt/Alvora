@@ -32,24 +32,29 @@
                             onReady: (event) => {
                                 console.log('[Alvora] onReady!');
                                 const d = event.target.getDuration();
-                                if (d > 0 && window._alvoraPlayer) window._alvoraPlayer.ytDuration = d;
-                                if (window._alvoraPlayer) window._alvoraPlayer.ytPlayer = player;
+                                const vm = window._alvoraPlayer;
+                                if (!vm) return;
+                                // Sempre substitui — garante que é o player atual
+                                vm.ytPlayer = player;
+                                if (d > 0) vm.ytDuration = d;
+                                console.log('[Alvora] player salvo, duration:', d);
                             },
                             onStateChange: (event) => {
                                 console.log('[Alvora] state:', event.data);
-                                if (!window._alvoraPlayer) return;
+                                const vm = window._alvoraPlayer;
+                                if (!vm) return;
                                 if (event.data === 1) {
-                                    window._alvoraPlayer.isPlaying = true;
-                                    window._alvoraPlayer.startYTTicker();
+                                    vm.isPlaying = true;
+                                    vm.startYTTicker();
                                 } else if (event.data === 2) {
-                                    window._alvoraPlayer.isPlaying = false;
-                                    window._alvoraPlayer.stopYTTicker();
+                                    vm.isPlaying = false;
+                                    vm.stopYTTicker();
                                 } else if (event.data === 0) {
-                                    window._alvoraPlayer.isPlaying = false;
-                                    window._alvoraPlayer.stopYTTicker();
-                                    window._alvoraPlayer.currentLessonPercent = 100;
-                                    if (!window._alvoraPlayer.isCompleted) {
-                                        window._alvoraPlayer.$wire.toggleComplete();
+                                    vm.isPlaying = false;
+                                    vm.stopYTTicker();
+                                    vm.currentLessonPercent = 100;
+                                    if (!vm.isCompleted) {
+                                        vm.$wire.toggleComplete();
                                     }
                                 }
                             }
