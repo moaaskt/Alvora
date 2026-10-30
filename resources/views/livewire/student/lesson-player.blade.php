@@ -1,24 +1,93 @@
 <div class="w-full"
      x-data="{
-        currentLessonPercent: @entangle('currentLessonPercent'),
-        isCompleted: @entangle('isCompleted'),
+        currentLessonPercent: 0,
+        isCompleted: {{ $isCompleted ? 'true' : 'false' }},
         lastReportedPercent: 0,
         ytPlayer: null,
-        ytPollInterval: null,
+        ytTicker: null,
         vimeoPlayer: null,
+        ytDuration: {{ (int) (($currentLesson->duration_minutes ?? 10) * 60) }},
+        isPlaying: false,
 
         init() {
-            this.$nextTick(() => this.initPlayer());
-            window.addEventListener('message', this.handleYTMessage.bind(this));
+            window._alvoraPlayer = this;
+
+            window.initYT = () => {
+                if (!window._alvoraPlayer) return;
+                const container = document.getElementById('alvora-yt-iframe');
+                if (!container) return;
+                if (window._alvoraPlayer.ytPlayer) {
+                    try { window._alvoraPlayer.ytPlayer.destroy(); } catch(e) {}
+                    window._alvoraPlayer.ytPlayer = null;
+                }
+                try {
+                    const player = new window.YT.Player('alvora-yt-iframe', {
+                        videoId: container.dataset.videoId,
+                        playerVars: {
+                            rel: 0,
+                            modestbranding: 1,
+                            origin: window.location.origin,
+                        },
+                        events: {
+                            onReady: (event) => {
+                                console.log('[Alvora] onReady!');
+                                const d = event.target.getDuration();
+                                const vm = window._alvoraPlayer;
+                                if (!vm) return;
+                                // Sempre substitui — garante que é o player atual
+                                vm.ytPlayer = player;
+                                if (d > 0) vm.ytDuration = d;
+                                console.log('[Alvora] player salvo, duration:', d);
+                            },
+                            onStateChange: (event) => {
+                                console.log('[Alvora] state:', event.data);
+                                const vm = window._alvoraPlayer;
+                                if (!vm) return;
+                                if (event.data === 1) {
+                                    vm.isPlaying = true;
+                                    vm.startYTTicker();
+                                } else if (event.data === 2) {
+                                    vm.isPlaying = false;
+                                    vm.stopYTTicker();
+                                } else if (event.data === 0) {
+                                    vm.isPlaying = false;
+                                    vm.stopYTTicker();
+                                    vm.currentLessonPercent = 100;
+                                    if (!vm.isCompleted) {
+                                        vm.$wire.toggleComplete();
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.warn('[Alvora YT] Erro initYT:', e);
+                }
+            };
+
+            const prevYTReady = window.onYouTubeIframeAPIReady;
+            window.onYouTubeIframeAPIReady = () => {
+                if (typeof prevYTReady === 'function') prevYTReady();
+                window.initYT();
+            };
+
+            if (window.YT && window.YT.Player) {
+                window.initYT();
+            }
+
+            this.$nextTick(() => {
+                this.initPlayer();
+                if (window.YT && window.YT.Player) {
+                    window.initYT();
+                }
+            });
         },
 
         initPlayer() {
             this.cleanup();
-            const ytIframe = document.getElementById('alvora-yt-iframe');
-            if (ytIframe) {
-                this.setupYouTube(ytIframe);
-                return;
-            }
+            this.currentLessonPercent = 0;
+            this.lastReportedPercent = 0;
+
             const vimeoIframe = document.getElementById('alvora-vimeo-iframe');
             if (vimeoIframe) {
                 this.setupVimeo(vimeoIframe);
@@ -26,94 +95,37 @@
             }
         },
 
-        setupYouTube(iframe) {
-            const initYT = () => {
-                try {
-                    if (window.YT && window.YT.Player) {
-                        this.ytPlayer = new window.YT.Player('alvora-yt-iframe', {
-                            events: {
-                                onStateChange: (event) => {
-                                    if (event.data === 1) { // PLAYING
-                                        this.startYTPolling();
-                                    } else {
-                                        this.stopYTPolling();
-                                    }
-                                    if (event.data === 0) { // ENDED
-                                        this.currentLessonPercent = 100;
-                                        if (!this.isCompleted) {
-                                            $wire.toggleComplete();
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
-                } catch (e) {
-                    console.warn('YT player init:', e);
-                }
-            };
-
-            if (!window.YT || !window.YT.Player) {
-                if (!document.getElementById('yt-iframe-api')) {
-                    const tag = document.createElement('script');
-                    tag.id = 'yt-iframe-api';
-                    tag.src = 'https://www.youtube.com/iframe_api';
-                    document.head.appendChild(tag);
-                }
-                const oldCallback = window.onYouTubeIframeAPIReady;
-                window.onYouTubeIframeAPIReady = () => {
-                    if (typeof oldCallback === 'function') oldCallback();
-                    initYT();
-                };
-            } else {
-                initYT();
-            }
-        },
-
-        startYTPolling() {
-            this.stopYTPolling();
-            this.ytPollInterval = setInterval(() => {
-                if (this.ytPlayer && typeof this.ytPlayer.getCurrentTime === 'function') {
+        startYTTicker() {
+            this.stopYTTicker();
+            this.ytTicker = setInterval(() => {
+                const player = this.ytPlayer || (window._alvoraPlayer && window._alvoraPlayer.ytPlayer);
+                if (player && typeof player.getCurrentTime === 'function') {
                     try {
-                        const current = this.ytPlayer.getCurrentTime() || 0;
-                        const duration = this.ytPlayer.getDuration() || 0;
+                        const current = player.getCurrentTime() || 0;
+                        const duration = player.getDuration() || this.ytDuration || 1;
                         if (duration > 0) {
-                            const pct = Math.min(100, Math.round((current / duration) * 100));
-                            this.currentLessonPercent = pct;
-                            if (pct >= this.lastReportedPercent + 5 || (pct >= 90 && this.lastReportedPercent < 90)) {
-                                this.lastReportedPercent = pct;
-                                $wire.updateLessonProgress(Math.round(current), pct);
-                            }
+                            this.calcAndApplyProgress(current, duration);
                         }
                     } catch (e) {}
                 }
             }, 250);
         },
 
-        stopYTPolling() {
-            if (this.ytPollInterval) {
-                clearInterval(this.ytPollInterval);
-                this.ytPollInterval = null;
+        stopYTTicker() {
+            if (this.ytTicker) {
+                clearInterval(this.ytTicker);
+                this.ytTicker = null;
             }
         },
 
-        handleYTMessage(event) {
-            if (!event || !event.data) return;
-            try {
-                const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-                if (data.event === 'infoDelivery' && data.info) {
-                    const current = data.info.currentTime;
-                    const duration = data.info.duration;
-                    if (current !== undefined && duration !== undefined && duration > 0) {
-                        const pct = Math.min(100, Math.round((current / duration) * 100));
-                        this.currentLessonPercent = pct;
-                        if (pct >= this.lastReportedPercent + 5 || (pct >= 90 && this.lastReportedPercent < 90)) {
-                            this.lastReportedPercent = pct;
-                            $wire.updateLessonProgress(Math.round(current), pct);
-                        }
-                    }
-                }
-            } catch (e) {}
+        calcAndApplyProgress(current, duration) {
+            const pct = Math.min(100, Math.round((current / duration) * 100));
+            this.currentLessonPercent = pct;
+
+            if (pct >= this.lastReportedPercent + 5 || (pct >= 90 && this.lastReportedPercent < 90)) {
+                this.lastReportedPercent = pct;
+                $wire.updateLessonProgress(Math.round(current), pct);
+            }
         },
 
         setupVimeo(iframe) {
@@ -167,7 +179,7 @@
         },
 
         cleanup() {
-            this.stopYTPolling();
+            this.stopYTTicker();
             if (this.ytPlayer) {
                 try {
                     if (typeof this.ytPlayer.destroy === 'function') {
@@ -267,7 +279,7 @@
         <div class="flex-1 w-full min-w-0">
             {{-- Video / Media Area (16:9, rounded-2xl, native controls only) --}}
             <div wire:key="media-player-container-{{ $currentLesson->id ?? 0 }}"
-                 x-init="$nextTick(() => initPlayer())"
+                 x-init="$nextTick(() => { initPlayer(); if (window.initYT && window.YT && window.YT.Player) window.initYT(); })"
                  class="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-card flex items-center justify-center border border-edtech-border/60">
                 @if ($currentLesson && $currentLesson->video_url)
                     @php
@@ -288,13 +300,9 @@
 
                     @if ($isYoutube)
                         @if ($youtubeId)
-                            <iframe id="alvora-yt-iframe"
-                                    class="w-full h-full"
-                                    src="https://www.youtube-nocookie.com/embed/{{ $youtubeId }}?rel=0&modestbranding=1&enablejsapi=1&origin={{ urlencode(request()->getSchemeAndHttpHost()) }}"
-                                    title="{{ $currentLesson->title }}"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                    allowfullscreen></iframe>
+                            <div id="alvora-yt-iframe"
+                                 class="w-full h-full"
+                                 data-video-id="{{ $youtubeId }}"></div>
                         @else
                             <div class="text-center p-8 space-y-2 text-slate-300">
                                 <x-icon name="alert-triangle" class="w-8 h-8 text-edtech-amber mx-auto" />

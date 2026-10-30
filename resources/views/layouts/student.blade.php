@@ -23,6 +23,7 @@
 
     <!-- Scripts & Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://www.youtube.com/iframe_api"></script>
     @livewireStyles
 </head>
 <body class="min-h-screen flex flex-col bg-edtech-bg text-edtech-text font-sans antialiased relative selection:bg-edtech-blue selection:text-white">
