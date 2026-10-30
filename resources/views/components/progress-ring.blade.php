@@ -18,7 +18,7 @@
     {{-- Background Track --}}
     <circle cx="12" cy="12" r="{{ $radius }}" stroke="var(--color-edtech-blue-border, #BFDBFE)" stroke-width="2.5" fill="none" class="stroke-edtech-blue-border" />
 
-    {{-- Progress Arc (rotates from 12 o'clock clockwise) --}}
+    {{-- Progress Arc (rotates from 12 o'clock clockwise as video advances) --}}
     @if ($alpineModel)
         <circle cx="12" cy="12" r="{{ $radius }}"
                 stroke="var(--color-edtech-blue, #2563EB)"
@@ -28,7 +28,7 @@
                 stroke-dasharray="{{ $circumference }}"
                 :stroke-dashoffset="{{ $circumference }} * (1 - (Math.min(100, Math.max(0, {{ $alpineModel }})) / 100))"
                 transform="rotate(-90 12 12)"
-                x-show="{{ $alpineModel }} > 0"
+                :class="{{ $alpineModel }} > 0 ? 'opacity-100' : 'opacity-0'"
                 class="stroke-edtech-blue transition-all duration-200" />
     @else
         @if ($pct > 0)
