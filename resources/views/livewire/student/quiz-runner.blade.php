@@ -27,17 +27,11 @@
         </section>
 
         <!-- Flash Warnings / Notifications -->
-        @if (session('warning'))
-            <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-[14px] flex items-center justify-between shadow-xs">
-                <div class="flex items-center gap-2.5">
-                    <x-icon name="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0" />
-                    <span class="font-medium">{{ session('warning') }}</span>
-                </div>
-                <button type="button" @click="$el.parentElement.remove()" class="p-1 text-amber-700 hover:text-amber-950 rounded-lg transition-colors cursor-pointer" aria-label="Fechar">
-                    <x-icon name="x" class="w-4 h-4" />
-                </button>
-            </div>
-        @endif
+        <div x-data x-init="
+            @if(session('success')) AlvoraSwal.fire({ icon: 'success', title: 'Pronto!', text: '{{ session('success') }}', toast: true, position: 'top-end', timer: 2500, timerProgressBar: true, showConfirmButton: false }); @endif
+            @if(session('error')) AlvoraSwal.fire({ icon: 'error', title: 'Erro', text: '{{ session('error') }}', confirmButtonText: 'Fechar' }); @endif
+            @if(session('warning')) AlvoraSwal.fire({ icon: 'warning', title: 'Atenção', text: '{{ session('warning') }}', confirmButtonText: 'Entendi' }); @endif
+        "></div>
 
         <!-- 2. RESULT BANNER (Rendered only after submission) -->
         @if ($submitted)
