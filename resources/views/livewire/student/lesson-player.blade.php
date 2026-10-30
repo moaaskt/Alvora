@@ -90,41 +90,11 @@
     </div>
 
     {{-- 2. FLASH NOTIFICATIONS (Dismissible) --}}
-    @if (session('success'))
-        <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center justify-between shadow-xs">
-            <div class="flex items-center gap-2.5">
-                <x-icon name="check-circle" class="w-4 h-4 text-alvora-emerald shrink-0" />
-                <span class="font-medium">{{ session('success') }}</span>
-            </div>
-            <button type="button" @click="$el.parentElement.remove()" class="p-1 text-emerald-700 hover:text-emerald-950 rounded-lg transition-colors cursor-pointer" title="Fechar notificação">
-                <x-icon name="x" class="w-4 h-4" />
-            </button>
-        </div>
-    @endif
-
-    @if (session('warning'))
-        <div class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-center justify-between shadow-xs">
-            <div class="flex items-center gap-2.5">
-                <x-icon name="alert-triangle" class="w-4 h-4 text-edtech-amber shrink-0" />
-                <span class="font-medium">{{ session('warning') }}</span>
-            </div>
-            <button type="button" @click="$el.parentElement.remove()" class="p-1 text-amber-700 hover:text-amber-950 rounded-lg transition-colors cursor-pointer" title="Fechar notificação">
-                <x-icon name="x" class="w-4 h-4" />
-            </button>
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-center justify-between shadow-xs">
-            <div class="flex items-center gap-2.5">
-                <x-icon name="alert-triangle" class="w-4 h-4 text-rose-600 shrink-0" />
-                <span class="font-medium">{{ session('error') }}</span>
-            </div>
-            <button type="button" @click="$el.parentElement.remove()" class="p-1 text-rose-700 hover:text-rose-950 rounded-lg transition-colors cursor-pointer" title="Fechar notificação">
-                <x-icon name="x" class="w-4 h-4" />
-            </button>
-        </div>
-    @endif
+    <div x-data x-init="
+        @if(session('success')) AlvoraSwal.fire({ icon: 'success', title: 'Pronto!', text: '{{ session('success') }}', toast: true, position: 'top-end', timer: 2500, timerProgressBar: true, showConfirmButton: false }); @endif
+        @if(session('error')) AlvoraSwal.fire({ icon: 'error', title: 'Erro', text: '{{ session('error') }}', confirmButtonText: 'Fechar' }); @endif
+        @if(session('warning')) AlvoraSwal.fire({ icon: 'warning', title: 'Atenção', text: '{{ session('warning') }}', confirmButtonText: 'Entendi' }); @endif
+    "></div>
 
     {{-- 3. TWO-COLUMN WORKSPACE (Left: Player & Tabs, Right: Curriculum Sidebar) --}}
     <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
