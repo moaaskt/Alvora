@@ -14,16 +14,20 @@
 
             window.initYT = () => {
                 if (!window._alvoraPlayer) return;
-                const iframe = document.getElementById('alvora-yt-iframe');
-                if (!iframe) return;
-
+                const container = document.getElementById('alvora-yt-iframe');
+                if (!container) return;
                 if (window._alvoraPlayer.ytPlayer) {
                     try { window._alvoraPlayer.ytPlayer.destroy(); } catch(e) {}
                     window._alvoraPlayer.ytPlayer = null;
                 }
-
                 try {
-                    const player = new window.YT.Player(iframe, {
+                    const player = new window.YT.Player('alvora-yt-iframe', {
+                        videoId: container.dataset.videoId,
+                        playerVars: {
+                            rel: 0,
+                            modestbranding: 1,
+                            origin: window.location.origin,
+                        },
                         events: {
                             onReady: (event) => {
                                 console.log('[Alvora] onReady!');
@@ -51,8 +55,6 @@
                             }
                         }
                     });
-
-                    console.log('[Alvora] player criado:', player);
                 } catch (e) {
                     console.warn('[Alvora YT] Erro initYT:', e);
                 }
@@ -91,10 +93,11 @@
         startYTTicker() {
             this.stopYTTicker();
             this.ytTicker = setInterval(() => {
-                if (this.ytPlayer && typeof this.ytPlayer.getCurrentTime === 'function') {
+                const player = this.ytPlayer || (window._alvoraPlayer && window._alvoraPlayer.ytPlayer);
+                if (player && typeof player.getCurrentTime === 'function') {
                     try {
-                        const current = this.ytPlayer.getCurrentTime() || 0;
-                        const duration = this.ytPlayer.getDuration() || this.ytDuration || 1;
+                        const current = player.getCurrentTime() || 0;
+                        const duration = player.getDuration() || this.ytDuration || 1;
                         if (duration > 0) {
                             this.calcAndApplyProgress(current, duration);
                         }
@@ -292,13 +295,9 @@
 
                     @if ($isYoutube)
                         @if ($youtubeId)
-                            <iframe id="alvora-yt-iframe"
-                                    class="w-full h-full"
-                                    src="https://www.youtube.com/embed/{{ $youtubeId }}?enablejsapi=1&origin={{ request()->getSchemeAndHttpHost() }}&widget_referrer={{ request()->getSchemeAndHttpHost() }}&rel=0&modestbranding=1"
-                                    title="{{ $currentLesson->title }}"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                    allowfullscreen></iframe>
+                            <div id="alvora-yt-iframe"
+                                 class="w-full h-full"
+                                 data-video-id="{{ $youtubeId }}"></div>
                         @else
                             <div class="text-center p-8 space-y-2 text-slate-300">
                                 <x-icon name="alert-triangle" class="w-8 h-8 text-edtech-amber mx-auto" />
