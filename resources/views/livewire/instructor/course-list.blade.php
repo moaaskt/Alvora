@@ -265,9 +265,7 @@
 
                                         <div class="my-1 border-t border-slate-100"></div>
 
-                                        <button wire:click="deleteCourse({{ $course->id }})" 
-                                                wire:confirm="Tem certeza de que deseja remover o curso '{{ $course->title }}'? Todos os módulos e lições serão excluídos."
-                                                @click="open = false"
+                                        <button x-on:click="open = false; AlvoraSwal.fire({ icon: 'warning', title: 'Tem certeza?', text: 'Tem certeza de que deseja remover o curso \'{{ $course->title }}\'? Todos os módulos e lições serão excluídos.', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'Sim, excluir', cancelButtonText: 'Cancelar' }).then(r => { if (r.isConfirmed) $wire.deleteCourse({{ $course->id }}) })" 
                                                 type="button" 
                                                 class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-rose-600 hover:bg-rose-50 transition-colors font-medium text-left">
                                             <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
