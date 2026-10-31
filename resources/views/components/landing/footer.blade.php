@@ -1,6 +1,19 @@
-<footer class="bg-edtech-navy text-white pt-14 sm:pt-16 pb-12 border-t border-edtech-navy-soft">
-    <div class="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-16">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 pb-12 sm:pb-14 border-b border-edtech-navy-soft">
+<footer class="relative bg-[#020B24] text-white pt-14 sm:pt-16 pb-12 border-t border-slate-800/80 overflow-hidden">
+    <!-- Background Image & Ambient Glow -->
+    <div class="absolute inset-0 pointer-events-none select-none z-0">
+        <img src="{{ asset('images/img-footer.png') }}"
+             alt=""
+             role="presentation"
+             aria-hidden="true"
+             class="w-full h-full object-cover object-center"
+             loading="lazy"
+             decoding="async">
+        <!-- Overlay gradual para acabamento e legibilidade do conteúdo -->
+        <div class="absolute inset-0 bg-gradient-to-b from-[#020B24]/80 via-transparent to-[#020B24]/75"></div>
+    </div>
+
+    <div class="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 pb-12 sm:pb-14 border-b border-white/10">
 
             <!-- COL 1: Brand & Overview (dark background logo) -->
             <div>
@@ -53,7 +66,7 @@
                 <p class="text-base text-slate-400 leading-[1.6] mb-4">
                     Sua empresa já é parceira Alvora? Acesse o portal do colaborador ou gestor de RH.
                 </p>
-                <a href="{{ route('login') }}" class="inline-flex items-center justify-center w-full py-3 px-4 rounded-xl bg-edtech-navy-soft hover:bg-edtech-blue text-white text-sm font-semibold transition-colors border border-alvora-border">
+                <a href="{{ route('login') }}" class="inline-flex items-center justify-center w-full py-3 px-4 rounded-xl bg-white/10 hover:bg-edtech-blue text-white text-sm font-semibold transition-all duration-200 border border-white/15 backdrop-blur-sm shadow-sm hover:border-transparent">
                     Entrar na Plataforma
                 </a>
             </div>

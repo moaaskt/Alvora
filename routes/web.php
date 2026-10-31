@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BillingReturnController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\PublicCourseController;
 use App\Livewire\Admin\AdminBilling;
 use App\Livewire\Admin\CategoryManager;
 use App\Livewire\Admin\CourseManager;
@@ -73,6 +74,9 @@ Route::get('/', function () {
         'featuredTracks' => $featuredTracks,
     ]);
 })->name('home');
+
+// Detalhes Públicos do Treinamento Corporativo (Sem exigência de login)
+Route::get('/cursos/{slug}', [PublicCourseController::class, 'show'])->name('courses.public.show');
 
 Route::get('/planos', function () {
     return view('pricing');
