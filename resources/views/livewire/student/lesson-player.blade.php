@@ -52,14 +52,18 @@
                 });
             };
 
-            // UMA SÓ chamada — via callback quando API pronta, ou direto se já carregou
+            // UMA SÓ chamada — apenas se ainda não existir player ativo
             if (window.YT && window.YT.Player) {
-                window.initYT();
+                if (!window._alvoraPlayer.ytPlayer) {
+                    window.initYT();
+                }
             } else {
                 const prev = window.onYouTubeIframeAPIReady;
                 window.onYouTubeIframeAPIReady = () => {
                     if (typeof prev === 'function') prev();
-                    window.initYT();
+                    if (!window._alvoraPlayer || !window._alvoraPlayer.ytPlayer) {
+                        window.initYT();
+                    }
                 };
             }
 
@@ -259,6 +263,7 @@
         <div class="flex-1 w-full min-w-0">
             {{-- Video / Media Area (16:9, rounded-2xl, native controls only) --}}
             <div wire:key="media-player-container-{{ $currentLesson->id ?? 0 }}"
+                 wire:ignore
                  class="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-card flex items-center justify-center border border-edtech-border/60">
                 @if ($currentLesson && $currentLesson->video_url)
                     @php
