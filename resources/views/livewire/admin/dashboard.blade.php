@@ -162,8 +162,8 @@
                     @forelse($recentCourses as $course)
                         <div class="p-4 flex items-center justify-between gap-4 hover:bg-slate-50/60 transition-colors">
                             <div class="flex items-center gap-3 min-w-0">
-                                @if($course->thumbnail)
-                                    <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="{{ $course->title }}" class="w-12 h-10 object-cover rounded-lg border border-slate-200 shrink-0">
+                                @if($course->thumbnail_url)
+                                    <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}" class="w-12 h-10 object-cover rounded-lg border border-slate-200 shrink-0">
                                 @else
                                     <div class="w-12 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 font-bold text-xs shrink-0">
                                         ALV
