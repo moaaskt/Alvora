@@ -130,8 +130,20 @@
         <x-landing.footer />
     @else
         <!-- Footer Corporativo (Dark) -->
-        <footer class="bg-[#0B1120] border-t border-slate-800/80 text-slate-400 text-sm mt-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        <footer class="relative bg-[#020B24] border-t border-slate-800/80 text-slate-400 text-sm mt-20 overflow-hidden">
+            <!-- Background Image & Ambient Glow -->
+            <div class="absolute inset-0 pointer-events-none select-none z-0">
+                <img src="{{ asset('images/img-footer.png') }}"
+                     alt=""
+                     role="presentation"
+                     aria-hidden="true"
+                     class="w-full h-full object-cover object-center"
+                     loading="lazy"
+                     decoding="async">
+                <div class="absolute inset-0 bg-gradient-to-b from-[#020B24]/80 via-transparent to-[#020B24]/75"></div>
+            </div>
+
+            <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
                     <div class="space-y-4 md:col-span-1">
                         <div class="flex items-center space-x-3">
