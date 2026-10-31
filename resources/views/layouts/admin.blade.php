@@ -148,14 +148,10 @@
             <div class="flex items-center gap-space-sm">
                 <nav class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant">
                     <a class="hover:text-on-surface transition-colors" href="{{ route('admin.dashboard') }}">Home</a>
-                    <svg class="w-3.5 h-3.5 text-secondary shrink-0 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path d="m8.25 4.5 7.5 7.5-7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                    </svg>
+                    <x-icon name="chevron-right" class="w-3.5 h-3.5 text-secondary shrink-0" />
                     <span class="text-slate-600">Painel do Administrador</span>
                     @if(isset($breadcrumb) && $breadcrumb)
-                        <svg class="w-3.5 h-3.5 text-secondary shrink-0 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="m8.25 4.5 7.5 7.5-7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                        </svg>
+                        <x-icon name="chevron-right" class="w-3.5 h-3.5 text-secondary shrink-0" />
                         <span class="text-on-surface font-semibold">{{ $breadcrumb }}</span>
                     @endif
                 </nav>
@@ -183,9 +179,7 @@
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
                     <button type="submit" class="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="Encerrar Sessão">
-                        <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H3.75"></path>
-                        </svg>
+                        <x-icon name="box-arrow-right" class="w-4 h-4" />
                     </button>
                 </form>
             </div>

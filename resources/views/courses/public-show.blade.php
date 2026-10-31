@@ -709,17 +709,29 @@
 
                             <article class="group bg-white rounded-xl border border-slate-200/80 shadow-2xs hover:-translate-y-1 hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col justify-between">
                                 <div>
-                                    {{-- Banner Cover --}}
-                                    <div class="h-36 overflow-hidden relative bg-slate-900">
-                                        <div class="w-full h-full bg-gradient-to-br {{ $meta['gradient'] }} p-5 flex flex-col justify-between text-white transition-transform duration-300 group-hover:scale-105">
+                                    {{-- Banner Cover with Course Thumbnail or Gradient Fallback --}}
+                                    <div class="h-40 overflow-hidden relative bg-slate-900">
+                                        @if($relCourse->thumbnail_url)
+                                            <img src="{{ $relCourse->thumbnail_url }}"
+                                                 alt="{{ $relCourse->title }}"
+                                                 loading="lazy"
+                                                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-slate-950/30"></div>
+                                        @else
+                                            <div class="w-full h-full bg-gradient-to-br {{ $meta['gradient'] }} transition-transform duration-300 group-hover:scale-105"></div>
+                                        @endif
+
+                                        <div class="absolute inset-0 p-4.5 flex flex-col justify-between text-white z-10">
                                             <div class="flex justify-between items-start">
-                                                <p class="text-xs font-semibold uppercase tracking-wider text-slate-200">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-black/50 backdrop-blur-md text-white border border-white/20">
                                                     {{ $relCourse->category->name ?? $meta['category'] }}
-                                                </p>
-                                                <img src="{{ asset('images/logo-symbol.png') }}" width="20" height="16" alt="Alvora" class="h-3.5 w-auto opacity-75 shrink-0">
+                                                </span>
+                                                <img src="{{ asset('images/logo-symbol.png') }}" width="18" height="14" alt="Alvora" class="h-3.5 w-auto opacity-85 shrink-0 drop-shadow">
                                             </div>
-                                            <h3 class="text-base font-semibold text-white leading-tight line-clamp-2">
-                                                {{ $relCourse->title }}
+                                            <h3 class="text-sm sm:text-base font-bold text-white leading-tight line-clamp-2 drop-shadow-md">
+                                                <a href="{{ route('courses.public.show', $relCourse->slug) }}" class="hover:underline">
+                                                    {{ $relCourse->title }}
+                                                </a>
                                             </h3>
                                         </div>
                                     </div>

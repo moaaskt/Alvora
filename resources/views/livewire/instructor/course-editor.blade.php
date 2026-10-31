@@ -4,9 +4,7 @@
         <div class="flex items-center gap-2">
             <a href="{{ route('instructor.courses.index') }}" 
                class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
-                <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"></path>
-                </svg>
+                <x-icon name="arrow-left" class="w-3.5 h-3.5" />
                 <span>Voltar aos Cursos</span>
             </a>
             <span class="text-slate-300">/</span>
@@ -63,9 +61,7 @@
             @if($courseId)
                 <a href="{{ route('instructor.courses.curriculum', $courseId) }}" 
                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-colors text-xs font-semibold border border-slate-200 shadow-2xs">
-                    <svg class="w-4 h-4 text-slate-500 shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"></path>
-                    </svg>
+                    <x-icon name="collection-play" class="w-4 h-4 text-slate-500 shrink-0" />
                     <span>Grade Curricular</span>
                 </a>
             @endif
@@ -75,9 +71,7 @@
                     wire:loading.attr="disabled"
                     class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all text-xs font-semibold shadow-sm cursor-pointer disabled:opacity-50">
                 <span wire:loading.remove wire:target="save" class="flex items-center gap-1.5">
-                    <svg class="w-4 h-4 shrink-0 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path>
-                    </svg>
+                    <x-icon name="check-lg" class="w-4 h-4 shrink-0" />
                     <span>{{ $courseId ? 'Salvar Alterações' : 'Criar Curso' }}</span>
                 </span>
                 <span wire:loading wire:target="save" class="flex items-center gap-1.5">
@@ -172,9 +166,7 @@
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
-                                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path>
-                                </svg>
+                                <x-icon name="file-earmark-text" class="w-4 h-4" />
                             </div>
                             <div>
                                 <h2 class="text-sm font-semibold text-slate-800">Dados Gerais do Treinamento</h2>
@@ -217,9 +209,7 @@
                                         @endforeach
                                     @endforeach
                                 </select>
-                                <svg class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path d="m19.5 8.25-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                </svg>
+                                <x-icon name="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                             </div>
                             @error('category_id')
                                 <span class="text-rose-500 text-xs">{{ $message }}</span>
@@ -239,9 +229,7 @@
                                         <option value="{{ $inst->id }}">{{ $inst->name }} ({{ $inst->email }})</option>
                                     @endforeach
                                 </select>
-                                <svg class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path d="m19.5 8.25-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                </svg>
+                                <x-icon name="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                             </div>
                             @error('instructor_id')
                                 <span class="text-rose-500 text-xs">{{ $message }}</span>
@@ -256,9 +244,7 @@
                                 Descrição Completa e Objetivos Pedagógicos
                             </label>
                             <span class="inline-flex items-center gap-1 text-[11px] text-blue-600 font-medium">
-                                <svg class="w-3.5 h-3.5 text-blue-600 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z"></path>
-                                </svg>
+                                <x-icon name="stars" class="w-3.5 h-3.5 text-blue-600" />
                                 <span>Assistente Alvora IA Habilitado</span>
                             </span>
                         </div>
@@ -270,14 +256,10 @@
                                 <span class="p-1 rounded underline text-xs select-none">U</span>
                                 <span class="w-px h-4 bg-slate-200 mx-1"></span>
                                 <span class="p-1 rounded text-xs select-none flex items-center">
-                                    <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"></path>
-                                    </svg>
+                                    <x-icon name="list-ul" class="w-3.5 h-3.5" />
                                 </span>
                                 <span class="p-1 rounded text-xs select-none flex items-center">
-                                    <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"></path>
-                                    </svg>
+                                    <x-icon name="link-45deg" class="w-3.5 h-3.5" />
                                 </span>
                                 <span class="w-px h-4 bg-slate-200 mx-1"></span>
                                 <span class="text-[11px] text-slate-400 ml-auto font-mono">Texto & Markdown Suportado</span>
@@ -309,9 +291,7 @@
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm">
-                                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
-                                </svg>
+                                <x-icon name="check2-circle" class="w-4 h-4" />
                             </div>
                             <div>
                                 <h2 class="text-sm font-semibold text-slate-800">Objetivos de Aprendizagem & Competências</h2>
@@ -351,9 +331,7 @@
                 @if($errors->any())
                     <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex flex-col gap-1 shadow-xs">
                         <span class="font-bold flex items-center gap-1.5 text-rose-700">
-                            <svg class="w-4 h-4 shrink-0 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 7.5h.008v.008H12v-.008Z"></path>
-                            </svg>
+                            <x-icon name="exclamation-triangle" class="w-4 h-4 shrink-0" />
                             Não foi possível salvar o treinamento. Verifique as pendências:
                         </span>
                         <ul class="list-disc list-inside space-y-0.5 mt-1 text-rose-700 font-medium">
@@ -373,9 +351,7 @@
                             wire:loading.attr="disabled"
                             class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all text-xs font-semibold shadow-sm cursor-pointer disabled:opacity-50 shrink-0">
                         <span wire:loading.remove wire:target="save" class="flex items-center gap-1.5">
-                            <svg class="w-4 h-4 shrink-0 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path>
-                            </svg>
+                            <x-icon name="check-lg" class="w-4 h-4 shrink-0" />
                             <span>{{ $courseId ? 'Salvar Alterações' : 'Criar Curso' }}</span>
                         </span>
                         <span wire:loading wire:target="save" class="flex items-center gap-1.5">
@@ -408,9 +384,7 @@
                             </div>
                         @else
                             <div class="flex flex-col items-center justify-center text-slate-400 gap-1">
-                                <svg class="w-8 h-8 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"></path>
-                                </svg>
+                                <x-icon name="image" class="w-8 h-8 text-slate-400" />
                                 <span class="text-xs font-semibold">Sem Imagem de Capa</span>
                             </div>
                         @endif
@@ -439,9 +413,7 @@
                     <!-- Box IA Copilot Insights do Stitch -->
                     <div class="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200/80 flex flex-col gap-2">
                         <div class="flex items-center gap-1.5 text-blue-700 text-xs font-semibold">
-                            <svg class="w-4 h-4 text-blue-600 shrink-0 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z"></path>
-                            </svg>
+                            <x-icon name="stars" class="w-4 h-4 text-blue-600 shrink-0" />
                             <span>Alvora Copilot Insights</span>
                         </div>
                         <p class="text-xs text-slate-600 leading-relaxed">
@@ -513,9 +485,7 @@
 
                 <a href="{{ route('instructor.courses.quizzes.create', $courseId) }}" 
                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-colors shadow-sm self-start sm:self-auto">
-                    <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
-                    </svg>
+                    <x-icon name="plus-lg" class="w-4 h-4" />
                     <span>Nova Avaliação</span>
                 </a>
             </div>
@@ -523,9 +493,7 @@
             @if(!$course || $course->quizzes->isEmpty())
                 <div class="p-12 text-center rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
                     <div class="w-12 h-12 mx-auto rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                        <svg class="w-6 h-6 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"></path>
-                        </svg>
+                        <x-icon name="journal-text" class="w-6 h-6 text-blue-600" />
                     </div>
                     <h3 class="text-sm font-semibold text-slate-800">Nenhuma avaliação cadastrada</h3>
                     <p class="text-xs text-slate-500 max-w-md mx-auto">
@@ -566,9 +534,7 @@
                                     <button x-on:click="AlvoraSwal.fire({ icon: 'warning', title: 'Tem certeza?', text: 'Tem certeza de que deseja excluir a avaliação \'{{ $quiz->title }}\'?', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'Sim, excluir', cancelButtonText: 'Cancelar' }).then(r => { if (r.isConfirmed) $wire.deleteQuiz({{ $quiz->id }}) })" 
                                             type="button" 
                                             class="p-1 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors">
-                                        <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"></path>
-                                        </svg>
+                                        <x-icon name="trash3" class="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>

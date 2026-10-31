@@ -28,17 +28,11 @@
             <!-- Breadcrumbs -->
             <nav class="flex items-center text-xs font-medium text-slate-500 gap-2">
                 <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition-colors">Home</a>
-                <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
+                <x-icon name="chevron-right" class="w-3.5 h-3.5 text-slate-300" />
                 <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition-colors">Painel do Administrador</a>
-                <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
+                <x-icon name="chevron-right" class="w-3.5 h-3.5 text-slate-300" />
                 <span class="text-slate-900 font-semibold">Matrículas</span>
-                <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
+                <x-icon name="chevron-right" class="w-3.5 h-3.5 text-slate-300" />
                 <span class="text-blue-600 font-semibold">Histórico de Matrículas</span>
             </nav>
 
@@ -412,17 +406,11 @@
             <!-- Breadcrumbs -->
             <nav class="flex items-center text-xs font-medium text-slate-500 gap-2">
                 <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition-colors">Home</a>
-                <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
+                <x-icon name="chevron-right" class="w-3.5 h-3.5 text-slate-300" />
                 <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition-colors">Painel do Administrador</a>
-                <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
+                <x-icon name="chevron-right" class="w-3.5 h-3.5 text-slate-300" />
                 <a href="{{ route('admin.enrollments.index') }}" wire:click.prevent="switchToHistory" class="hover:text-blue-600 transition-colors">Matrículas</a>
-                <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
+                <x-icon name="chevron-right" class="w-3.5 h-3.5 text-slate-300" />
                 <span class="text-blue-600 font-semibold">Nova Matrícula</span>
             </nav>
 

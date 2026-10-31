@@ -5,17 +5,11 @@
         <!-- Breadcrumb -->
         <nav class="flex items-center text-xs font-medium text-slate-500 gap-2">
             <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition-colors">Home</a>
-            <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
+            <x-icon name="chevron-right" class="w-3.5 h-3.5 text-slate-300" />
             <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition-colors">Painel do Administrador</a>
-            <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
+            <x-icon name="chevron-right" class="w-3.5 h-3.5 text-slate-300" />
             <span class="text-slate-500">Usuários</span>
-            <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
+            <x-icon name="chevron-right" class="w-3.5 h-3.5 text-slate-300" />
             <span class="text-slate-900 font-semibold">{{ $roleTitle }}</span>
         </nav>
 
@@ -42,9 +36,7 @@
             <button wire:click="exportCsv" 
                     type="button" 
                     class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all shadow-2xs cursor-pointer">
-                <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-                </svg>
+                <x-icon name="upload" class="w-4 h-4 text-slate-500" />
                 <span>Exportar CSV</span>
             </button>
 
@@ -52,9 +44,7 @@
             <button wire:click="openCreateModal" 
                     type="button" 
                     class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:bg-blue-800 transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
-                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
+                <x-icon name="plus-lg" class="w-4 h-4 text-white" />
                 <span>Adicionar Novo {{ rtrim($roleTitle, 'es') === 'Estudant' ? 'Estudante' : (rtrim($roleTitle, 'res') === 'Administrado' ? 'Administrador' : (rtrim($roleTitle, 'es') === 'Instrutor' ? 'Instrutor' : 'Usuário')) }}</span>
             </button>
         </div>
@@ -65,14 +55,12 @@
         <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-slate-800 text-sm shadow-2xs">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+                    <x-icon name="check-circle-fill" class="w-4 h-4 text-emerald-600" />
                 </div>
                 <span>{{ session('message') }}</span>
             </div>
             <button type="button" @click="$el.parentElement.remove()" class="text-slate-400 hover:text-slate-600">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                <x-icon name="x-lg" class="w-3.5 h-3.5" />
             </button>
         </div>
     @endif
@@ -81,14 +69,12 @@
         <div class="p-4 rounded-xl bg-rose-50 border border-rose-200/80 flex items-center justify-between text-rose-800 text-sm shadow-2xs">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center font-bold">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
+                    <x-icon name="exclamation-triangle-fill" class="w-4 h-4 text-rose-600" />
                 </div>
                 <span>{{ session('error') }}</span>
             </div>
             <button type="button" @click="$el.parentElement.remove()" class="text-rose-400 hover:text-rose-600">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                <x-icon name="x-lg" class="w-3.5 h-3.5" />
             </button>
         </div>
     @endif
@@ -140,9 +126,7 @@
         <!-- Input de Busca com Lupa Perfeitamente Alinhada -->
         <div class="relative flex-1">
             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                </svg>
+                <x-icon name="search" class="w-4 h-4" />
             </div>
             <input wire:model.live.debounce.300ms="search" 
                    type="text" 
@@ -403,7 +387,7 @@
                                 <p class="text-xs text-slate-500 mt-0.5">Preencha os campos abaixo com os dados cadastrais corporativos.</p>
                             </div>
                             <button wire:click="closeUserModal" type="button" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                <x-icon name="x-lg" class="w-4 h-4" />
                             </button>
                         </div>
 
@@ -532,7 +516,7 @@
                                 <p class="text-xs text-slate-500 mt-0.5">Definir nova credencial de acesso para <strong>{{ $passwordUserName }}</strong>.</p>
                             </div>
                             <button wire:click="closePasswordModal" type="button" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                <x-icon name="x-lg" class="w-4 h-4" />
                             </button>
                         </div>
 
@@ -583,9 +567,7 @@
                     <div class="p-6">
                         <div class="flex items-start gap-4">
                             <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
+                                <x-icon name="exclamation-triangle-fill" class="w-5 h-5" />
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h3 class="text-base font-bold text-slate-900">Excluir Usuário</h3>

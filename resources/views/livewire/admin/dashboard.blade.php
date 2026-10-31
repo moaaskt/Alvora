@@ -19,15 +19,11 @@
         <!-- Quick Actions Buttons -->
         <div class="flex items-center gap-2.5 shrink-0">
             <a href="{{ route('admin.courses.create') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-container shadow-sm transition-all hover:shadow">
-                <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
-                </svg>
+                <x-icon name="plus-lg" class="w-4 h-4" />
                 <span>Novo Curso</span>
             </a>
             <a href="{{ route('admin.billing') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 shadow-xs transition-colors">
-                <svg class="w-4 h-4 text-slate-500 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-6 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V5.25a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5Z"></path>
-                </svg>
+                <x-icon name="credit-card-2-front-fill" class="w-4 h-4 text-slate-500" />
                 <span>Faturamento B2B</span>
             </a>
         </div>
@@ -39,11 +35,7 @@
         <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-colors">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total de Cursos</span>
-                <svg class="w-5 h-5 text-blue-600 shrink-0" fill="currentColor" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M6 1h6v7a.5.5 0 0 1-.757.429L9 7.083 6.757 8.43A.5.5 0 0 1 6 8z"/>
-                    <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2"/>
-                    <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z"/>
-                </svg>
+                <x-icon name="journal-bookmark-fill" class="w-5 h-5 text-blue-600 shrink-0" />
             </div>
             <div>
                 <div class="text-3xl font-bold text-slate-900 tracking-tight">{{ $totalCourses }}</div>
@@ -62,9 +54,7 @@
         <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-colors">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total de Aulas</span>
-                <svg class="w-5 h-5 text-indigo-600 shrink-0" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M2.5 3.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1zm2-2a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1zM0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6zm6.258-6.437a.5.5 0 0 1 .507.013l4 2.5a.5.5 0 0 1 0 .848l-4 2.5A.5.5 0 0 1 6 12V7a.5.5 0 0 1 .258-.437"/>
-                </svg>
+                <x-icon name="collection-play-fill" class="w-5 h-5 text-indigo-600 shrink-0" />
             </div>
             <div>
                 <div class="text-3xl font-bold text-slate-900 tracking-tight">{{ $totalLessons }}</div>
@@ -81,10 +71,7 @@
         <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-colors">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total de Matrículas</span>
-                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8.211 2.047a.5.5 0 0 0-.422 0l-7.5 3.5a.5.5 0 0 0 .025.917l7.5 3a.5.5 0 0 0 .372 0L14 7.14V13a1 1 0 0 0-1 1v2h3v-2a1 1 0 0 0-1-1V6.739l.686-.275a.5.5 0 0 0 .025-.917z"/>
-                    <path d="M4.176 9.032a.5.5 0 0 0-.656.327l-.5 1.7a.5.5 0 0 0 .294.605l4.5 1.8a.5.5 0 0 0 .372 0l4.5-1.8a.5.5 0 0 0 .294-.605l-.5-1.7a.5.5 0 0 0-.656-.327L8 10.466z"/>
-                </svg>
+                <x-icon name="mortarboard-fill" class="w-5 h-5 text-emerald-600 shrink-0" />
             </div>
             <div>
                 <div class="text-3xl font-bold text-slate-900 tracking-tight">{{ $totalEnrollments }}</div>
@@ -103,9 +90,7 @@
         <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-colors">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Alunos Ativos</span>
-                <svg class="w-5 h-5 text-cyan-600 shrink-0" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
-                </svg>
+                <x-icon name="people-fill" class="w-5 h-5 text-cyan-600 shrink-0" />
             </div>
             <div>
                 <div class="text-3xl font-bold text-slate-900 tracking-tight">{{ $totalStudents }}</div>
@@ -120,9 +105,7 @@
         <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-colors">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Instrutores</span>
-                <svg class="w-5 h-5 text-amber-600 shrink-0" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm4.5 0a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zM8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6m5 2.755C12.146 12.825 10.623 12 8 12s-4.146.826-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1z"/>
-                </svg>
+                <x-icon name="person-badge-fill" class="w-5 h-5 text-amber-600 shrink-0" />
             </div>
             <div>
                 <div class="text-3xl font-bold text-slate-900 tracking-tight">{{ $totalInstructors }}</div>
@@ -186,7 +169,7 @@
                                     </span>
                                 @endif
                                 <a href="{{ route('admin.courses.edit', $course) }}" class="p-1.5 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100" title="Editar">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path></svg>
+                                    <x-icon name="pencil-square" class="w-4 h-4" />
                                 </a>
                             </div>
                         </div>
@@ -271,19 +254,19 @@
             </div>
             <div class="flex flex-wrap items-center gap-2">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold text-white border border-white/10 transition-colors">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <x-icon name="tags-fill" class="w-3.5 h-3.5 text-emerald-400" />
                     Categorias
                 </span>
                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold text-white border border-white/10 transition-colors">
-                    <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                    <x-icon name="mortarboard-fill" class="w-3.5 h-3.5 text-blue-400" />
                     Matrículas
                 </span>
                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold text-white border border-white/10 transition-colors">
-                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                    <x-icon name="people-fill" class="w-3.5 h-3.5 text-amber-400" />
                     Usuários
                 </span>
                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold text-white border border-white/10 transition-colors">
-                    <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                    <x-icon name="gear-fill" class="w-3.5 h-3.5 text-purple-400" />
                     Configurações
                 </span>
             </div>
