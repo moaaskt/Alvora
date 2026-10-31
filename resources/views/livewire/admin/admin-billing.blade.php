@@ -1,13 +1,7 @@
-<div class="relative w-full">
-    <!-- Hero Background Band (240px vertical gradient, straight bottom) -->
-    <div class="absolute -top-10 -left-6 -right-6 lg:-left-10 lg:-right-10 h-[240px] pointer-events-none z-0"
-         style="background: linear-gradient(180deg, var(--color-edtech-bg) 0%, var(--color-edtech-hero-mid) 45%, var(--color-edtech-hero-end) 100%);"
-         aria-hidden="true"></div>
+<div class="flex flex-col gap-6 max-w-7xl mx-auto w-full">
 
-    <div class="relative z-10 flex flex-col gap-6 max-w-7xl mx-auto w-full">
-
-        <!-- Header Title & Action Row -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+    <!-- Header Title & Action Row -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Gestão Global de Faturamento B2B</h1>
                 <p class="text-slate-500 text-sm mt-1">Visão consolidada de receita recorrente mensal, contratos corporativos e auditoria de webhooks.</p>
@@ -254,5 +248,4 @@
                 </div>
             @endif
         </div>
-    </div>
 </div>
