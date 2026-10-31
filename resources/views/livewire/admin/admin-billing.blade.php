@@ -16,7 +16,7 @@
                 <button type="button"
                         wire:click="syncSubscriptions"
                         wire:loading.attr="disabled"
-                        class="h-11 rounded-xl bg-edtech-blue hover:bg-edtech-blue-hover text-white font-medium px-4 flex items-center gap-2.5 shadow-sm transition-colors text-sm disabled:opacity-50 cursor-pointer">
+                        class="h-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 flex items-center gap-2.5 shadow-sm transition-colors text-sm disabled:opacity-50 cursor-pointer">
                     <span wire:loading.remove wire:target="syncSubscriptions" class="inline-flex items-center gap-2">
                         <x-icon name="refresh-cw" class="w-4 h-4" />
                         <span>Sincronizar Assinaturas Mercado Pago</span>
