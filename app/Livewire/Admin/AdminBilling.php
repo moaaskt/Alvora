@@ -124,6 +124,8 @@ class AdminBilling extends Component
             'proCount' => $proCount,
             'enterpriseCount' => $enterpriseCount,
             'companies' => $companies,
-        ])->layout('layouts.app');
+        ])->layout('layouts.admin', [
+            'breadcrumb' => 'Faturamento B2B',
+        ]);
     }
 }
