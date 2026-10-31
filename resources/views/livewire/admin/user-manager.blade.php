@@ -85,9 +85,7 @@
         <button wire:click="switchRole('admin')" 
                 type="button" 
                 class="px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2.5 transition-all cursor-pointer {{ $role === 'admin' ? 'bg-white text-slate-900 shadow-xs border border-slate-200/60' : 'text-slate-600 hover:text-slate-900' }}">
-            <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-            </svg>
+            <x-icon name="shield-lock-fill" class="w-4 h-4 text-blue-600" />
             <span>Administradores</span>
             <span class="px-2 py-0.5 rounded-full text-[11px] font-bold {{ $role === 'admin' ? 'bg-blue-50 text-blue-700 border border-blue-200/60' : 'bg-slate-200 text-slate-700' }}">
                 {{ $adminCount }}
@@ -98,9 +96,7 @@
         <button wire:click="switchRole('instructor')" 
                 type="button" 
                 class="px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2.5 transition-all cursor-pointer {{ $role === 'instructor' ? 'bg-white text-slate-900 shadow-xs border border-slate-200/60' : 'text-slate-600 hover:text-slate-900' }}">
-            <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-            </svg>
+            <x-icon name="mortarboard-fill" class="w-4 h-4 text-amber-600" />
             <span>Instrutores</span>
             <span class="px-2 py-0.5 rounded-full text-[11px] font-bold {{ $role === 'instructor' ? 'bg-amber-50 text-amber-700 border border-amber-200/60' : 'bg-slate-200 text-slate-700' }}">
                 {{ $instructorCount }}
@@ -111,9 +107,7 @@
         <button wire:click="switchRole('student')" 
                 type="button" 
                 class="px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2.5 transition-all cursor-pointer {{ $role === 'student' ? 'bg-white text-slate-900 shadow-xs border border-slate-200/60' : 'text-slate-600 hover:text-slate-900' }}">
-            <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.636 50.636 0 00-2.658-.813A59.906 59.906 0 0112 3.493a59.903 59.903 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5Zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
-            </svg>
+            <x-icon name="people-fill" class="w-4 h-4 text-slate-600" />
             <span>Estudantes</span>
             <span class="px-2 py-0.5 rounded-full text-[11px] font-bold {{ $role === 'student' ? 'bg-slate-200 text-slate-800' : 'bg-slate-200 text-slate-700' }}">
                 {{ $studentCount }}
@@ -206,9 +200,7 @@
                             <td class="py-3.5 px-4">
                                 @if ($user->phone)
                                     <span class="text-xs font-mono text-slate-700 flex items-center gap-1.5">
-                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                        </svg>
+                                        <x-icon name="telephone-fill" class="w-3.5 h-3.5 text-slate-400" />
                                         {{ $user->phone }}
                                     </span>
                                 @else
@@ -299,9 +291,7 @@
                                         <a href="{{ route('admin.enrollments.create') }}?student_id={{ $user->id }}" 
                                            title="Matricular em Curso" 
                                            class="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                            </svg>
+                                            <x-icon name="plus-lg" class="w-4 h-4" />
                                         </a>
                                     @endif
 
@@ -310,9 +300,7 @@
                                             type="button" 
                                             title="Redefinir Senha de Acesso"
                                             class="p-1.5 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
-                                        </svg>
+                                        <x-icon name="key-fill" class="w-4 h-4" />
                                     </button>
 
                                     <!-- Editar Dados -->
@@ -320,9 +308,7 @@
                                             type="button" 
                                             title="Editar Dados Cadastrais"
                                             class="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                        </svg>
+                                        <x-icon name="pencil-square" class="w-4 h-4" />
                                     </button>
 
                                     <!-- Excluir -->
@@ -330,9 +316,7 @@
                                             type="button" 
                                             title="Excluir Usuário"
                                             class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                        </svg>
+                                        <x-icon name="trash3-fill" class="w-4 h-4" />
                                     </button>
                                 </div>
                             </td>
@@ -342,9 +326,7 @@
                             <td colspan="8" class="py-12 text-center">
                                 <div class="max-w-sm mx-auto flex flex-col items-center">
                                     <div class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
-                                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0Zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                                        </svg>
+                                        <x-icon name="people" class="w-6 h-6 text-slate-300" />
                                     </div>
                                     <h3 class="text-sm font-bold text-slate-800">Nenhum {{ strtolower(rtrim($roleTitle, 's')) }} encontrado</h3>
                                     <p class="text-xs text-slate-500 mt-1">Nenhum registro corresponde aos filtros ou termo de busca aplicado.</p>
