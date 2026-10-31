@@ -528,4 +528,225 @@ class CertificateTemplateListTest extends TestCase
             ->test(CertificateTemplateList::class)
             ->assertOk();
     }
+
+    public function test_active_banner_shows_personalizar_modelo_only_when_using_global_default(): void
+    {
+        $setup = $this->setupCompanyAndUsers();
+
+        // 1. Sem template personalizado: usa padrão global, botão Personalizar Modelo deve aparecer
+        Livewire::actingAs($setup['admin'])
+            ->test(CertificateTemplateList::class)
+            ->assertOk()
+            ->assertSee('Personalizar Modelo');
+
+        // 2. Com template ativo próprio: não deve exibir o botão Personalizar Modelo
+        $customTemplate = CertificateTemplate::create([
+            'company_id' => $setup['company']->id,
+            'name' => 'Template Exclusivo da Alpha',
+            'description' => 'Descrição do modelo exclusivo',
+            'status' => 'active',
+            'is_default' => true,
+        ]);
+
+        CertificateTemplateVersion::create([
+            'template_id' => $customTemplate->id,
+            'version' => 1,
+            'schema_json' => $this->resolver->getDefaultSchema(),
+            'status' => 'active',
+            'created_by' => $setup['admin']->id,
+        ]);
+
+        Livewire::actingAs($setup['admin'])
+            ->test(CertificateTemplateList::class)
+            ->assertOk()
+            ->assertDontSee('Personalizar Modelo')
+            ->assertSee('Template Exclusivo da Alpha');
+    }
+
+    public function test_description_text_uses_slate_color_classes_not_blue(): void
+    {
+        $setup = $this->setupCompanyAndUsers();
+
+        CertificateTemplate::create([
+            'company_id' => $setup['company']->id,
+            'name' => 'Template de Design Slate',
+            'description' => 'Texto descritivo com formatação slate',
+            'status' => 'draft',
+            'is_default' => false,
+        ]);
+
+        $component = Livewire::actingAs($setup['admin'])
+            ->test(CertificateTemplateList::class)
+            ->assertOk();
+
+        $html = $component->html();
+        $this->assertStringContainsString('text-sm text-slate-500 mb-5 line-clamp-2', $html);
+        $this->assertStringNotContainsString('text-sm text-blue-', $html);
+    }
+
+    public function test_badges_have_no_border_classes(): void
+    {
+        $setup = $this->setupCompanyAndUsers();
+
+        $active = CertificateTemplate::create([
+            'company_id' => $setup['company']->id,
+            'name' => 'Template Ativo Teste',
+            'description' => 'Descrição',
+            'status' => 'active',
+            'is_default' => true,
+        ]);
+
+        CertificateTemplateVersion::create([
+            'template_id' => $active->id,
+            'version' => 1,
+            'schema_json' => $this->resolver->getDefaultSchema(),
+            'status' => 'active',
+            'created_by' => $setup['admin']->id,
+        ]);
+
+        $draft = CertificateTemplate::create([
+            'company_id' => $setup['company']->id,
+            'name' => 'Template Rascunho Teste',
+            'description' => 'Descrição',
+            'status' => 'draft',
+            'is_default' => false,
+        ]);
+
+        $archived = CertificateTemplate::create([
+            'company_id' => $setup['company']->id,
+            'name' => 'Template Arquivado Teste',
+            'description' => 'Descrição',
+            'status' => 'archived',
+            'is_default' => false,
+        ]);
+
+        $component = Livewire::actingAs($setup['admin'])
+            ->test(CertificateTemplateList::class)
+            ->assertOk();
+
+        $html = $component->html();
+
+        // Verifica que os badges não possuem classes de borda colorida
+        $this->assertStringContainsString('bg-green-100 text-green-700', $html);
+        $this->assertStringNotContainsString('border-green-200', $html);
+
+        $this->assertStringContainsString('bg-yellow-100 text-yellow-700', $html);
+        $this->assertStringNotContainsString('border-amber-200', $html);
+
+        $this->assertStringContainsString('bg-slate-100 text-slate-600', $html);
+        $this->assertStringNotContainsString('border-slate-200" leading-none', $html);
+
+        $this->assertStringContainsString('bg-blue-100 text-blue-700', $html);
+        $this->assertStringNotContainsString('border-blue-200', $html);
+
+        $this->assertStringContainsString('bg-edtech-blue text-white', $html);
+    }
+
+    public function test_in_use_card_has_edtech_blue_border_and_ring(): void
+    {
+        $setup = $this->setupCompanyAndUsers();
+
+        $inUseTemplate = CertificateTemplate::create([
+            'company_id' => $setup['company']->id,
+            'name' => 'Template em Uso Ativo',
+            'description' => 'Descrição',
+            'status' => 'active',
+            'is_default' => true,
+        ]);
+
+        CertificateTemplateVersion::create([
+            'template_id' => $inUseTemplate->id,
+            'version' => 1,
+            'schema_json' => $this->resolver->getDefaultSchema(),
+            'status' => 'active',
+            'created_by' => $setup['admin']->id,
+        ]);
+
+        $otherTemplate = CertificateTemplate::create([
+            'company_id' => $setup['company']->id,
+            'name' => 'Outro Template',
+            'description' => 'Descrição',
+            'status' => 'draft',
+            'is_default' => false,
+        ]);
+
+        $component = Livewire::actingAs($setup['admin'])
+            ->test(CertificateTemplateList::class)
+            ->assertOk();
+
+        $html = $component->html();
+        $this->assertStringContainsString('border border-edtech-blue ring-2 ring-edtech-blue/20', $html);
+    }
+
+    public function test_archived_card_shows_reativar_and_hides_trash_and_star(): void
+    {
+        $setup = $this->setupCompanyAndUsers();
+
+        $archivedTemplate = CertificateTemplate::create([
+            'company_id' => $setup['company']->id,
+            'name' => 'Template Aposentado',
+            'description' => 'Modelo antigo descontinuado',
+            'status' => 'archived',
+            'is_default' => false,
+        ]);
+
+        $component = Livewire::actingAs($setup['admin'])
+            ->test(CertificateTemplateList::class)
+            ->assertOk();
+
+        $component->assertSee('Reativar');
+
+        $html = $component->html();
+        // Não deve conter os botões de arquivar ou tornar padrão para o template arquivado
+        $this->assertStringNotContainsString('wire:click="archiveTemplate(' . $archivedTemplate->id . ')"', $html);
+        $this->assertStringNotContainsString('wire:click="setAsDefault(' . $archivedTemplate->id . ')"', $html);
+    }
+
+    public function test_company_can_unarchive_own_template(): void
+    {
+        $setup = $this->setupCompanyAndUsers();
+
+        $template = CertificateTemplate::create([
+            'company_id' => $setup['company']->id,
+            'name' => 'Template Meu Arquivado',
+            'description' => 'Descrição',
+            'status' => 'archived',
+            'is_default' => false,
+        ]);
+
+        Livewire::actingAs($setup['admin'])
+            ->test(CertificateTemplateList::class)
+            ->call('unarchiveTemplate', $template->id)
+            ->assertHasNoErrors()
+            ->assertDispatched('toast');
+
+        $this->assertEquals('draft', $template->fresh()->status);
+    }
+
+    public function test_company_cannot_unarchive_another_companys_template(): void
+    {
+        $corpA = $this->setupCompanyAndUsers('Company A');
+        $corpB = $this->setupCompanyAndUsers('Company B');
+
+        $templateB = CertificateTemplate::create([
+            'company_id' => $corpB['company']->id,
+            'name' => 'Template da Empresa B',
+            'description' => 'Descrição B',
+            'status' => 'archived',
+            'is_default' => false,
+        ]);
+
+        // Usuário da Empresa A tenta desarquivar o template da Empresa B
+        try {
+            Livewire::actingAs($corpA['admin'])
+                ->test(CertificateTemplateList::class)
+                ->call('unarchiveTemplate', $templateB->id);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // TenantScope isolou com sucesso
+            $this->assertTrue(true);
+        }
+
+        // Garante que o status do template da Empresa B continua arquivado
+        $this->assertEquals('archived', $templateB->fresh()->status);
+    }
 }

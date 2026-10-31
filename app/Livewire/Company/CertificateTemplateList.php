@@ -208,6 +208,31 @@ class CertificateTemplateList extends Component
         $this->dispatch('toast', message: 'Template arquivado com sucesso.', type: 'info');
     }
 
+    /**
+     * Unarchive / reactivate an existing corporate template.
+     */
+    public function unarchiveTemplate(int $templateId): void
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return;
+        }
+
+        $template = CertificateTemplate::findOrFail($templateId);
+
+        if (!$user->isAlvoraAdmin() && $template->company_id !== $user->company_id) {
+            $this->dispatch('toast', message: 'Acesso não autorizado.', type: 'error');
+            return;
+        }
+
+        $template->update([
+            'status' => 'draft',
+        ]);
+
+        session()->flash('success', "O template '{$template->name}' foi reativado em modo rascunho.");
+        $this->dispatch('toast', message: 'Template reativado com sucesso.', type: 'success');
+    }
+
     public function render(CertificateTemplateResolver $resolver)
     {
         $user = Auth::user();

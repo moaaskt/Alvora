@@ -1,25 +1,20 @@
 <div class="px-space-xl py-space-lg flex flex-col gap-6 max-w-[1600px] mx-auto w-full">
     <!-- BREADCRUMBS & TOP BAR -->
-    <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-2">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
             <a href="{{ route('dashboard') }}" 
-               class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
-                <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"></path>
-                </svg>
+               class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-edtech-navy transition-colors">
+                <x-icon name="arrow-left" class="w-3.5 h-3.5" />
                 <span>Voltar ao Dashboard</span>
             </a>
             <span class="text-slate-300">/</span>
-            <span class="text-xs text-slate-500 font-medium">Gestão Corporativa</span>
+            <span>Gestão Corporativa</span>
             <span class="text-slate-300">/</span>
-            <span class="text-xs text-slate-800 font-semibold">Templates de Certificados</span>
+            <span class="text-edtech-navy font-semibold">Templates de Certificados</span>
         </div>
 
-        <div class="flex items-center gap-2">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                <span class="w-2 h-2 rounded-full {{ $isUsingGlobalDefault ? 'bg-indigo-500' : 'bg-emerald-500' }}"></span>
-                <span>Modelo Vigente: <strong>{{ $templateInUse->name ?? 'Padrão ALVORA' }}</strong></span>
-            </span>
+        <div class="inline-flex items-center bg-slate-100 text-slate-600 text-xs px-3 py-1.5 rounded-full font-medium self-start md:self-auto">
+            Modelo Vigente: {{ $templateInUse->name ?? 'Template Padrão Institucional ALVORA' }}
         </div>
     </div>
 
@@ -31,85 +26,79 @@
         @if(session('info')) AlvoraSwal.fire({ icon: 'info', title: 'Informação', text: '{{ session('info') }}', toast: true, position: 'top-end', timer: 2500, timerProgressBar: true, showConfirmButton: false }); @endif
     "></div>
 
-    <!-- HEADER DA PÁGINA COM AÇÕES -->
-    <header class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-slate-200/70">
-        <div class="flex flex-col gap-1 max-w-3xl">
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+    <!-- HEADER DA PÁGINA -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex flex-col gap-1">
+            <h1 class="text-2xl lg:text-[28px] font-semibold text-edtech-navy tracking-tight leading-tight">
                 Templates de Certificados
             </h1>
-            <p class="text-xs text-slate-500">
+            <p class="text-sm text-slate-500">
                 Gerencie os modelos visuais e a identidade gráfica dos certificados emitidos aos colaboradores da sua organização.
             </p>
         </div>
 
-        <div class="flex items-center gap-2.5 shrink-0">
-            <button type="button"
-                    wire:click="openCreateModal"
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all text-xs font-semibold shadow-sm cursor-pointer">
-                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
-                </svg>
-                <span>Novo Template Corporativo</span>
-            </button>
-        </div>
-    </header>
+        <button type="button"
+                wire:click="openCreateModal"
+                class="inline-flex items-center justify-center gap-2 bg-edtech-blue hover:bg-edtech-blue-dark text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm transition-colors self-start sm:self-auto shrink-0 cursor-pointer">
+            <x-icon name="plus" class="w-4 h-4" />
+            <span>+ Novo Template Corporativo</span>
+        </button>
+    </div>
 
-    <!-- BANNER DE STATUS DO TEMPLATE ATUALMENTE EM USO -->
-    <section class="rounded-2xl border p-5 transition-all shadow-2xs {{ $isUsingGlobalDefault ? 'bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border-indigo-800 text-white' : 'bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-900 border-emerald-800 text-white' }}">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div class="flex items-start gap-4">
-                <div class="p-3 rounded-xl {{ $isUsingGlobalDefault ? 'bg-indigo-600/30 border border-indigo-400/30' : 'bg-emerald-600/30 border border-emerald-400/30' }}">
-                    <svg class="w-6 h-6 {{ $isUsingGlobalDefault ? 'text-indigo-300' : 'text-emerald-300' }} stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"></path>
-                    </svg>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md {{ $isUsingGlobalDefault ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-400/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' }}">
-                            {{ $isUsingGlobalDefault ? 'Padrão Institucional ALVORA' : 'Modelo Exclusivo Ativo' }}
-                        </span>
-                        @if($activeVersionInUse)
-                            <span class="text-xs text-slate-300 font-mono">Versão v{{ $activeVersionInUse->version }}</span>
-                        @endif
-                    </div>
-                    <h3 class="text-base font-bold text-white">
-                        {{ $templateInUse->name ?? 'Template Institucional Oficial' }}
-                    </h3>
-                    <p class="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-                        @if($isUsingGlobalDefault)
-                            Sua empresa está utilizando o design institucional padrão da ALVORA. Ao criar e publicar um template corporativo próprio, ele assumirá automaticamente a emissão dos próximos certificados.
-                        @else
-                            Este modelo personalizado está ativo como padrão oficial para todos os certificados emitidos na conclusão de cursos pelos seus colaboradores.
-                        @endif
-                    </p>
-                </div>
+    <!-- ACTIVE TEMPLATE BANNER -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-edtech-border flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-edtech-blue-light flex items-center justify-center shrink-0 text-edtech-blue">
+                <x-icon name="award" class="w-7 h-7" />
             </div>
+            <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xs uppercase tracking-wider font-semibold text-slate-500">Template em uso</span>
+                    @if($activeVersionInUse)
+                        <span class="bg-slate-100 text-slate-700 font-mono rounded px-2 py-0.5 text-xs">v{{ $activeVersionInUse->version }}</span>
+                    @endif
+                </div>
+                <h2 class="text-lg font-semibold text-edtech-navy leading-tight">
+                    {{ $templateInUse->name ?? 'Template Padrão Institucional ALVORA' }}
+                </h2>
+                <p class="text-sm text-slate-500 max-w-3xl line-clamp-2 leading-relaxed">
+                    @if($isUsingGlobalDefault)
+                        Sua empresa está utilizando o design institucional padrão da ALVORA. Ao criar e publicar um template corporativo próprio, ele assumirá automaticamente a emissão dos próximos certificados.
+                    @else
+                        {{ $templateInUse->description ?: 'Este modelo personalizado está ativo como padrão oficial para todos os certificados emitidos na conclusão de cursos pelos seus colaboradores.' }}
+                    @endif
+                </p>
+            </div>
+        </div>
 
-            @if($isUsingGlobalDefault)
-                <button type="button" 
+        @if($isUsingGlobalDefault)
+            <div class="flex items-center shrink-0">
+                <button type="button"
                         wire:click="openCreateModal"
-                        class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-all shadow-sm shrink-0 cursor-pointer">
+                        class="border border-edtech-blue text-edtech-blue hover:bg-edtech-blue-light px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer">
                     Personalizar Modelo
                 </button>
-            @endif
-        </div>
-    </section>
+            </div>
+        @endif
+    </div>
 
-    <!-- BARRA DE PESQUISA E FILTROS -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs">
-        <div class="relative w-full sm:w-80">
+    <!-- SEARCH AND FILTER BAR -->
+    <div class="bg-white rounded-2xl p-4 border border-edtech-border flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+        <div class="relative w-full flex-grow">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <x-icon name="search" class="w-4 h-4" />
+            </div>
             <input type="text"
+                   id="template-search"
                    wire:model.live.debounce.300ms="search"
                    placeholder="Buscar template corporativo..."
-                   class="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 placeholder-slate-400">
-            <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path>
-            </svg>
+                   class="w-full pl-10 pr-4 py-2.5 bg-white border border-edtech-border rounded-lg text-sm text-edtech-navy placeholder-slate-400 focus:outline-none focus:border-edtech-blue focus:ring-1 focus:ring-edtech-blue transition-colors">
         </div>
 
-        <div class="flex items-center gap-2 w-full sm:w-auto">
+        <div class="w-full md:w-64 shrink-0">
             <select wire:model.live="statusFilter"
-                    class="text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-slate-700 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer">
+                    id="status-filter"
+                    class="w-full py-2.5 px-3.5 border border-edtech-border rounded-lg text-sm text-edtech-navy bg-white focus:outline-none focus:border-edtech-blue focus:ring-1 focus:ring-edtech-blue cursor-pointer transition-colors">
                 <option value="">Todos os Status</option>
                 <option value="active">Ativos</option>
                 <option value="draft">Rascunhos</option>
@@ -122,159 +111,157 @@
     <div class="flex flex-col gap-4">
         @if($templates->isEmpty())
             <!-- ESTADO VAZIO (EMPTY STATE) -->
-            <div class="p-12 text-center bg-white rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col items-center justify-center">
-                <div class="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 mb-4">
-                    <svg class="w-8 h-8 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path>
-                    </svg>
+            <div class="bg-white rounded-2xl border border-edtech-border p-12 text-center shadow-sm flex flex-col items-center justify-center">
+                <div class="w-10 h-10 mx-auto mb-3 text-slate-300 flex items-center justify-center">
+                    <x-icon name="file-text" class="w-10 h-10" />
                 </div>
-                <h3 class="text-sm font-bold text-slate-900 mb-1">
+
+                <h3 class="text-base font-semibold text-edtech-navy mb-1">
                     {{ $search || $statusFilter ? 'Nenhum template encontrado com os filtros aplicados' : 'Nenhum template personalizado cadastrado' }}
                 </h3>
-                <p class="text-xs text-slate-500 max-w-md mb-5 leading-relaxed">
+
+                <p class="text-sm text-slate-500 mb-5 max-w-md mx-auto leading-relaxed">
                     {{ $search || $statusFilter ? 'Tente ajustar os termos da pesquisa para encontrar o template desejado.' : 'Sua empresa está utilizando o modelo padrão ALVORA. Crie seu primeiro template corporativo para personalizar cores, logotipo e assinaturas.' }}
                 </p>
 
-                @if(!$search && !$statusFilter)
+                @if($search || $statusFilter)
+                    <button type="button"
+                            wire:click="$set('search', ''); $set('statusFilter', '')"
+                            class="text-sm font-semibold text-edtech-blue hover:underline cursor-pointer">
+                        Limpar filtros
+                    </button>
+                @else
                     <button type="button"
                             wire:click="openCreateModal"
-                            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 text-xs font-semibold transition-all shadow-sm cursor-pointer">
-                        <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
-                        </svg>
+                            class="inline-flex items-center gap-2 bg-edtech-blue hover:bg-edtech-blue-dark text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm transition-colors cursor-pointer">
+                        <x-icon name="plus" class="w-4 h-4" />
                         <span>Criar Primeiro Template Corporativo</span>
                     </button>
                 @endif
             </div>
         @else
-            <!-- GRID DE TEMPLATES -->
+            <!-- GRID DE TEMPLATES (3 COLUNAS) -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 @foreach($templates as $template)
                     @php
                         $isActiveInUse = !$isUsingGlobalDefault && $templateInUse && $templateInUse->id === $template->id;
                         $hasActiveVersion = (bool) $template->activeVersion;
                     @endphp
-                    <div class="bg-white rounded-2xl border transition-all duration-200 hover:shadow-md flex flex-col justify-between overflow-hidden {{ $isActiveInUse ? 'border-emerald-400 ring-2 ring-emerald-500/20' : 'border-slate-200/80 shadow-2xs' }}">
-                        <!-- CARD HEADER -->
-                        <div class="p-5">
-                            <div class="flex items-start justify-between gap-3 mb-3">
+                    <div class="bg-white rounded-2xl shadow-sm p-6 flex flex-col justify-between hover:-translate-y-1 hover:shadow-md transition duration-200 ease-out {{ $isActiveInUse ? 'border border-edtech-blue ring-2 ring-edtech-blue/20' : 'border border-edtech-border' }}">
+                        <!-- CARD CONTENT -->
+                        <div>
+                            <!-- TOP ROW: BADGES & ID -->
+                            <div class="flex items-center justify-between mb-4 gap-2">
                                 <div class="flex flex-wrap items-center gap-1.5">
-                                    <!-- BADGE DE STATUS -->
-                                    @if($template->status === 'active')
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-2xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                            Ativo
-                                        </span>
-                                    @elseif($template->status === 'draft')
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-2xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                            Rascunho
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-2xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-                                            Arquivado
+                                    @if($isActiveInUse)
+                                        <span class="inline-flex rounded-md px-2.5 py-1 text-xs font-semibold bg-edtech-blue text-white leading-none">
+                                            Em Uso
                                         </span>
                                     @endif
 
-                                    <!-- BADGE DE PADRÃO -->
                                     @if($template->is_default)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-2xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                        <span class="inline-flex rounded-md px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-700 leading-none">
                                             Padrão da Empresa
                                         </span>
                                     @endif
 
-                                    @if($isActiveInUse)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-2xs font-semibold bg-emerald-600 text-white shadow-2xs">
-                                            Em Uso
+                                    @if($template->status === 'active')
+                                        <span class="inline-flex rounded-md px-2.5 py-1 text-xs font-semibold bg-green-100 text-green-700 leading-none">
+                                            Ativo
+                                        </span>
+                                    @elseif($template->status === 'draft')
+                                        <span class="inline-flex rounded-md px-2.5 py-1 text-xs font-semibold bg-yellow-100 text-yellow-700 leading-none">
+                                            Rascunho
+                                        </span>
+                                    @else
+                                        <span class="inline-flex rounded-md px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-600 leading-none">
+                                            Arquivado
                                         </span>
                                     @endif
                                 </div>
 
-                                <span class="text-2xs font-mono text-slate-400">#{{ $template->id }}</span>
+                                <span class="font-mono text-xs text-slate-400 shrink-0">#{{ $template->id }}</span>
                             </div>
 
-                            <h3 class="text-sm font-bold text-slate-900 line-clamp-1 mb-1">
+                            <!-- TITLE & DESCRIPTION -->
+                            <h3 class="text-lg font-semibold text-edtech-navy leading-tight mb-2 truncate" title="{{ $template->name }}">
                                 {{ $template->name }}
                             </h3>
 
-                            <p class="text-xs text-slate-500 line-clamp-2 min-h-[32px] leading-relaxed">
+                            <p class="text-sm text-slate-500 mb-5 line-clamp-2 min-h-[40px] leading-relaxed">
                                 {{ $template->description ?: 'Sem descrição informada para este modelo.' }}
                             </p>
 
-                            <!-- INFORMAÇÕES DE VERSÃO -->
-                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-2xs text-slate-500">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="font-medium text-slate-700">Versão:</span>
+                            <!-- META ROW -->
+                            <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
+                                <div class="flex items-center gap-1.5 text-[13px]">
+                                    <span>Versão:</span>
                                     @if($template->activeVersion)
-                                        <span class="font-mono font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
+                                        <span class="bg-slate-100 text-slate-700 font-mono rounded px-1.5 py-0.5 text-xs font-semibold">
                                             v{{ $template->activeVersion->version }}
                                         </span>
                                     @else
-                                        <span class="italic text-amber-600">Sem versão ativa</span>
+                                        <span class="italic text-amber-600 text-xs">Sem versão ativa</span>
                                     @endif
                                 </div>
 
-                                <div>
-                                    <span>Atualizado: {{ $template->updated_at->format('d/m/Y') }}</span>
-                                </div>
+                                <span>Atualizado: {{ $template->updated_at->format('d/m/Y') }}</span>
                             </div>
                         </div>
 
-                        <!-- CARD FOOTER / AÇÕES -->
-                        <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
-                            <div class="flex items-center gap-1.5">
-                                <!-- BOTÃO DO EDITOR VISUAL (FASE 3.3) -->
-                                <a href="{{ route('instructor.certificate-templates.edit', $template->id) }}"
-                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 hover:border-blue-600 transition-all shadow-2xs"
-                                   title="Abrir Editor Visual com Canvas A4">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"></path>
-                                    </svg>
-                                    <span>Abrir Editor Visual</span>
-                                </a>
-                            </div>
+                        <!-- DIVIDER & ACTIONS -->
+                        <div class="border-t border-edtech-border pt-4 mt-4 flex items-center justify-between gap-2">
+                            <a href="{{ route('instructor.certificate-templates.edit', $template->id) }}"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-edtech-blue hover:text-white hover:bg-edtech-blue border border-edtech-blue/30 hover:border-edtech-blue transition-colors shadow-2xs"
+                               title="Abrir Editor Visual com Canvas A4">
+                                <x-icon name="pencil" class="w-3.5 h-3.5" />
+                                <span>Abrir Editor Visual</span>
+                            </a>
 
-                            <div class="flex items-center gap-1.5">
-                                <!-- DUPLICAR TEMPLATE -->
-                                <button type="button"
-                                        wire:click="duplicateTemplate({{ $template->id }})"
-                                        wire:loading.attr="disabled"
-                                        class="p-1.5 text-xs text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
-                                        title="Duplicar este template como um novo modelo">
-                                    <span class="sr-only">Duplicar</span>
-                                    <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"></path>
-                                    </svg>
-                                </button>
-
-                                <!-- DEFINIR COMO PADRÃO -->
-                                @if(!$template->is_default && $hasActiveVersion && $template->status === 'active')
+                            @if($template->status === 'archived')
+                                <div>
                                     <button type="button"
-                                            wire:click="setAsDefault({{ $template->id }})"
+                                            wire:click="unarchiveTemplate({{ $template->id }})"
                                             wire:loading.attr="disabled"
-                                            class="p-1.5 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
-                                            title="Definir este template como padrão da empresa">
-                                        <span class="sr-only">Tornar Padrão</span>
-                                        <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"></path>
-                                        </svg>
+                                            class="text-xs font-semibold text-edtech-blue hover:underline transition-all cursor-pointer">
+                                        Reativar
                                     </button>
-                                @endif
+                                </div>
+                            @else
+                                <div class="flex items-center gap-1">
+                                    <!-- Duplicar -->
+                                    <button type="button"
+                                            wire:click="duplicateTemplate({{ $template->id }})"
+                                            wire:loading.attr="disabled"
+                                            class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-edtech-blue hover:bg-slate-50 transition-colors cursor-pointer"
+                                            title="Duplicar este template como um novo modelo">
+                                        <span class="sr-only">Duplicar</span>
+                                        <x-icon name="copy" class="w-4 h-4" />
+                                    </button>
 
-                                <!-- ARQUIVAR TEMPLATE -->
-                                @if($template->status !== 'archived')
+                                    <!-- Definir como Padrão -->
+                                    @if(!$template->is_default && $hasActiveVersion && $template->status === 'active')
+                                        <button type="button"
+                                                wire:click="setAsDefault({{ $template->id }})"
+                                                wire:loading.attr="disabled"
+                                                class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-amber-500 hover:bg-slate-50 transition-colors cursor-pointer"
+                                                title="Definir este template como padrão da empresa">
+                                            <span class="sr-only">Tornar Padrão</span>
+                                            <x-icon name="star" class="w-4 h-4" />
+                                        </button>
+                                    @endif
+
+                                    <!-- Arquivar -->
                                     <button type="button"
                                             x-on:click="AlvoraSwal.fire({ icon: 'warning', title: 'Tem certeza?', text: 'Tem certeza de que deseja arquivar este template? Ele deixará de ser emitido para novos certificados.', showCancelButton: true, confirmButtonColor: '#EF4444', confirmButtonText: 'Sim, excluir', cancelButtonText: 'Cancelar' }).then(r => { if (r.isConfirmed) $wire.archiveTemplate({{ $template->id }}) })"
                                             wire:loading.attr="disabled"
-                                            class="p-1.5 text-xs text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                            class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                                             title="Arquivar template">
                                         <span class="sr-only">Arquivar</span>
-                                        <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"></path>
-                                        </svg>
+                                        <x-icon name="trash" class="w-4 h-4" />
                                     </button>
-                                @endif
-                            </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 @endforeach
@@ -284,71 +271,69 @@
 
     <!-- MODAL DE CRIAÇÃO DE TEMPLATE -->
     @if($showCreateModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full overflow-hidden" 
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-edtech-navy/50 backdrop-blur-xs animate-in fade-in duration-150">
+            <div class="bg-white rounded-[20px] border border-edtech-border shadow-2xl max-w-lg w-full overflow-hidden" 
                  wire:keydown.escape="closeCreateModal">
                 
-                <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                <div class="p-6 border-b border-edtech-border flex items-start justify-between">
                     <div>
-                        <h3 class="text-base font-bold text-slate-900">Novo Template Corporativo</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Defina as informações iniciais para seu modelo personalizado.</p>
+                        <h3 class="text-xl font-semibold text-edtech-navy leading-tight">Novo Template Corporativo</h3>
+                        <p class="text-sm text-slate-500 mt-0.5">Defina as informações iniciais para seu modelo personalizado.</p>
                     </div>
                     <button type="button" 
                             wire:click="closeCreateModal"
-                            class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 cursor-pointer">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
+                            class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">
+                        <x-icon name="x" class="w-5 h-5" />
                     </button>
                 </div>
 
                 <form wire:submit="createTemplate" class="p-6 flex flex-col gap-4">
                     <div>
-                        <label for="newTemplateName" class="block text-xs font-semibold text-slate-700 mb-1">
+                        <label for="newTemplateName" class="block text-xs font-semibold text-slate-700 mb-1.5">
                             Nome do Modelo <span class="text-rose-500">*</span>
                         </label>
                         <input type="text"
-                               id="newTemplateName"
-                               wire:model="newTemplateName"
-                               placeholder="Ex: Certificado Executivo 2026"
-                               class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800">
+                                id="newTemplateName"
+                                wire:model="newTemplateName"
+                                placeholder="Ex: Certificado Executivo 2026"
+                                class="w-full h-10 px-3.5 bg-white border border-edtech-border rounded-lg text-sm text-edtech-navy placeholder-slate-400 focus:outline-none focus:border-edtech-blue focus:ring-1 focus:ring-edtech-blue transition-colors">
                         @error('newTemplateName')
-                            <span class="text-2xs text-rose-600 font-medium mt-1 block">{{ $message }}</span>
+                            <span class="text-xs text-rose-600 font-medium mt-1 block">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div>
-                        <label for="newTemplateDescription" class="block text-xs font-semibold text-slate-700 mb-1">
+                        <label for="newTemplateDescription" class="block text-xs font-semibold text-slate-700 mb-1.5">
                             Descrição (Opcional)
                         </label>
                         <textarea id="newTemplateDescription"
                                   wire:model="newTemplateDescription"
                                   rows="3"
-                                  placeholder="Ex: Modelo oficial com layout escuro para cursos da área de tecnologia e liderança."
-                                  class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800"></textarea>
+                                  placeholder="Ex: Modelo oficial com layout escuro..."
+                                  class="w-full p-3 bg-white border border-edtech-border rounded-lg text-sm text-edtech-navy placeholder-slate-400 focus:outline-none focus:border-edtech-blue focus:ring-1 focus:ring-edtech-blue resize-none transition-colors"></textarea>
                         @error('newTemplateDescription')
-                            <span class="text-2xs text-rose-600 font-medium mt-1 block">{{ $message }}</span>
+                            <span class="text-xs text-rose-600 font-medium mt-1 block">{{ $message }}</span>
                         @enderror
                     </div>
 
-                    <div class="p-3.5 rounded-xl bg-blue-50/60 border border-blue-100 text-2xs text-blue-900 flex items-start gap-2.5">
-                        <svg class="w-4 h-4 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"></path>
-                        </svg>
-                        <p class="leading-relaxed">
+                    <div class="bg-edtech-blue-light border border-edtech-blue-border rounded-xl p-3.5 flex items-start gap-3 text-xs text-slate-600 leading-relaxed">
+                        <div class="text-edtech-blue shrink-0 mt-0.5">
+                            <x-icon name="info" class="w-4 h-4" />
+                        </div>
+                        <p>
                             O template será inicializado com a Versão 1 em rascunho baseada no layout institucional padrão da ALVORA, pronto para customização visual e publicação.
                         </p>
                     </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-edtech-border mt-1">
                         <button type="button"
                                 wire:click="closeCreateModal"
-                                class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">
+                                class="border border-edtech-border text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer">
                             Cancelar
                         </button>
                         <button type="submit"
                                 wire:loading.attr="disabled"
-                                class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-all shadow-sm cursor-pointer">
+                                class="bg-edtech-blue hover:bg-edtech-blue-dark text-white px-5 py-2 rounded-lg text-sm font-semibold shadow-sm transition-colors cursor-pointer">
                             <span wire:loading.remove>Criar Template</span>
                             <span wire:loading>Criando...</span>
                         </button>
