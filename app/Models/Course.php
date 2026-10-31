@@ -30,6 +30,15 @@ class Course extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        'thumbnail_url',
+    ];
+
+    /**
      * Boot model events for automatic slug generation if not provided.
      */
     protected static function boot(): void
@@ -147,5 +156,25 @@ class Course extends Model
     public function isArchived(): bool
     {
         return $this->status === 'archived';
+    }
+
+    /**
+     * Get the resolved thumbnail URL.
+     * Supports external URLs, absolute paths, and storage-relative paths.
+     */
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        if (empty($this->thumbnail)) {
+            return null;
+        }
+
+        if (str_starts_with($this->thumbnail, 'http://') || 
+            str_starts_with($this->thumbnail, 'https://') || 
+            str_starts_with($this->thumbnail, '//') || 
+            str_starts_with($this->thumbnail, '/')) {
+            return $this->thumbnail;
+        }
+
+        return asset('storage/' . $this->thumbnail);
     }
 }
