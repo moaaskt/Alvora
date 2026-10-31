@@ -467,9 +467,7 @@
                                         'https://lh3.googleusercontent.com/aida-public/AB6AXuBE3B_tqK8QSeVFVTYFbX7Cjvtj8jEtu_cgaJ5hojilJIIqi3uWoF3NJcKw5OBgPrE2XKkkDm8sexYSYIbEY7KWTuS_AgHE-eEL9LgEeketfcRgdCnDIdFCgwQoPAWvp9Ktb7gC_86FyslP_zny-FnRdlrfvhIHHmvLH6Tb_YZu4gQ3MTD0_VH0syowD06hUEPkaxv-F1fGjLayyKeACDZqD51kqoJOolUbfruH3CqBZynSoj1Z9jti',
                                         'https://lh3.googleusercontent.com/aida-public/AB6AXuDAPj2pCA-uO8FAjshJLSPcsM8D8G0-DaYTbpu-SPLCS8yktbS67-5hAKXNCtWzNC_Eb6Wv2sc3xlwWzN9m7aqwFJ4nyI8l9QaUNkltlg4TbEhd1eJWMsfdjQeHpwD5-9087v8zkWUU2BqQwB-0XWTmJfFqVrRSVY-UWB2a073iKRiWwoCij8DaEcblkOWC6bDHUkAEnmJrvvm0m8RmNVICDzljeigihGa1wq_FeLwT9eH0lshZ49cL'
                                     ];
-                                    $imgUrl = $course->thumbnail && (str_starts_with($course->thumbnail, 'http') || str_starts_with($course->thumbnail, '/')) 
-                                        ? $course->thumbnail 
-                                        : ($defaultImages[$loop->index % count($defaultImages)]);
+                                    $imgUrl = $course->thumbnail_url ?: ($defaultImages[$loop->index % count($defaultImages)]);
                                 @endphp
 
                                 <div class="course-card rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between overflow-hidden group border border-outline-variant/20" 

@@ -136,8 +136,8 @@
                             <td class="py-3.5 px-4">
                                 <div class="flex items-center gap-3">
                                     <a href="{{ route('instructor.courses.edit', $course) }}" class="relative w-16 h-10 rounded-md overflow-hidden shrink-0 border border-slate-200 shadow-2xs bg-slate-100 block group-hover:ring-2 group-hover:ring-blue-500/30 transition-all">
-                                        @if($course->thumbnail)
-                                            <img class="w-full h-full object-cover" src="{{ $course->thumbnail }}" alt="{{ $course->title }}">
+                                        @if($course->thumbnail_url)
+                                            <img class="w-full h-full object-cover" src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}">
                                         @else
                                             <div class="w-full h-full flex items-center justify-center bg-blue-50 text-blue-600 font-bold text-xs uppercase">
                                                 {{ substr($course->title, 0, 2) }}

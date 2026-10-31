@@ -309,7 +309,16 @@ class BillingWebhookAndDashboardTest extends TestCase
             ->assertSee('Gestão Global de Faturamento B2B')
             ->assertSee('R$ 1.290,00')
             ->assertSee($company->name)
+            ->assertSee('Recorrência')
+            ->assertSee('Ativas')
+            ->assertSee('bg-blue-100 text-blue-700')
+            ->assertSee('bg-green-100 text-green-700')
+            ->assertSee('bg-edtech-blue-light text-edtech-blue')
+            ->assertSee('empresas cadastradas')
+            ->assertDontSee('Gateway Conectado')
+            ->assertDontSee('Painel Executivo B2B')
             ->call('syncSubscriptions')
-            ->assertSee('Sincronização concluída com sucesso');
+            ->assertSee('Sincronização concluída com sucesso')
+            ->assertSee('bg-green-50 border border-green-200 text-green-700');
     }
 }

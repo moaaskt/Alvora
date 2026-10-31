@@ -351,4 +351,25 @@ class CourseTest extends TestCase
         $response->assertSee('Adicionar Módulo');
         $response->assertSee('Gerador Curricular Inteligente');
     }
+
+    public function test_thumbnail_url_resolves_external_and_storage_paths(): void
+    {
+        $courseExternal = new Course(['thumbnail' => 'https://exemplo.com/capa.jpg']);
+        $this->assertEquals('https://exemplo.com/capa.jpg', $courseExternal->thumbnail_url);
+
+        $courseHttp = new Course(['thumbnail' => 'http://exemplo.com/capa.png']);
+        $this->assertEquals('http://exemplo.com/capa.png', $courseHttp->thumbnail_url);
+
+        $courseAbsolute = new Course(['thumbnail' => '/images/default.jpg']);
+        $this->assertEquals('/images/default.jpg', $courseAbsolute->thumbnail_url);
+
+        $courseRelative = new Course(['thumbnail' => 'courses/thumbnails/capa.jpg']);
+        $this->assertEquals(asset('storage/courses/thumbnails/capa.jpg'), $courseRelative->thumbnail_url);
+
+        $courseEmpty = new Course(['thumbnail' => '']);
+        $this->assertNull($courseEmpty->thumbnail_url);
+
+        $courseNull = new Course(['thumbnail' => null]);
+        $this->assertNull($courseNull->thumbnail_url);
+    }
 }

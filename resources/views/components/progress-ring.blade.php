@@ -45,6 +45,20 @@
         @endif
     @endif
 
-    {{-- Center Solid Play Triangle --}}
-    <polygon points="10.5,8.5 15.5,12 10.5,15.5" class="fill-edtech-blue" />
+    {{-- 3. Ícone Central: Play ou Pause via Alpine --}}
+    @if ($alpineModel)
+        <g>
+            {{-- Pause (duas barras) — visível quando isPlaying = true --}}
+            <g x-show="typeof isPlaying !== 'undefined' ? isPlaying : false">
+                <rect x="9.5" y="8.5" width="2" height="7" rx="0.5" class="fill-edtech-blue" />
+                <rect x="12.5" y="8.5" width="2" height="7" rx="0.5" class="fill-edtech-blue" />
+            </g>
+            {{-- Play (triângulo) — visível quando isPlaying = false --}}
+            <polygon x-show="typeof isPlaying !== 'undefined' ? !isPlaying : true"
+                     points="10.5,8.5 15.5,12 10.5,15.5"
+                     class="fill-edtech-blue" />
+        </g>
+    @else
+        <polygon points="10.5,8.5 15.5,12 10.5,15.5" class="fill-edtech-blue" />
+    @endif
 </svg>

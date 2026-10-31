@@ -162,4 +162,23 @@ class AdminDashboardTest extends TestCase
 
         $response->assertRedirect('/login');
     }
+
+    public function test_recent_courses_renders_thumbnail_url_correctly(): void
+    {
+        $externalUrl = 'https://exemplo.com/capa-ia.jpg';
+        $course = Course::create([
+            'company_id' => $this->company->id,
+            'instructor_id' => $this->instructor->id,
+            'title' => 'Curso com Capa Externa ' . uniqid(),
+            'slug' => 'curso-capa-' . uniqid(),
+            'thumbnail' => $externalUrl,
+            'status' => 'published',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('src="' . $externalUrl . '"', false);
+        $response->assertDontSee('storage/' . $externalUrl, false);
+    }
 }

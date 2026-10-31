@@ -20,66 +20,56 @@
                     try { window._alvoraPlayer.ytPlayer.destroy(); } catch(e) {}
                     window._alvoraPlayer.ytPlayer = null;
                 }
-                try {
-                    const player = new window.YT.Player('alvora-yt-iframe', {
-                        videoId: container.dataset.videoId,
-                        playerVars: {
-                            rel: 0,
-                            modestbranding: 1,
-                            origin: window.location.origin,
+                const player = new window.YT.Player('alvora-yt-iframe', {
+                    videoId: container.dataset.videoId,
+                    playerVars: { rel: 0, modestbranding: 1, origin: window.location.origin },
+                    events: {
+                        onReady: (event) => {
+                            console.log('[Alvora] onReady! duration:', event.target.getDuration());
+                            const vm = window._alvoraPlayer;
+                            if (!vm) return;
+                            vm.ytPlayer = player;
+                            vm.ytDuration = event.target.getDuration() || vm.ytDuration;
                         },
-                        events: {
-                            onReady: (event) => {
-                                console.log('[Alvora] onReady!');
-                                const d = event.target.getDuration();
-                                const vm = window._alvoraPlayer;
-                                if (!vm) return;
-                                // Sempre substitui — garante que é o player atual
-                                vm.ytPlayer = player;
-                                if (d > 0) vm.ytDuration = d;
-                                console.log('[Alvora] player salvo, duration:', d);
-                            },
-                            onStateChange: (event) => {
-                                console.log('[Alvora] state:', event.data);
-                                const vm = window._alvoraPlayer;
-                                if (!vm) return;
-                                if (event.data === 1) {
-                                    vm.isPlaying = true;
-                                    vm.startYTTicker();
-                                } else if (event.data === 2) {
-                                    vm.isPlaying = false;
-                                    vm.stopYTTicker();
-                                } else if (event.data === 0) {
-                                    vm.isPlaying = false;
-                                    vm.stopYTTicker();
-                                    vm.currentLessonPercent = 100;
-                                    if (!vm.isCompleted) {
-                                        vm.$wire.toggleComplete();
-                                    }
-                                }
+                        onStateChange: (event) => {
+                            console.log('[Alvora] state:', event.data);
+                            const vm = window._alvoraPlayer;
+                            if (!vm) return;
+                            if (event.data === 1) {
+                                vm.isPlaying = true;
+                                vm.startYTTicker();
+                            } else if (event.data === 2) {
+                                vm.isPlaying = false;
+                                vm.stopYTTicker();
+                            } else if (event.data === 0) {
+                                vm.isPlaying = false;
+                                vm.stopYTTicker();
+                                vm.currentLessonPercent = 100;
+                                if (!vm.isCompleted) vm.$wire.toggleComplete();
                             }
                         }
-                    });
-                } catch (e) {
-                    console.warn('[Alvora YT] Erro initYT:', e);
-                }
+                    }
+                });
             };
 
-            const prevYTReady = window.onYouTubeIframeAPIReady;
-            window.onYouTubeIframeAPIReady = () => {
-                if (typeof prevYTReady === 'function') prevYTReady();
-                window.initYT();
-            };
-
+            // UMA SÓ chamada — apenas se ainda não existir player ativo
             if (window.YT && window.YT.Player) {
-                window.initYT();
+                if (!window._alvoraPlayer.ytPlayer) {
+                    window.initYT();
+                }
+            } else {
+                const prev = window.onYouTubeIframeAPIReady;
+                window.onYouTubeIframeAPIReady = () => {
+                    if (typeof prev === 'function') prev();
+                    if (!window._alvoraPlayer || !window._alvoraPlayer.ytPlayer) {
+                        window.initYT();
+                    }
+                };
             }
 
             this.$nextTick(() => {
-                this.initPlayer();
-                if (window.YT && window.YT.Player) {
-                    window.initYT();
-                }
+                const vimeoIframe = document.getElementById('alvora-vimeo-iframe');
+                if (vimeoIframe) this.setupVimeo(vimeoIframe);
             });
         },
 
@@ -87,12 +77,6 @@
             this.cleanup();
             this.currentLessonPercent = 0;
             this.lastReportedPercent = 0;
-
-            const vimeoIframe = document.getElementById('alvora-vimeo-iframe');
-            if (vimeoIframe) {
-                this.setupVimeo(vimeoIframe);
-                return;
-            }
         },
 
         startYTTicker() {
@@ -279,7 +263,7 @@
         <div class="flex-1 w-full min-w-0">
             {{-- Video / Media Area (16:9, rounded-2xl, native controls only) --}}
             <div wire:key="media-player-container-{{ $currentLesson->id ?? 0 }}"
-                 x-init="$nextTick(() => { initPlayer(); if (window.initYT && window.YT && window.YT.Player) window.initYT(); })"
+                 wire:ignore
                  class="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-card flex items-center justify-center border border-edtech-border/60">
                 @if ($currentLesson && $currentLesson->video_url)
                     @php
