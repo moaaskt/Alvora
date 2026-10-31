@@ -29,8 +29,8 @@
     <div class="flex flex-col flex-1">
         <!-- 1. Cover Image (16:10 aspect ratio, zoom 1.05 on hover) -->
         <div class="w-full aspect-[16/10] rounded-[12px] overflow-hidden bg-edtech-border-light shrink-0 relative border border-edtech-border/60">
-            @if ($course->thumbnail)
-                <img src="{{ $course->thumbnail }}"
+            @if ($course->thumbnail_url)
+                <img src="{{ $course->thumbnail_url }}"
                      alt="{{ $course->title }}"
                      loading="lazy"
                      class="w-full h-full object-cover motion-safe:group-hover:scale-105 transition-transform duration-300 ease-out">
