@@ -69,7 +69,11 @@
                                     </div>
                                     <div>
                                         <!-- Card titles: 18-20px, weight 600 -->
-                                        <h3 class="text-[19px] font-semibold text-white leading-tight line-clamp-2">{{ $course->title }}</h3>
+                                        <h3 class="text-[19px] font-semibold text-white leading-tight line-clamp-2">
+                                        <a href="{{ route('courses.public.show', $course->slug) }}" class="hover:underline">
+                                            {{ $course->title }}
+                                        </a>
+                                    </h3>
                                     </div>
                                 </div>
                             </div>
@@ -114,8 +118,8 @@
                                     @endif
                                 </span>
                             </div>
-                            <a href="#apresentacao" class="text-[13px] font-semibold text-edtech-blue hover:text-edtech-blue-hover flex items-center gap-1">
-                                <span>Capacitar Equipe</span>
+                            <a href="{{ route('courses.public.show', $course->slug) }}" class="text-[13px] font-semibold text-edtech-blue hover:text-edtech-blue-hover flex items-center gap-1">
+                                <span>Conhecer Curso</span>
                                 <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
                             </a>
                         </div>

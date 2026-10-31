@@ -12,10 +12,10 @@
 
         <!-- DESKTOP NAV LINKS -->
         <nav aria-label="Navegação Principal" class="hidden md:flex items-center gap-6 lg:gap-8">
-            <a href="#diferenciais" class="text-sm font-semibold text-edtech-muted hover:text-edtech-blue transition-colors">Diferenciais</a>
-            <a href="#comparativo" class="text-sm font-semibold text-edtech-muted hover:text-edtech-blue transition-colors">Por que Alvora?</a>
-            <a href="#cursos" class="text-sm font-semibold text-edtech-muted hover:text-edtech-blue transition-colors">Programas &amp; Cursos</a>
-            <a href="#docentes" class="text-sm font-semibold text-edtech-muted hover:text-edtech-blue transition-colors">Especialistas</a>
+            <a href="{{ url('/#diferenciais') }}" class="text-sm font-semibold text-edtech-muted hover:text-edtech-blue transition-colors">Diferenciais</a>
+            <a href="{{ url('/#comparativo') }}" class="text-sm font-semibold text-edtech-muted hover:text-edtech-blue transition-colors">Por que Alvora?</a>
+            <a href="{{ url('/#cursos') }}" class="text-sm font-semibold text-edtech-muted hover:text-edtech-blue transition-colors">Programas &amp; Cursos</a>
+            <a href="{{ url('/#docentes') }}" class="text-sm font-semibold text-edtech-muted hover:text-edtech-blue transition-colors">Especialistas</a>
             <a href="{{ url('/planos') }}" class="text-sm font-semibold text-edtech-muted hover:text-edtech-blue transition-colors">Planos B2B</a>
         </nav>
 
@@ -24,7 +24,7 @@
             <a href="{{ route('login') }}" class="hidden sm:inline-flex text-sm font-semibold text-edtech-text hover:text-edtech-blue px-4 py-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-edtech-blue/30">
                 Acessar
             </a>
-            <a href="#apresentacao" class="hidden sm:inline-flex items-center justify-center bg-edtech-blue hover:bg-edtech-blue-hover text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm shadow-edtech-blue/20 focus:outline-none focus:ring-2 focus:ring-edtech-blue/40">
+            <a href="{{ url('/#apresentacao') }}" class="hidden sm:inline-flex items-center justify-center bg-edtech-blue hover:bg-edtech-blue-hover text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm shadow-edtech-blue/20 focus:outline-none focus:ring-2 focus:ring-edtech-blue/40">
                 Falar com Consultor
             </a>
 
@@ -50,16 +50,16 @@
          x-transition:leave-end="opacity-0 -translate-y-2"
          class="md:hidden px-4 pt-2 pb-5 border-t border-edtech-border bg-edtech-surface space-y-2"
          style="display: none;">
-        <a @click="mobileMenuOpen = false" href="#diferenciais" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-edtech-text hover:bg-edtech-bg hover:text-edtech-blue">Diferenciais</a>
-        <a @click="mobileMenuOpen = false" href="#comparativo" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-edtech-text hover:bg-edtech-bg hover:text-edtech-blue">Por que Alvora?</a>
-        <a @click="mobileMenuOpen = false" href="#cursos" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-edtech-text hover:bg-edtech-bg hover:text-edtech-blue">Programas &amp; Cursos</a>
-        <a @click="mobileMenuOpen = false" href="#docentes" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-edtech-text hover:bg-edtech-bg hover:text-edtech-blue">Especialistas</a>
+        <a @click="mobileMenuOpen = false" href="{{ url('/#diferenciais') }}" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-edtech-text hover:bg-edtech-bg hover:text-edtech-blue">Diferenciais</a>
+        <a @click="mobileMenuOpen = false" href="{{ url('/#comparativo') }}" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-edtech-text hover:bg-edtech-bg hover:text-edtech-blue">Por que Alvora?</a>
+        <a @click="mobileMenuOpen = false" href="{{ url('/#cursos') }}" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-edtech-text hover:bg-edtech-bg hover:text-edtech-blue">Programas &amp; Cursos</a>
+        <a @click="mobileMenuOpen = false" href="{{ url('/#docentes') }}" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-edtech-text hover:bg-edtech-bg hover:text-edtech-blue">Especialistas</a>
         <a @click="mobileMenuOpen = false" href="{{ url('/planos') }}" class="block px-3 py-2.5 rounded-xl text-sm font-semibold text-edtech-text hover:bg-edtech-bg hover:text-edtech-blue">Planos B2B</a>
         <div class="pt-3 border-t border-edtech-border flex flex-col gap-2.5">
             <a @click="mobileMenuOpen = false" href="{{ route('login') }}" class="w-full text-center py-2.5 px-4 rounded-xl text-sm font-semibold text-edtech-text border border-edtech-border hover:bg-edtech-bg">
                 Acessar
             </a>
-            <a @click="mobileMenuOpen = false" href="#apresentacao" class="w-full text-center py-3 px-4 rounded-xl text-sm font-semibold text-white bg-edtech-blue hover:bg-edtech-blue-hover shadow-sm">
+            <a @click="mobileMenuOpen = false" href="{{ url('/#apresentacao') }}" class="w-full text-center py-3 px-4 rounded-xl text-sm font-semibold text-white bg-edtech-blue hover:bg-edtech-blue-hover shadow-sm">
                 Falar com Consultor
             </a>
         </div>
