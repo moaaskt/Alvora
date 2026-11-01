@@ -48,6 +48,15 @@
         }
     }" class="bg-[#F8FAFC] min-h-screen flex flex-col text-slate-800">
 
+        @if(!empty($isPreviewMode))
+            <aside class="bg-amber-400 text-slate-900 py-2 px-4 text-xs font-semibold flex items-center justify-between shadow-xs sticky top-0 z-50">
+                <div class="flex items-center gap-2 mx-auto">
+                    <x-icon name="eye" class="w-4 h-4 text-slate-900" />
+                    <span>Modo de Pré-visualização em Tempo Real — Visível exclusivamente para Gestão e Autoria do Curso.</span>
+                </div>
+            </aside>
+        @endif
+
         <!-- 1. NAVBAR OFICIAL DA LANDING PAGE -->
         <x-landing.navbar />
 

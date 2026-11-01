@@ -1,4 +1,4 @@
-<div class="px-space-xl py-space-lg flex flex-col gap-6 max-w-[1600px] mx-auto w-full">
+<div x-data="{ showPublicPreviewModal: false, previewDevice: 'desktop' }" class="px-space-xl py-space-lg flex flex-col gap-6 max-w-[1600px] mx-auto w-full">
     <!-- SUB-NAV / BREADCRUMBS & STATUS TOP BAR -->
     <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
@@ -59,13 +59,13 @@
             </a>
 
             @if($courseId && $slug)
-                <a href="{{ route('courses.public.show', $slug) }}" 
-                   target="_blank"
-                   class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors text-xs font-semibold border border-indigo-200/80 shadow-2xs"
-                   title="Visualizar a página pública deste treinamento corporativo em nova aba">
-                    <x-icon name="box-arrow-up-right" class="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                    <span>Ver Página Pública</span>
-                </a>
+                <button type="button" 
+                        @click="showPublicPreviewModal = true"
+                        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors text-xs font-semibold border border-indigo-200/80 shadow-2xs cursor-pointer"
+                        title="Visualizar a página pública real e completa deste curso">
+                    <x-icon name="eye" class="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span>Prévia da Página Pública</span>
+                </button>
             @endif
 
             @if($courseId)
@@ -247,69 +247,24 @@
                         </div>
                     </div>
 
-                    <!-- Descrição Completa com Editor WYSIWYG Estilo Stitch & Mini Preview -->
-                    <div class="flex flex-col gap-2" x-data="{ viewMode: 'editor' }">
+                    <!-- Descrição Completa com Editor WYSIWYG Estilo Stitch -->
+                    <div class="flex flex-col gap-2">
                         <div class="flex items-center justify-between">
                             <label class="text-xs font-semibold text-slate-700" for="course-description">
                                 Descrição Completa e Objetivos Pedagógicos
                             </label>
-
-                            <!-- Toggle de Modo: Editor vs Pré-visualização -->
-                            <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs">
-                                <button type="button" 
-                                        @click="viewMode = 'editor'" 
-                                        :class="viewMode === 'editor' ? 'bg-white text-blue-600 font-semibold shadow-2xs' : 'text-slate-500 hover:text-slate-800'"
-                                        class="flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-all cursor-pointer">
-                                    <x-icon name="pencil-square" class="w-3.5 h-3.5" />
-                                    <span>Editor</span>
-                                </button>
-                                <button type="button" 
-                                        @click="viewMode = 'preview'" 
-                                        :class="viewMode === 'preview' ? 'bg-white text-blue-600 font-semibold shadow-2xs' : 'text-slate-500 hover:text-slate-800'"
-                                        class="flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-all cursor-pointer">
-                                    <x-icon name="eye" class="w-3.5 h-3.5" />
-                                    <span>Mini Preview</span>
-                                </button>
-                            </div>
+                            <span class="inline-flex items-center gap-1 text-[11px] text-blue-600 font-medium">
+                                <x-icon name="stars" class="w-3.5 h-3.5 text-blue-600" />
+                                <span>Assistente Alvora IA Habilitado</span>
+                            </span>
                         </div>
 
-                        <!-- Modo 1: Editor Visual WYSIWYG (blindado com wire:ignore) -->
-                        <div x-show="viewMode === 'editor'">
-                            <x-wysiwyg 
-                                id="course-description" 
-                                wire:model="description" 
-                                placeholder="Descreva a ementa do treinamento, competências desenvolvidas, metodologia e metas de aprendizagem para os colaboradores..."
-                                minHeight="180px"
-                            />
-                        </div>
-
-                        <!-- Modo 2: Mini Preview em Tempo Real idêntico à Página Pública -->
-                        <div x-show="viewMode === 'preview'" style="display: none;">
-                            <div class="border border-slate-200 rounded-xl p-4 sm:p-5 bg-slate-50/70 shadow-2xs flex flex-col gap-3">
-                                <div class="flex items-center justify-between border-b border-slate-200/80 pb-2">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        <span class="text-xs font-semibold text-slate-700">Prévia da Vitrine Pública</span>
-                                    </div>
-                                    <span class="text-[11px] text-slate-400">Renderização fiel em tempo real</span>
-                                </div>
-
-                                <div class="bg-white rounded-lg p-5 border border-slate-200/90 shadow-2xs">
-                                    <h4 class="text-sm font-bold text-slate-900 mb-2.5">
-                                        Sobre este Treinamento Corporativo
-                                    </h4>
-                                    <template x-if="$wire.description && $wire.description.trim() !== '' && $wire.description !== '<p><br></p>'">
-                                        <div class="alvora-wysiwyg-content" x-html="$wire.description"></div>
-                                    </template>
-                                    <template x-if="!$wire.description || $wire.description.trim() === '' || $wire.description === '<p><br></p>'">
-                                        <p class="text-xs text-slate-400 italic py-6 text-center">
-                                            Nenhum conteúdo digitado ainda. Alterne para a aba "Editor" acima para redigir a ementa do treinamento.
-                                        </p>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
-
+                        <x-wysiwyg 
+                            id="course-description" 
+                            wire:model="description" 
+                            placeholder="Descreva a ementa do treinamento, competências desenvolvidas, metodologia e metas de aprendizagem para os colaboradores..."
+                            minHeight="180px"
+                        />
                         @error('description')
                             <span class="text-rose-500 text-xs">{{ $message }}</span>
                         @enderror
@@ -627,6 +582,103 @@
                         class="px-5 py-2 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-all shadow-sm">
                     Salvar Publicação
                 </button>
+            </div>
+        </div>
+    @endif
+
+    <!-- ======================================================== -->
+    <!-- MODAL DE PRÉ-VISUALIZAÇÃO COMPLETA DA PÁGINA DO CURSO    -->
+    <!-- ======================================================== -->
+    @if($courseId && $slug)
+        <div x-show="showPublicPreviewModal" 
+             x-cloak
+             style="display: none;"
+             class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-slate-900/80 backdrop-blur-sm"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+
+            <div class="relative w-full h-[95vh] max-w-7xl bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-700"
+                 @click.outside="showPublicPreviewModal = false">
+                
+                <!-- Barra de Navegador do Simulador -->
+                <div class="px-4 py-2.5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800 shrink-0 select-none">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" @click="showPublicPreviewModal = false" class="w-3 h-3 rounded-full bg-rose-500 hover:opacity-80 transition-opacity cursor-pointer" title="Fechar"></button>
+                            <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                        </div>
+                        <div class="h-4 w-px bg-slate-700 mx-1"></div>
+                        <div class="flex items-center gap-2 text-xs font-medium text-slate-300">
+                            <x-icon name="globe" class="w-3.5 h-3.5 text-blue-400" />
+                            <span class="font-mono text-slate-300 text-[11px] truncate max-w-xs sm:max-w-md">{{ url('/cursos/' . $slug) }}</span>
+                            <span class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Página Pública Real</span>
+                        </div>
+                    </div>
+
+                    <!-- Controles: Dispositivos, Nova Aba e Fechar -->
+                    <div class="flex items-center gap-2">
+                        <!-- Alternar Desktop / Tablet / Mobile -->
+                        <div class="hidden sm:flex items-center gap-1 bg-slate-800 p-0.5 rounded-lg border border-slate-700 text-xs">
+                            <button type="button" 
+                                    @click="previewDevice = 'desktop'"
+                                    :class="previewDevice === 'desktop' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'"
+                                    class="flex items-center gap-1 px-2 py-1 rounded transition-colors text-[11px] cursor-pointer" title="Visão Desktop Completa">
+                                <x-icon name="laptop" class="w-3.5 h-3.5" />
+                                <span>Desktop</span>
+                            </button>
+                            <button type="button" 
+                                    @click="previewDevice = 'tablet'"
+                                    :class="previewDevice === 'tablet' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'"
+                                    class="flex items-center gap-1 px-2 py-1 rounded transition-colors text-[11px] cursor-pointer" title="Visão Tablet (768px)">
+                                <x-icon name="tablet" class="w-3.5 h-3.5" />
+                                <span>Tablet</span>
+                            </button>
+                            <button type="button" 
+                                    @click="previewDevice = 'mobile'"
+                                    :class="previewDevice === 'mobile' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'"
+                                    class="flex items-center gap-1 px-2 py-1 rounded transition-colors text-[11px] cursor-pointer" title="Visão Mobile (390px)">
+                                <x-icon name="phone" class="w-3.5 h-3.5" />
+                                <span>Mobile</span>
+                            </button>
+                        </div>
+
+                        <!-- Abrir em Nova Aba Real -->
+                        <a href="{{ route('courses.public.show', $slug) }}?preview=1" 
+                           target="_blank" 
+                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-xs transition-colors"
+                           title="Abrir em aba real do navegador">
+                            <x-icon name="box-arrow-up-right" class="w-3 h-3" />
+                            <span>Abrir em Nova Aba</span>
+                        </a>
+
+                        <!-- Fechar -->
+                        <button type="button" 
+                                @click="showPublicPreviewModal = false"
+                                class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                                title="Fechar Prévia (ESC)">
+                            <x-icon name="x-lg" class="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Janela do Iframe -->
+                <div class="flex-1 w-full bg-slate-200/70 flex items-center justify-center overflow-auto p-2 sm:p-4">
+                    <div :class="{
+                        'w-full h-full rounded-lg shadow-sm': previewDevice === 'desktop',
+                        'w-[768px] h-full shadow-2xl rounded-2xl border-4 border-slate-800': previewDevice === 'tablet',
+                        'w-[390px] h-full shadow-2xl rounded-3xl border-8 border-slate-800': previewDevice === 'mobile'
+                    }" class="transition-all duration-300 bg-white overflow-hidden flex flex-col">
+                        <iframe x-ref="previewFrame" 
+                                :src="showPublicPreviewModal ? '{{ route('courses.public.show', $slug) }}?preview=1' : 'about:blank'" 
+                                class="w-full flex-1 border-0"
+                                title="Prévia Real da Página Pública do Curso"></iframe>
+                    </div>
+                </div>
             </div>
         </div>
     @endif
