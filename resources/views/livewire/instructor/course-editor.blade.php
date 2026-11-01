@@ -237,7 +237,7 @@
                         </div>
                     </div>
 
-                    <!-- Descrição Completa com Estilo Stitch -->
+                    <!-- Descrição Completa com Editor WYSIWYG Estilo Stitch -->
                     <div class="flex flex-col gap-2">
                         <div class="flex items-center justify-between">
                             <label class="text-xs font-semibold text-slate-700" for="course-description">
@@ -249,27 +249,15 @@
                             </span>
                         </div>
 
-                        <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs bg-white">
-                            <div class="flex items-center gap-1 px-3 py-2 bg-slate-50 border-b border-slate-200 text-slate-600 flex-wrap">
-                                <span class="p-1 rounded font-bold text-xs select-none">B</span>
-                                <span class="p-1 rounded italic text-xs select-none">I</span>
-                                <span class="p-1 rounded underline text-xs select-none">U</span>
-                                <span class="w-px h-4 bg-slate-200 mx-1"></span>
-                                <span class="p-1 rounded text-xs select-none flex items-center">
-                                    <x-icon name="list-ul" class="w-3.5 h-3.5" />
-                                </span>
-                                <span class="p-1 rounded text-xs select-none flex items-center">
-                                    <x-icon name="link-45deg" class="w-3.5 h-3.5" />
-                                </span>
-                                <span class="w-px h-4 bg-slate-200 mx-1"></span>
-                                <span class="text-[11px] text-slate-400 ml-auto font-mono">Texto & Markdown Suportado</span>
-                            </div>
-                            <textarea id="course-description" 
-                                      wire:model="description" 
-                                      rows="5" 
-                                      placeholder="Descreva a ementa do treinamento, competências desenvolvidas e metas de aprendizagem para os colaboradores..."
-                                      class="w-full p-4 text-xs font-normal text-slate-800 leading-relaxed focus:outline-none resize-y min-h-[140px]"></textarea>
-                        </div>
+                        <x-wysiwyg 
+                            id="course-description" 
+                            wire:model="description" 
+                            placeholder="Descreva a ementa do treinamento, competências desenvolvidas, metodologia e metas de aprendizagem para os colaboradores..."
+                            minHeight="180px"
+                        />
+                        @error('description')
+                            <span class="text-rose-500 text-xs">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <!-- URL da Capa / Thumbnail (Campo Real do Eloquent) -->

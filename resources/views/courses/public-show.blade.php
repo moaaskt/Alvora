@@ -183,9 +183,17 @@
                                 <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-3">
                                     Sobre este Treinamento Corporativo
                                 </h3>
-                                <div class="text-sm sm:text-base text-slate-600 leading-relaxed space-y-4 font-normal">
+                                <div class="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
                                     @if($course->description)
-                                        {!! nl2br(e($course->description)) !!}
+                                        @if(strip_tags($course->description) === $course->description)
+                                            <div class="space-y-4">
+                                                {!! nl2br(e($course->description)) !!}
+                                            </div>
+                                        @else
+                                            <div class="prose prose-slate max-w-none text-slate-600 leading-relaxed text-sm sm:text-base [&_p]:mb-4 [&_p:last-child]:mb-0 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-slate-900 [&_h2]:mt-6 [&_h2]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-slate-800 [&_h3]:mt-4 [&_h3]:mb-1.5 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_ul]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1.5 [&_ol]:mb-4 [&_li]:text-slate-600 [&_strong]:text-slate-900 [&_strong]:font-semibold [&_a]:text-blue-600 [&_a]:underline hover:[&_a]:text-blue-700 [&_blockquote]:border-l-4 [&_blockquote]:border-blue-500 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-500 [&_pre]:bg-slate-900 [&_pre]:text-slate-100 [&_pre]:p-3 [&_pre]:rounded-lg [&_code]:text-blue-600 [&_code]:bg-blue-50 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded">
+                                                {!! \App\Support\HtmlSanitizer::clean($course->description) !!}
+                                            </div>
+                                        @endif
                                     @else
                                         <p>
                                             Este programa executivo foi especialmente desenhado para capacitar equipes corporativas de alto desempenho. Através de uma abordagem prática baseada em casos reais de negócio, os colaboradores desenvolvem competências críticas com foco em aplicação imediata na rotina de trabalho.
