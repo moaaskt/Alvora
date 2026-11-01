@@ -60,7 +60,6 @@
          "></div>
 
     @auth
-        @livewire('profile-drawer')
         @if(auth()->user()->isStudent())
             @livewire('student.ai-tutor-drawer')
         @endif

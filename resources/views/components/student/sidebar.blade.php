@@ -12,9 +12,13 @@
     <div class="bg-edtech-surface border-2 border-edtech-blue rounded-[20px] p-5 lg:p-6 shadow-sidebar flex flex-col">
         <!-- Student Profile Identity -->
         <div class="flex flex-row lg:flex-col items-center lg:text-center gap-4 lg:gap-0 pb-4 lg:pb-6 border-b border-edtech-border">
-            <div class="w-14 h-14 sm:w-16 sm:h-16 lg:w-[112px] lg:h-[112px] rounded-full bg-gradient-to-br from-edtech-blue to-edtech-blue-dark text-white flex items-center justify-center font-semibold text-xl sm:text-2xl lg:text-[36px] lg:mb-4 shadow-[0_0_0_4px_#FFFFFF] shrink-0">
-                {{ $initials }}
-            </div>
+            @if($user && $user->avatar_url)
+                <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="w-14 h-14 sm:w-16 sm:h-16 lg:w-[112px] lg:h-[112px] rounded-full object-cover lg:mb-4 shadow-[0_0_0_4px_#FFFFFF] shrink-0 border border-slate-100">
+            @else
+                <div class="w-14 h-14 sm:w-16 sm:h-16 lg:w-[112px] lg:h-[112px] rounded-full bg-gradient-to-br from-edtech-blue to-edtech-blue-dark text-white flex items-center justify-center font-semibold text-xl sm:text-2xl lg:text-[36px] lg:mb-4 shadow-[0_0_0_4px_#FFFFFF] shrink-0">
+                    {{ $initials }}
+                </div>
+            @endif
             <div class="min-w-0">
                 <h2 class="font-semibold text-edtech-text text-[17px] lg:text-[20px] leading-tight truncate">
                     {{ $user->name }}
@@ -63,7 +67,18 @@
 
             <div class="h-px bg-edtech-border my-1"></div>
 
-            <!-- 4. Sair (POST Form with CSRF) -->
+            <!-- 4. Meu Perfil -->
+            @php $isProfile = ($active === 'profile' || request()->routeIs('settings.*')); @endphp
+            <a href="{{ route('settings.profile') }}"
+               class="group relative flex items-center gap-3 px-3.5 h-[48px] rounded-xl text-[15px] transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edtech-blue focus-visible:bg-edtech-blue-light/60 overflow-hidden {{ $isProfile ? 'font-semibold text-edtech-blue bg-edtech-blue-light' : 'font-medium text-edtech-muted hover:text-edtech-blue hover:bg-edtech-blue-light/60' }}">
+                <span class="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r transition-transform origin-center duration-200 ease-out motion-reduce:transform-none {{ $isProfile ? 'bg-edtech-blue scale-y-100' : 'bg-edtech-blue/50 scale-y-0 group-hover:scale-y-100 group-focus-visible:scale-y-100' }}"></span>
+                <x-icon name="user" class="w-5 h-5 shrink-0 transition-transform duration-200 ease-out motion-reduce:transform-none {{ $isProfile ? 'text-edtech-blue' : 'text-edtech-muted group-hover:text-edtech-blue group-hover:translate-x-0.5 group-focus-visible:text-edtech-blue group-focus-visible:translate-x-0.5' }}" />
+                <span>Meu Perfil</span>
+            </a>
+
+            <div class="h-px bg-edtech-border my-1"></div>
+
+            <!-- 5. Sair (POST Form with CSRF) -->
             <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf
                 <button type="submit"

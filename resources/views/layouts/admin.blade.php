@@ -223,12 +223,12 @@
                         </div>
 
                         <div class="py-1">
-                            <button type="button"
-                                    @click="dropdownOpen = false; $dispatch('open-profile-drawer')"
-                                    class="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 hover:text-primary hover:bg-slate-50 flex items-center gap-2.5 transition-colors cursor-pointer">
+                            <a href="{{ route('settings.profile') }}"
+                               @click="dropdownOpen = false"
+                               class="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 hover:text-primary hover:bg-slate-50 flex items-center gap-2.5 transition-colors cursor-pointer">
                                 <x-icon name="person" class="w-4 h-4 text-slate-500" />
                                 <span>Meu Perfil</span>
-                            </button>
+                            </a>
                         </div>
 
                         <div class="py-1">
@@ -267,8 +267,6 @@
                 showConfirmButton: false
             });
          "></div>
-
-    @livewire('profile-drawer')
 
     @livewireScripts
 </body>
