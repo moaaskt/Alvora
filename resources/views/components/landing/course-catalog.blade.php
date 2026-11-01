@@ -52,28 +52,38 @@
 
                     <article class="group bg-edtech-surface rounded-[16px] border border-edtech-border shadow-sm hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between">
                         <div>
-                            <!-- Banner / Cover Top with distinct gradient, overflow-hidden and zoom 1.05 on hover -->
-                            <div class="h-44 overflow-hidden relative bg-edtech-navy">
-                                <div class="w-full h-full bg-gradient-to-br {{ $meta['gradient'] }} p-6 flex flex-col justify-between text-white transition-transform duration-300 group-hover:scale-105">
+                            <!-- Banner / Cover Top with Course Thumbnail or Gradient Fallback -->
+                            <div class="h-44 overflow-hidden relative bg-slate-900">
+                                @if($course->thumbnail_url)
+                                    <img src="{{ $course->thumbnail_url }}"
+                                         alt="{{ $course->title }}"
+                                         loading="lazy"
+                                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-slate-950/30"></div>
+                                @else
+                                    <div class="w-full h-full bg-gradient-to-br {{ $meta['gradient'] }} transition-transform duration-300 group-hover:scale-105"></div>
+                                @endif
+
+                                <div class="absolute inset-0 p-5 flex flex-col justify-between text-white z-10">
                                     <div class="flex justify-between items-start">
-                                        <!-- Plain category text above title (13px, no badge/pill) -->
-                                        <p class="text-[13px] font-semibold uppercase tracking-wider text-slate-200">
-                                            {{ $meta['category'] }}
-                                        </p>
+                                        <!-- Plain category text above title -->
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-black/50 backdrop-blur-md text-white border border-white/20">
+                                            {{ $course->category->name ?? $meta['category'] }}
+                                        </span>
                                         <img src="{{ asset('images/logo-symbol.png') }}"
-                                             width="24"
-                                             height="19"
+                                             width="20"
+                                             height="16"
                                              loading="lazy"
                                              alt="Alvora"
-                                             class="h-4 w-auto opacity-75 shrink-0">
+                                             class="h-3.5 w-auto opacity-85 shrink-0 drop-shadow">
                                     </div>
                                     <div>
                                         <!-- Card titles: 18-20px, weight 600 -->
-                                        <h3 class="text-[19px] font-semibold text-white leading-tight line-clamp-2">
-                                        <a href="{{ route('courses.public.show', $course->slug) }}" class="hover:underline">
-                                            {{ $course->title }}
-                                        </a>
-                                    </h3>
+                                        <h3 class="text-[18px] sm:text-[19px] font-bold text-white leading-tight line-clamp-2 drop-shadow-md">
+                                            <a href="{{ route('courses.public.show', $course->slug) }}" class="hover:underline">
+                                                {{ $course->title }}
+                                            </a>
+                                        </h3>
                                     </div>
                                 </div>
                             </div>

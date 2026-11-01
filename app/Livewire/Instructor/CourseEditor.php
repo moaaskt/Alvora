@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\Course;
 use App\Models\Quiz;
 use App\Models\User;
+use App\Support\HtmlSanitizer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -33,7 +34,7 @@ class CourseEditor extends Component
         return [
             'title' => 'required|string|min:3|max:255',
             'slug' => 'nullable|string|min:3|max:255',
-            'description' => 'nullable|string|max:3000',
+            'description' => 'nullable|string|max:30000',
             'thumbnail' => 'nullable|string|max:2048',
             'status' => 'required|in:draft,published,archived',
             'instructor_id' => 'required|exists:users,id',
@@ -131,12 +132,14 @@ class CourseEditor extends Component
             $validated['slug'] = Course::generateUniqueSlug(Str::slug($validated['slug']), $companyId);
         }
 
+        $sanitizedDescription = HtmlSanitizer::clean($validated['description'] ?? null);
+
         if ($this->courseId) {
             $course = Course::findOrFail($this->courseId);
             $course->update([
                 'title' => $validated['title'],
                 'slug' => $validated['slug'],
-                'description' => $validated['description'] ?: null,
+                'description' => $sanitizedDescription ?: null,
                 'thumbnail' => $validated['thumbnail'] ?: null,
                 'status' => $validated['status'],
                 'instructor_id' => $validated['instructor_id'],
@@ -150,7 +153,7 @@ class CourseEditor extends Component
                 'company_id' => $companyId,
                 'title' => $validated['title'],
                 'slug' => $validated['slug'],
-                'description' => $validated['description'] ?: null,
+                'description' => $sanitizedDescription ?: null,
                 'thumbnail' => $validated['thumbnail'] ?: null,
                 'status' => $validated['status'],
                 'instructor_id' => $validated['instructor_id'],

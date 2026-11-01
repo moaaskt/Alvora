@@ -40,9 +40,10 @@ Route::get('/', function () {
         // Seleciona exclusivamente campos públicos, sem expor dados internos de negócio
         $showcaseCourses = \App\Models\Course::where('company_id', $demoCompany->id)
             ->where('status', 'published')
-            ->select(['id', 'company_id', 'instructor_id', 'title', 'slug', 'description', 'thumbnail', 'status'])
+            ->select(['id', 'company_id', 'instructor_id', 'category_id', 'title', 'slug', 'description', 'thumbnail', 'status'])
             ->with([
                 'instructor' => fn ($query) => $query->select(['id', 'company_id', 'name', 'role']),
+                'category' => fn ($query) => $query->select(['id', 'name', 'slug']),
             ])
             ->withCount(['lessons', 'modules'])
             ->withSum('lessons as total_duration_minutes', 'duration_minutes')

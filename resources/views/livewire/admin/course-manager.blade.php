@@ -5,13 +5,9 @@
         <!-- Breadcrumb -->
         <nav class="flex items-center text-xs font-medium text-slate-500 gap-2">
             <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition-colors">Home</a>
-            <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
+            <x-icon name="chevron-right" class="w-3.5 h-3.5 text-slate-300" />
             <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition-colors">Painel do Administrador</a>
-            <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
+            <x-icon name="chevron-right" class="w-3.5 h-3.5 text-slate-300" />
             <span class="text-slate-900 font-semibold">Cursos</span>
         </nav>
 
@@ -40,18 +36,14 @@
             <button wire:click="exportCsv" 
                     type="button" 
                     class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all shadow-2xs cursor-pointer">
-                <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-                </svg>
+                <x-icon name="upload" class="w-4 h-4 text-slate-500" />
                 <span>Exportar Relatório</span>
             </button>
 
             <!-- Botão Primário: Adicionar Novo Curso -->
             <a href="{{ route('admin.courses.create') }}" 
                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:bg-blue-800 transition-all shadow-sm shadow-blue-500/25">
-                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
+                <x-icon name="plus-lg" class="w-4 h-4 text-white" />
                 <span>Adicionar Novo Curso</span>
             </a>
         </div>
@@ -64,9 +56,7 @@
             <div class="flex items-center justify-between text-slate-500 mb-3">
                 <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total de Cursos Globais</span>
                 <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-                    </svg>
+                    <x-icon name="journal-bookmark-fill" class="w-4 h-4" />
                 </div>
             </div>
             <div>
@@ -83,9 +73,7 @@
             <div class="flex items-center justify-between text-slate-500 mb-3">
                 <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Cursos Publicados</span>
                 <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <x-icon name="check2-circle" class="w-4 h-4" />
                 </div>
             </div>
             <div>
@@ -237,9 +225,7 @@
                                         @if($c->thumbnail_url)
                                             <img src="{{ $c->thumbnail_url }}" alt="{{ $c->title }}" class="w-full h-full object-cover">
                                         @else
-                                            <svg class="w-5 h-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-                                            </svg>
+                                            <x-icon name="journal-bookmark" class="w-5 h-5 text-slate-300" />
                                         @endif
                                     </div>
                                     <div class="flex flex-col min-w-0">
@@ -303,9 +289,7 @@
                             <!-- Matrículas -->
                             <td class="py-4 px-4 text-center">
                                 <span class="inline-flex items-center gap-1 font-semibold text-xs text-slate-700 bg-slate-50 border border-slate-200/70 px-2.5 py-1 rounded-lg">
-                                    <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                                    </svg>
+                                    <x-icon name="person-fill" class="w-3.5 h-3.5 text-blue-600" />
                                     {{ $c->enrollments_count }}
                                 </span>
                             </td>
@@ -328,18 +312,14 @@
                                     <a href="{{ route('admin.courses.edit', $c->id) }}" 
                                        title="Editar Curso" 
                                        class="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-slate-100 transition-colors">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                        </svg>
+                                        <x-icon name="pencil-square" class="w-4 h-4" />
                                     </a>
 
                                     <!-- Ver Grade Curricular -->
                                     <a href="{{ route('admin.courses.curriculum', $c->id) }}" 
                                        title="Ver Grade Curricular" 
                                        class="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-slate-100 transition-colors">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                                        </svg>
+                                        <x-icon name="list-nested" class="w-4 h-4" />
                                     </a>
 
                                     <!-- Excluir -->
@@ -347,9 +327,7 @@
                                             type="button" 
                                             title="Excluir Curso" 
                                             class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
+                                        <x-icon name="trash3-fill" class="w-4 h-4" />
                                     </button>
                                 </div>
                             </td>

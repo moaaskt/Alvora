@@ -54,6 +54,7 @@ class PublicCourseTest extends TestCase
             'title' => 'Inteligência Artificial e Automação para Líderes Corporativos',
             'slug' => 'ia-para-lideres-corporativos-' . uniqid(),
             'description' => 'Aprenda a liderar a transformação digital e integrar modelos generativos na tomada de decisão estratégica.',
+            'thumbnail' => 'https://alvora.test/capa.jpg',
             'status' => 'published',
         ]);
 
@@ -87,6 +88,7 @@ class PublicCourseTest extends TestCase
         $response->assertSee('Módulo 1: Fundamentos de IA Generativa');
         $response->assertSee('Aula Grátis');
         $response->assertSee('Garantia Corporativa Alvora');
+        $response->assertSee('https://alvora.test/capa.jpg');
         // Navbar check
         $response->assertSee('Programas &amp; Cursos', false);
         // Footer check
@@ -146,5 +148,6 @@ class PublicCourseTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee(route('courses.public.show', $this->course->slug));
+        $response->assertSee('https://alvora.test/capa.jpg');
     }
 }
