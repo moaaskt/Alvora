@@ -430,13 +430,19 @@
                             </div>
 
                             <div class="flex flex-col sm:flex-row items-start gap-6 pt-2">
-                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#0B1528] to-edtech-blue text-white flex items-center justify-center font-bold text-xl sm:text-2xl shrink-0 shadow-sm">
-                                    @php
-                                        $instructorName = $course->instructor->name ?? 'Prof. Carlos Eduardo';
-                                        $initials = collect(explode(' ', $instructorName))->map(fn($p) => mb_substr($p, 0, 1))->take(2)->join('');
-                                    @endphp
-                                    <span>{{ $initials ?: 'AV' }}</span>
-                                </div>
+                                @php
+                                    $instructorName = $course->instructor->name ?? 'Prof. Carlos Eduardo';
+                                    $instructorAvatar = $course->instructor?->avatar_url;
+                                    $initials = collect(explode(' ', $instructorName))->map(fn($p) => mb_substr($p, 0, 1))->take(2)->join('');
+                                @endphp
+
+                                @if($instructorAvatar)
+                                    <img src="{{ $instructorAvatar }}" alt="{{ $instructorName }}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover shrink-0 shadow-sm border border-slate-200">
+                                @else
+                                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#0B1528] to-edtech-blue text-white flex items-center justify-center font-bold text-xl sm:text-2xl shrink-0 shadow-sm">
+                                        <span>{{ $initials ?: 'AV' }}</span>
+                                    </div>
+                                @endif
 
                                 <div class="space-y-3 flex-1">
                                     <div>

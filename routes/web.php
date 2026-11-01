@@ -42,7 +42,7 @@ Route::get('/', function () {
             ->where('status', 'published')
             ->select(['id', 'company_id', 'instructor_id', 'category_id', 'title', 'slug', 'description', 'thumbnail', 'status'])
             ->with([
-                'instructor' => fn ($query) => $query->select(['id', 'company_id', 'name', 'role']),
+                'instructor' => fn ($query) => $query->select(['id', 'company_id', 'name', 'role', 'avatar']),
                 'category' => fn ($query) => $query->select(['id', 'name', 'slug']),
             ])
             ->withCount(['lessons', 'modules'])
@@ -57,7 +57,7 @@ Route::get('/', function () {
             $featuredInstructors = \App\Models\User::where('company_id', $demoCompany->id)
                 ->whereIn('id', $instructorIds)
                 ->where('role', \App\Enums\UserRole::INSTRUCTOR)
-                ->select(['id', 'company_id', 'name', 'role'])
+                ->select(['id', 'company_id', 'name', 'role', 'avatar', 'job_title', 'bio'])
                 ->get();
         }
 
@@ -244,6 +244,13 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
         Route::get('/cursos/{course}/quizzes/novo', QuizEditor::class)->name('courses.quizzes.create');
         Route::get('/cursos/{course}/quizzes/{quiz}/editar', QuizEditor::class)->name('courses.quizzes.edit');
         Route::get('/quizzes/{quiz}/editar', QuizEditor::class)->name('quizzes.edit');
+    });
+
+    // Central de Configurações do Usuário (Navegação interna no Dashboard)
+    Route::prefix('configuracoes')->name('settings.')->group(function () {
+        Route::get('/perfil', \App\Livewire\Settings\Profile::class)->name('profile');
+        Route::get('/seguranca', \App\Livewire\Settings\Security::class)->name('security');
+        Route::get('/notificacoes', \App\Livewire\Settings\Notifications::class)->name('notifications');
     });
 
     // Gestão e Backend do Editor de Templates de Certificados

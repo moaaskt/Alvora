@@ -99,9 +99,13 @@
                                             ->join('');
                                     @endphp
                                     <div class="flex items-center gap-3 mb-4 pb-4 border-b border-edtech-border-light">
-                                        <div class="w-10 h-10 rounded-full overflow-hidden bg-edtech-navy text-white font-bold text-xs shrink-0 flex items-center justify-center border border-edtech-navy-soft shadow-xs" title="{{ $course->instructor->name }}">
-                                            <span>{{ $initials ?: 'AV' }}</span>
-                                        </div>
+                                        @if($course->instructor->avatar_url)
+                                            <img src="{{ $course->instructor->avatar_url }}" alt="{{ $course->instructor->name }}" class="w-10 h-10 rounded-full object-cover shrink-0 border border-edtech-border shadow-xs">
+                                        @else
+                                            <div class="w-10 h-10 rounded-full overflow-hidden bg-edtech-navy text-white font-bold text-xs shrink-0 flex items-center justify-center border border-edtech-navy-soft shadow-xs" title="{{ $course->instructor->name }}">
+                                                <span>{{ $initials ?: 'AV' }}</span>
+                                            </div>
+                                        @endif
                                         <div class="min-w-0">
                                             <div class="text-sm font-semibold text-edtech-text truncate">{{ $course->instructor->name }}</div>
                                             <div class="text-[13px] text-edtech-muted">Especialista Corporativo Alvora</div>
