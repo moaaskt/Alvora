@@ -166,7 +166,9 @@
                     </span>
                 </div>
 
+                <!-- User Profile & Action Dropdown ("Select") -->
                 <div x-data="{
+                    dropdownOpen: false,
                     name: '{{ e(auth()->user()->name ?? 'Administrador') }}',
                     avatarUrl: '{{ auth()->user()->avatar_url ?? '' }}',
                     get initials() {
@@ -177,31 +179,70 @@
                     if ($event.detail.name) name = $event.detail.name;
                     if ($event.detail.avatarUrl !== undefined) avatarUrl = $event.detail.avatarUrl || '';
                 "
-                @click="$dispatch('open-profile-drawer')"
-                class="flex items-center gap-3 pl-2 border-l border-slate-200 cursor-pointer group hover:opacity-90 transition"
-                title="Meu Perfil">
-                    <template x-if="avatarUrl">
-                        <img :src="avatarUrl" :alt="name" class="w-8 h-8 rounded-full object-cover shadow-xs ring-1 ring-amber-500/30">
-                    </template>
-                    <template x-if="!avatarUrl">
-                        <div class="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs" x-text="initials">
-                            {{ substr(auth()->user()->name ?? 'SA', 0, 2) }}
+                class="relative pl-2 border-l border-slate-200">
+                    <button type="button"
+                            @click="dropdownOpen = !dropdownOpen"
+                            class="flex items-center gap-2.5 py-1 px-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer group focus:outline-none"
+                            aria-expanded="false"
+                            :aria-expanded="dropdownOpen.toString()">
+                        <template x-if="avatarUrl">
+                            <img :src="avatarUrl" :alt="name" class="w-8 h-8 rounded-full object-cover shadow-xs ring-1 ring-amber-500/30">
+                        </template>
+                        <template x-if="!avatarUrl">
+                            <div class="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs" x-text="initials">
+                                {{ substr(auth()->user()->name ?? 'SA', 0, 2) }}
+                            </div>
+                        </template>
+                        <div class="hidden sm:flex flex-col text-left">
+                            <span class="text-xs font-semibold text-slate-800 leading-tight group-hover:text-amber-600 transition-colors" x-text="name">
+                                {{ auth()->user()->name ?? 'Administrador' }}
+                            </span>
+                            <span class="text-[11px] text-slate-500">Super Admin Global</span>
                         </div>
-                    </template>
-                    <div class="hidden sm:flex flex-col text-left">
-                        <span class="text-xs font-semibold text-slate-800 leading-tight group-hover:text-amber-600 transition-colors" x-text="name">
-                            {{ auth()->user()->name ?? 'Administrador' }}
-                        </span>
-                        <span class="text-[11px] text-slate-500">Super Admin Global</span>
+                        <x-icon name="chevron-right" class="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition-transform rotate-90" />
+                    </button>
+
+                    <!-- Dropdown Options ("Select": Meu Perfil + Logout) -->
+                    <div x-show="dropdownOpen"
+                         @click.outside="dropdownOpen = false"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                         x-cloak
+                         class="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-xl border border-slate-200 py-1 z-50 divide-y divide-slate-100">
+                        <div class="px-3.5 py-2.5 bg-slate-50/70">
+                            <div class="text-xs font-semibold text-slate-900 truncate" x-text="name">
+                                {{ auth()->user()->name ?? 'Administrador' }}
+                            </div>
+                            <div class="text-[11px] text-slate-500 truncate mt-0.5">
+                                {{ auth()->user()->email }}
+                            </div>
+                        </div>
+
+                        <div class="py-1">
+                            <button type="button"
+                                    @click="dropdownOpen = false; $dispatch('open-profile-drawer')"
+                                    class="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 hover:text-primary hover:bg-slate-50 flex items-center gap-2.5 transition-colors cursor-pointer">
+                                <x-icon name="person" class="w-4 h-4 text-slate-500" />
+                                <span>Meu Perfil</span>
+                            </button>
+                        </div>
+
+                        <div class="py-1">
+                            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                                @csrf
+                                <button type="submit"
+                                        class="w-full text-left px-3.5 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors cursor-pointer">
+                                    <x-icon name="box-arrow-right" class="w-4 h-4 text-rose-500" />
+                                    <span>Sair da Plataforma</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-
-                <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
-                    <button type="submit" class="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="Encerrar Sessão">
-                        <x-icon name="box-arrow-right" class="w-4 h-4" />
-                    </button>
-                </form>
             </div>
         </header>
 

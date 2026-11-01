@@ -1,9 +1,17 @@
 <div class="min-h-screen w-full flex flex-col lg:grid lg:grid-cols-12 bg-[#F8FAFC]">
     <!-- PAINEL INSTITUCIONAL (Desktop: Esquerda 5 cols | Mobile: Cabeçalho Compacto) -->
     <div class="lg:col-span-5 bg-[#0F172A] text-white flex flex-col justify-between p-6 sm:p-10 lg:p-12 relative overflow-hidden border-b lg:border-b-0 lg:border-r border-slate-800">
+        <!-- Imagem de fundo institucional -->
+        <img src="{{ asset('images/login/img-login.jpg') }}"
+             alt="Ambiente corporativo de capacitação"
+             class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none" />
+
+        <!-- Overlay gradiente escuro para legibilidade perfeita do conteúdo textual -->
+        <div class="absolute inset-0 bg-gradient-to-b from-[#0F172A]/90 via-[#0F172A]/85 to-[#0F172A]/95 pointer-events-none"></div>
+
         <!-- Elementos gráficos discretos / Textura educacional e analítica -->
-        <div class="absolute -top-24 -left-24 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute bottom-10 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute -top-24 -left-24 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-10 right-0 w-80 h-80 bg-blue-500/20 rounded-full blur-2xl pointer-events-none"></div>
 
         <!-- Topo: Marca e Badge do Portal Corporativo -->
         <div class="relative z-10 flex items-center justify-between">
