@@ -180,19 +180,15 @@
                              class="space-y-8">
 
                             <div>
-                                <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-3">
+                                <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-2.5">
                                     Sobre este Treinamento Corporativo
                                 </h3>
                                 <div class="text-slate-600 font-normal">
                                     @if($course->description)
                                         @if(strip_tags($course->description) === $course->description)
-                                            <div class="space-y-4 text-sm sm:text-base leading-relaxed whitespace-pre-line">
-                                                {!! nl2br(e($course->description)) !!}
-                                            </div>
+                                            <div class="space-y-4 text-sm sm:text-base leading-relaxed whitespace-pre-line">{!! nl2br(e($course->description)) !!}</div>
                                         @else
-                                            <div class="alvora-wysiwyg-content">
-                                                {!! \App\Support\HtmlSanitizer::clean($course->description) !!}
-                                            </div>
+                                            <div class="alvora-wysiwyg-content">{!! \App\Support\HtmlSanitizer::clean($course->description) !!}</div>
                                         @endif
                                     @else
                                         <p>

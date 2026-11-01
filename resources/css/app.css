@@ -288,7 +288,16 @@ html.js .reveal-section.is-visible {
     font-size: 0.9375rem;
 }
 
+.alvora-wysiwyg-content > :first-child {
+    margin-top: 0 !important;
+}
+
+.alvora-wysiwyg-content > p:first-child:has(> br:only-child) {
+    display: none;
+}
+
 .alvora-wysiwyg-content p {
+    margin-top: 0;
     margin-bottom: 1.125rem;
     line-height: 1.7;
 }
