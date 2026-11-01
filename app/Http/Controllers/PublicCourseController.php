@@ -17,10 +17,11 @@ class PublicCourseController extends Controller
      */
     public function show(string $slug): View|RedirectResponse
     {
+        $user = Auth::user();
+
         // 1. Resolve course by slug without global tenant scope (public showcase)
         $course = Course::withoutGlobalScopes()
             ->where('slug', $slug)
-            ->where('status', 'published')
             ->with([
                 'instructor:id,company_id,name,role',
                 'category:id,name,slug',
@@ -32,6 +33,19 @@ class PublicCourseController extends Controller
             ->withCount(['lessons', 'modules', 'quizzes'])
             ->withSum('lessons as total_duration_minutes', 'duration_minutes')
             ->firstOrFail();
+
+        // Allow previewing draft courses for admins and course instructors
+        $canPreviewDraft = $user && (
+            $user->isAlvoraAdmin() ||
+            $user->id === $course->instructor_id ||
+            ($user->isCompanyAdmin() && $user->company_id === $course->company_id)
+        );
+
+        if ($course->status !== 'published' && !$canPreviewDraft) {
+            abort(404);
+        }
+
+        $isPreviewMode = $course->status !== 'published' || request()->boolean('preview');
 
         // 2. Fetch related published courses from the same tenant or category (excluding current)
         $relatedCourses = Course::withoutGlobalScopes()
@@ -84,6 +98,7 @@ class PublicCourseController extends Controller
             'relatedCourses' => $relatedCourses,
             'isEnrolled' => $isEnrolled,
             'previewLesson' => $previewLesson,
+            'isPreviewMode' => $isPreviewMode,
         ]);
     }
 }

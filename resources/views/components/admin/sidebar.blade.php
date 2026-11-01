@@ -16,7 +16,7 @@
         </div>
 
         <!-- Navigation Links -->
-        <div class="px-space-md py-space-xs" x-data="{ openMenu: {{ request()->routeIs('admin.enrollments.*') ? "'matriculas'" : (request()->routeIs('admin.users.*') ? "'usuarios'" : "null") }} }">
+        <div class="px-space-md py-space-xs" x-data="{ openMenu: {{ request()->routeIs('settings.*') ? "'configuracoes'" : (request()->routeIs('admin.enrollments.*') ? "'matriculas'" : (request()->routeIs('admin.users.*') ? "'usuarios'" : "null")) }} }">
             <div class="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 Governança & LMS
             </div>
@@ -103,24 +103,19 @@
                     </div>
                 </div>
 
-                <!-- Configurações (Com Sublinks) -->
+                <!-- Configurações (Com Sublink: Meu Perfil) -->
                 <div class="flex flex-col">
-                    <button type="button" @click="openMenu = (openMenu === 'configuracoes' ? null : 'configuracoes')" class="w-full flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors">
+                    <button type="button" @click="openMenu = (openMenu === 'configuracoes' ? null : 'configuracoes')" class="w-full flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('settings.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}">
                         <div class="flex items-center gap-space-sm">
                             <x-icon name="gear-fill" class="w-5 h-5 shrink-0" />
                             <span>Configurações</span>
                         </div>
-                        <x-icon name="chevron-down" class="w-4 h-4 text-slate-400 transition-transform duration-200" x-bind:class="{ 'rotate-180': openMenu === 'configuracoes' }" />
+                        <x-icon name="chevron-down" class="w-4 h-4 transition-transform duration-200 {{ request()->routeIs('settings.*') ? 'text-white' : 'text-slate-400' }}" x-bind:class="{ 'rotate-180': openMenu === 'configuracoes' }" />
                     </button>
                     <div x-show="openMenu === 'configuracoes'" x-collapse class="pl-9 pr-2 py-1 flex flex-col gap-1 text-sm text-slate-600">
-                        <a href="{{ route('admin.dashboard') }}#config-smtp" class="px-2 py-1.5 rounded hover:bg-slate-100 hover:text-slate-900 transition-colors">
-                            <span>SMTP & Mensageria</span>
-                        </a>
-                        <a href="{{ route('admin.dashboard') }}#config-websockets" class="px-2 py-1.5 rounded hover:bg-slate-100 hover:text-slate-900 transition-colors">
-                            <span>WebSockets (Reverb)</span>
-                        </a>
-                        <a href="{{ route('admin.dashboard') }}#config-logs" class="px-2 py-1.5 rounded hover:bg-slate-100 hover:text-slate-900 transition-colors">
-                            <span>Logs do Sistema</span>
+                        <a href="{{ route('settings.profile') }}" class="px-2 py-1.5 rounded transition-colors flex items-center gap-2 {{ request()->routeIs('settings.*') ? 'bg-blue-50 text-blue-700 font-semibold' : 'hover:bg-slate-100 hover:text-slate-900' }}">
+                            <x-icon name="person-fill" class="w-4 h-4 shrink-0 {{ request()->routeIs('settings.*') ? 'text-blue-600' : 'text-slate-400' }}" />
+                            <span>Meu Perfil</span>
                         </a>
                     </div>
                 </div>

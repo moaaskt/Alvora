@@ -308,6 +308,16 @@
                             <!-- Ações -->
                             <td class="py-4 px-4 text-right pr-6">
                                 <div class="flex items-center justify-end gap-1">
+                                    <!-- Ver Página Pública -->
+                                    @if($c->slug)
+                                        <a href="{{ route('courses.public.show', $c->slug) }}" 
+                                           target="_blank"
+                                           title="Ver Página Pública na Landing Page" 
+                                           class="p-1.5 text-slate-400 hover:text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors">
+                                            <x-icon name="box-arrow-up-right" class="w-4 h-4" />
+                                        </a>
+                                    @endif
+
                                     <!-- Editar -->
                                     <a href="{{ route('admin.courses.edit', $c->id) }}" 
                                        title="Editar Curso" 

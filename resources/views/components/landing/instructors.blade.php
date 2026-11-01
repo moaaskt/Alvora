@@ -43,10 +43,14 @@
                 @endphp
 
                 <div class="group p-6 sm:p-8 rounded-[20px] bg-edtech-bg border border-edtech-border flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6 hover:border-edtech-blue-border hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 w-full {{ $count < 3 ? 'max-w-lg' : '' }}">
-                    <!-- Circular avatar with initials (navy background, white text) -->
-                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-edtech-navy text-white flex items-center justify-center font-bold text-xl sm:text-2xl border-2 border-edtech-surface shadow-md shrink-0 select-none" title="{{ $inst->name }}">
-                        <span>{{ $initials ?: 'AV' }}</span>
-                    </div>
+                    <!-- Circular avatar (photo or initials) -->
+                    @if($inst->avatar_url)
+                        <img src="{{ $inst->avatar_url }}" alt="{{ $inst->name }}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-edtech-surface shadow-md shrink-0">
+                    @else
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-edtech-navy text-white flex items-center justify-center font-bold text-xl sm:text-2xl border-2 border-edtech-surface shadow-md shrink-0 select-none" title="{{ $inst->name }}">
+                            <span>{{ $initials ?: 'AV' }}</span>
+                        </div>
+                    @endif
 
                     <div class="text-center sm:text-left min-w-0">
                         <!-- Card titles: 18-20px, weight 600 -->

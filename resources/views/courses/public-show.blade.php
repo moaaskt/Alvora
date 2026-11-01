@@ -48,6 +48,15 @@
         }
     }" class="bg-[#F8FAFC] min-h-screen flex flex-col text-slate-800">
 
+        @if(!empty($isPreviewMode))
+            <aside class="bg-amber-400 text-slate-900 py-2 px-4 text-xs font-semibold flex items-center justify-between shadow-xs sticky top-0 z-50">
+                <div class="flex items-center gap-2 mx-auto">
+                    <x-icon name="eye" class="w-4 h-4 text-slate-900" />
+                    <span>Modo de Pré-visualização em Tempo Real — Visível exclusivamente para Gestão e Autoria do Curso.</span>
+                </div>
+            </aside>
+        @endif
+
         <!-- 1. NAVBAR OFICIAL DA LANDING PAGE -->
         <x-landing.navbar />
 
@@ -180,19 +189,15 @@
                              class="space-y-8">
 
                             <div>
-                                <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-3">
+                                <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-2.5">
                                     Sobre este Treinamento Corporativo
                                 </h3>
                                 <div class="text-slate-600 font-normal">
                                     @if($course->description)
                                         @if(strip_tags($course->description) === $course->description)
-                                            <div class="space-y-4 text-sm sm:text-base leading-relaxed whitespace-pre-line">
-                                                {!! nl2br(e($course->description)) !!}
-                                            </div>
+                                            <div class="space-y-4 text-sm sm:text-base leading-relaxed whitespace-pre-line">{!! nl2br(e($course->description)) !!}</div>
                                         @else
-                                            <div class="alvora-wysiwyg-content">
-                                                {!! \App\Support\HtmlSanitizer::clean($course->description) !!}
-                                            </div>
+                                            <div class="alvora-wysiwyg-content">{!! \App\Support\HtmlSanitizer::clean($course->description) !!}</div>
                                         @endif
                                     @else
                                         <p>
@@ -425,13 +430,19 @@
                             </div>
 
                             <div class="flex flex-col sm:flex-row items-start gap-6 pt-2">
-                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#0B1528] to-edtech-blue text-white flex items-center justify-center font-bold text-xl sm:text-2xl shrink-0 shadow-sm">
-                                    @php
-                                        $instructorName = $course->instructor->name ?? 'Prof. Carlos Eduardo';
-                                        $initials = collect(explode(' ', $instructorName))->map(fn($p) => mb_substr($p, 0, 1))->take(2)->join('');
-                                    @endphp
-                                    <span>{{ $initials ?: 'AV' }}</span>
-                                </div>
+                                @php
+                                    $instructorName = $course->instructor->name ?? 'Prof. Carlos Eduardo';
+                                    $instructorAvatar = $course->instructor?->avatar_url;
+                                    $initials = collect(explode(' ', $instructorName))->map(fn($p) => mb_substr($p, 0, 1))->take(2)->join('');
+                                @endphp
+
+                                @if($instructorAvatar)
+                                    <img src="{{ $instructorAvatar }}" alt="{{ $instructorName }}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover shrink-0 shadow-sm border border-slate-200">
+                                @else
+                                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#0B1528] to-edtech-blue text-white flex items-center justify-center font-bold text-xl sm:text-2xl shrink-0 shadow-sm">
+                                        <span>{{ $initials ?: 'AV' }}</span>
+                                    </div>
+                                @endif
 
                                 <div class="space-y-3 flex-1">
                                     <div>

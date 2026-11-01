@@ -24,6 +24,13 @@ class User extends Authenticatable
         'name',
         'email',
         'phone',
+        'avatar',
+        'bio',
+        'job_title',
+        'department',
+        'linkedin_url',
+        'facebook_url',
+        'twitter_url',
         'password',
         'company_id',
         'role',
@@ -67,6 +74,34 @@ class User extends Authenticatable
                 throw new \DomainException("Não é possível excluir o usuário '{$user->name}' pois ele possui certificados emitidos.");
             }
         });
+    }
+
+    /**
+     * Get avatar full URL or null.
+     */
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (!$this->avatar) {
+            return null;
+        }
+
+        if (str_starts_with($this->avatar, 'http://') || str_starts_with($this->avatar, 'https://')) {
+            return $this->avatar;
+        }
+
+        return asset('storage/' . $this->avatar);
+    }
+
+    /**
+     * Get two-letter initials for fallback display.
+     */
+    public function getInitialsAttribute(): string
+    {
+        $parts = preg_split('/\s+/', trim($this->name ?? ''));
+        if (count($parts) >= 2) {
+            return strtoupper(mb_substr($parts[0], 0, 1) . mb_substr(end($parts), 0, 1));
+        }
+        return strtoupper(mb_substr($this->name ?? 'U', 0, 2));
     }
 
     /**

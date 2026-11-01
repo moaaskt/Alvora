@@ -64,30 +64,84 @@
                 </nav>
             </div>
 
-            <!-- Right User Block -->
+            <!-- Right User Block & Dropdown ("Select") -->
             <div class="flex items-center gap-3 sm:gap-4 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-edtech-blue to-edtech-blue-dark text-white flex items-center justify-center font-semibold text-sm tracking-wide shadow-xs shrink-0">
-                        {{ strtoupper(substr(auth()->user()->name ?? 'AL', 0, 2)) }}
-                    </div>
-                    <div class="hidden sm:block text-left">
-                        <div class="text-sm font-semibold text-edtech-text leading-tight">{{ auth()->user()->name }}</div>
-                        <div class="text-[13px] text-edtech-muted leading-tight mt-0.5">Aluno</div>
+                <div x-data="{
+                    dropdownOpen: false,
+                    name: '{{ e(auth()->user()->name ?? 'Aluno') }}',
+                    avatarUrl: '{{ auth()->user()->avatar_url ?? '' }}',
+                    get initials() {
+                        return this.name ? this.name.substring(0, 2).toUpperCase() : 'AL';
+                    }
+                }"
+                x-on:profile-updated.window="
+                    if ($event.detail.name) name = $event.detail.name;
+                    if ($event.detail.avatarUrl !== undefined) avatarUrl = $event.detail.avatarUrl || '';
+                "
+                class="relative">
+                    <button type="button"
+                            @click="dropdownOpen = !dropdownOpen"
+                            class="flex items-center gap-3 p-1 rounded-xl hover:bg-edtech-border-light transition-colors cursor-pointer group focus:outline-none"
+                            aria-expanded="false"
+                            :aria-expanded="dropdownOpen.toString()">
+                        <template x-if="avatarUrl">
+                            <img :src="avatarUrl" :alt="name" class="w-10 h-10 rounded-full object-cover shadow-xs ring-2 ring-edtech-blue/30">
+                        </template>
+                        <template x-if="!avatarUrl">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-edtech-blue to-edtech-blue-dark text-white flex items-center justify-center font-semibold text-sm tracking-wide shadow-xs shrink-0" x-text="initials">
+                                {{ strtoupper(substr(auth()->user()->name ?? 'AL', 0, 2)) }}
+                            </div>
+                        </template>
+                        <div class="hidden sm:block text-left">
+                            <div class="text-sm font-semibold text-edtech-text leading-tight group-hover:text-edtech-blue transition-colors" x-text="name">
+                                {{ auth()->user()->name }}
+                            </div>
+                            <div class="text-[13px] text-edtech-muted leading-tight mt-0.5">Aluno</div>
+                        </div>
+                        <x-icon name="chevron-right" class="w-3.5 h-3.5 text-edtech-muted group-hover:text-edtech-text transition-transform rotate-90" />
+                    </button>
+
+                    <!-- Dropdown Options ("Select": Meu Perfil + Logout) -->
+                    <div x-show="dropdownOpen"
+                         @click.outside="dropdownOpen = false"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                         x-cloak
+                         class="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-xl border border-edtech-border py-1 z-50 divide-y divide-edtech-border">
+                        <div class="px-3.5 py-2.5 bg-slate-50/70">
+                            <div class="text-xs font-semibold text-edtech-text truncate" x-text="name">
+                                {{ auth()->user()->name }}
+                            </div>
+                            <div class="text-[11px] text-edtech-muted truncate mt-0.5">
+                                {{ auth()->user()->email }}
+                            </div>
+                        </div>
+
+                        <div class="py-1">
+                            <a href="{{ route('settings.profile') }}"
+                               @click="dropdownOpen = false"
+                               class="w-full text-left px-3.5 py-2 text-xs font-medium text-edtech-text hover:text-edtech-blue hover:bg-edtech-blue-light/50 flex items-center gap-2.5 transition-colors cursor-pointer">
+                                <x-icon name="person" class="w-4 h-4 text-edtech-muted" />
+                                <span>Meu Perfil</span>
+                            </a>
+                        </div>
+
+                        <div class="py-1">
+                            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                                @csrf
+                                <button type="submit"
+                                        class="w-full text-left px-3.5 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors cursor-pointer">
+                                    <x-icon name="box-arrow-right" class="w-4 h-4 text-rose-500" />
+                                    <span>Sair da Plataforma</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-
-                <div class="h-6 w-px bg-edtech-border mx-1 hidden sm:block"></div>
-
-                <!-- Logout Form Button -->
-                <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
-                    <button type="submit"
-                            title="Sair da Plataforma"
-                            aria-label="Sair da Plataforma"
-                            class="p-2 text-edtech-muted hover:text-edtech-text hover:bg-edtech-border-light rounded-lg transition-colors cursor-pointer">
-                        <x-icon name="log-out" class="w-5 h-5" />
-                    </button>
-                </form>
             </div>
         </div>
     </header>
