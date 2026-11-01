@@ -45,7 +45,17 @@ class HtmlSanitizer
         $cleaned = preg_replace('/\s*on[a-zA-Z]+\s*=\s*(["\'])(.*?)\1/i', '', $cleaned);
         $cleaned = preg_replace('/\s*on[a-zA-Z]+\s*=\s*[^"\'\s>]+/i', '', $cleaned);
 
-        // 3. Sanitiza atributos href em links para evitar javascript:, data: ou vbscript:
+        // 3. Sanitiza atributos style para remover potenciais injeções (expression, behavior, javascript)
+        $cleaned = preg_replace_callback('/\s*style\s*=\s*(["\'])(.*?)\1/i', function ($matches) {
+            $css = $matches[2];
+            // Bloqueia expression, behavior e javascript em estilos
+            if (preg_match('/(expression|behavior|javascript:|vbscript:)/i', $css)) {
+                return '';
+            }
+            return ' style="' . htmlspecialchars($css, ENT_QUOTES, 'UTF-8') . '"';
+        }, $cleaned);
+
+        // 4. Sanitiza atributos href em links para evitar javascript:, data: ou vbscript:
         $cleaned = preg_replace_callback('/<a\b([^>]*)>/i', function ($matches) {
             $attributes = $matches[1];
 

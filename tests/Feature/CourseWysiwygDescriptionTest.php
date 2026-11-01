@@ -136,6 +136,25 @@ class CourseWysiwygDescriptionTest extends TestCase
         $this->assertStringNotContainsString('onclick=', $course->description);
     }
 
+    public function test_html_sanitizer_preserves_colors_fonts_sizes_and_alignments(): void
+    {
+        $input = '<p><span style="color: rgb(239, 68, 68); background-color: rgb(254, 240, 138);">Texto colorido</span></p><p class="ql-align-center"><span class="ql-size-large ql-font-serif">Frase com fonte e tamanho personalizados</span></p>';
+        $cleaned = HtmlSanitizer::clean($input);
+
+        $this->assertStringContainsString('style="color: rgb(239, 68, 68); background-color: rgb(254, 240, 138);"', $cleaned);
+        $this->assertStringContainsString('class="ql-align-center"', $cleaned);
+        $this->assertStringContainsString('class="ql-size-large ql-font-serif"', $cleaned);
+        $this->assertStringContainsString('Texto colorido', $cleaned);
+    }
+
+    public function test_html_sanitizer_removes_dangerous_css_expressions_in_style(): void
+    {
+        $input = '<p><span style="color: red; background-image: expression(alert(1));">Texto</span></p>';
+        $cleaned = HtmlSanitizer::clean($input);
+
+        $this->assertStringNotContainsString('expression', $cleaned);
+    }
+
     public function test_public_course_page_renders_rich_wysiwyg_description(): void
     {
         $course = Course::create([
@@ -154,6 +173,31 @@ class CourseWysiwygDescriptionTest extends TestCase
         $response->assertSee('<h2>Visão Executiva</h2>', false);
         $response->assertSee('<strong>gestores</strong>', false);
         $response->assertSee('<li>Meta 1</li>', false);
+        $response->assertSee('alvora-wysiwyg-content', false);
+    }
+
+    public function test_public_course_page_renders_custom_fonts_colors_sizes_and_line_breaks(): void
+    {
+        $multilineDescription = "<p>Parágrafo 1 de apresentação com quebra de linha interna.\nLinha seguinte preservada.</p><p><br></p><p><span style=\"color: rgb(239, 68, 68);\">Destaque em Vermelho</span> e <span class=\"ql-size-large ql-font-serif\">Texto Grande Serifado</span>.</p>";
+
+        $course = Course::create([
+            'company_id' => $this->company->id,
+            'instructor_id' => $this->instructor->id,
+            'category_id' => $this->category->id,
+            'title' => 'Inteligência Artificial Aplicada',
+            'slug' => 'inteligencia-artificial-aplicada-' . uniqid(),
+            'description' => $multilineDescription,
+            'status' => 'published',
+        ]);
+
+        $response = $this->get(route('courses.public.show', $course->slug));
+
+        $response->assertStatus(200);
+        $response->assertSee('alvora-wysiwyg-content', false);
+        $response->assertSee('style="color: rgb(239, 68, 68);"', false);
+        $response->assertSee('class="ql-size-large ql-font-serif"', false);
+        $response->assertSee('Destaque em Vermelho', false);
+        $response->assertSee('Texto Grande Serifado', false);
     }
 }
 
