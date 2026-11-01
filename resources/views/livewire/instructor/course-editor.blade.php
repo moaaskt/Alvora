@@ -61,11 +61,19 @@
             @if($courseId && $slug)
                 <button type="button" 
                         @click="showPublicPreviewModal = true"
-                        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors text-xs font-semibold border border-indigo-200/80 shadow-2xs cursor-pointer"
-                        title="Visualizar a página pública real e completa deste curso">
-                    <x-icon name="eye" class="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                    <span>Prévia da Página Pública</span>
+                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors text-xs font-semibold border border-slate-200 shadow-2xs cursor-pointer"
+                        title="Simular visualização da página pública com troca de tela (Desktop/Tablet/Mobile)">
+                    <x-icon name="eye" class="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                    <span>Prévia da Página</span>
                 </button>
+
+                <a href="{{ route('courses.public.show', $slug) }}?preview=1" 
+                   target="_blank"
+                   class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors text-xs font-semibold border border-indigo-200/80 shadow-2xs"
+                   title="Abrir a página pública deste curso em uma nova aba do navegador">
+                    <x-icon name="box-arrow-up-right" class="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span>Ver Página Pública</span>
+                </a>
             @endif
 
             @if($courseId)
@@ -616,7 +624,6 @@
                         <div class="flex items-center gap-2 text-xs font-medium text-slate-300">
                             <x-icon name="globe" class="w-3.5 h-3.5 text-blue-400" />
                             <span class="font-mono text-slate-300 text-[11px] truncate max-w-xs sm:max-w-md">{{ url('/cursos/' . $slug) }}</span>
-                            <span class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Página Pública Real</span>
                         </div>
                     </div>
 
