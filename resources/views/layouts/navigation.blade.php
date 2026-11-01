@@ -92,12 +92,32 @@
                     {{ auth()->user()->isAlvoraAdmin() ? 'Administrador Alvora' : ((auth()->user()->isInstructor() || auth()->user()->isCompanyAdmin()) ? 'Instrutor' : 'Aluno') }}
                 </span>
 
-                <!-- User Info -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-xs text-white">
-                        {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
-                    </div>
-                    <span class="text-xs font-medium text-slate-200 hidden sm:inline-block">{{ auth()->user()->name }}</span>
+                <!-- User Info (Clicável para abrir drawer e reativo) -->
+                <div x-data="{
+                    name: '{{ e(auth()->user()->name ?? 'Usuário') }}',
+                    avatarUrl: '{{ auth()->user()->avatar_url ?? '' }}',
+                    get initials() {
+                        return this.name ? this.name.substring(0, 2).toUpperCase() : 'U';
+                    }
+                }"
+                x-on:profile-updated.window="
+                    if ($event.detail.name) name = $event.detail.name;
+                    if ($event.detail.avatarUrl !== undefined) avatarUrl = $event.detail.avatarUrl || '';
+                "
+                @click="$dispatch('open-profile-drawer')"
+                class="flex items-center space-x-3 cursor-pointer group hover:opacity-90 transition"
+                title="Meu Perfil">
+                    <template x-if="avatarUrl">
+                        <img :src="avatarUrl" :alt="name" class="w-8 h-8 rounded-full object-cover border border-slate-700">
+                    </template>
+                    <template x-if="!avatarUrl">
+                        <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-xs text-white" x-text="initials">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                        </div>
+                    </template>
+                    <span class="text-xs font-medium text-slate-200 hidden sm:inline-block group-hover:text-white transition-colors" x-text="name">
+                        {{ auth()->user()->name }}
+                    </span>
                 </div>
 
                 <!-- Logout Form -->

@@ -66,12 +66,32 @@
 
             <!-- Right User Block -->
             <div class="flex items-center gap-3 sm:gap-4 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-edtech-blue to-edtech-blue-dark text-white flex items-center justify-center font-semibold text-sm tracking-wide shadow-xs shrink-0">
-                        {{ strtoupper(substr(auth()->user()->name ?? 'AL', 0, 2)) }}
-                    </div>
+                <div x-data="{
+                    name: '{{ e(auth()->user()->name ?? 'Aluno') }}',
+                    avatarUrl: '{{ auth()->user()->avatar_url ?? '' }}',
+                    get initials() {
+                        return this.name ? this.name.substring(0, 2).toUpperCase() : 'AL';
+                    }
+                }"
+                x-on:profile-updated.window="
+                    if ($event.detail.name) name = $event.detail.name;
+                    if ($event.detail.avatarUrl !== undefined) avatarUrl = $event.detail.avatarUrl || '';
+                "
+                @click="$dispatch('open-profile-drawer')"
+                class="flex items-center gap-3 cursor-pointer group hover:opacity-90 transition"
+                title="Meu Perfil">
+                    <template x-if="avatarUrl">
+                        <img :src="avatarUrl" :alt="name" class="w-10 h-10 rounded-full object-cover shadow-xs ring-2 ring-edtech-blue/30">
+                    </template>
+                    <template x-if="!avatarUrl">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-edtech-blue to-edtech-blue-dark text-white flex items-center justify-center font-semibold text-sm tracking-wide shadow-xs shrink-0" x-text="initials">
+                            {{ strtoupper(substr(auth()->user()->name ?? 'AL', 0, 2)) }}
+                        </div>
+                    </template>
                     <div class="hidden sm:block text-left">
-                        <div class="text-sm font-semibold text-edtech-text leading-tight">{{ auth()->user()->name }}</div>
+                        <div class="text-sm font-semibold text-edtech-text leading-tight group-hover:text-edtech-blue transition-colors" x-text="name">
+                            {{ auth()->user()->name }}
+                        </div>
                         <div class="text-[13px] text-edtech-muted leading-tight mt-0.5">Aluno</div>
                     </div>
                 </div>
@@ -128,6 +148,7 @@
          "></div>
 
     @auth
+        @livewire('profile-drawer')
         @if(auth()->user()->isStudent() && ($showAiTutor ?? true))
             @livewire('student.ai-tutor-drawer')
         @endif

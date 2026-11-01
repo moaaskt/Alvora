@@ -166,12 +166,32 @@
                     </span>
                 </div>
 
-                <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
-                    <div class="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs">
-                        {{ substr(auth()->user()->name ?? 'SA', 0, 2) }}
-                    </div>
+                <div x-data="{
+                    name: '{{ e(auth()->user()->name ?? 'Administrador') }}',
+                    avatarUrl: '{{ auth()->user()->avatar_url ?? '' }}',
+                    get initials() {
+                        return this.name ? this.name.substring(0, 2).toUpperCase() : 'SA';
+                    }
+                }"
+                x-on:profile-updated.window="
+                    if ($event.detail.name) name = $event.detail.name;
+                    if ($event.detail.avatarUrl !== undefined) avatarUrl = $event.detail.avatarUrl || '';
+                "
+                @click="$dispatch('open-profile-drawer')"
+                class="flex items-center gap-3 pl-2 border-l border-slate-200 cursor-pointer group hover:opacity-90 transition"
+                title="Meu Perfil">
+                    <template x-if="avatarUrl">
+                        <img :src="avatarUrl" :alt="name" class="w-8 h-8 rounded-full object-cover shadow-xs ring-1 ring-amber-500/30">
+                    </template>
+                    <template x-if="!avatarUrl">
+                        <div class="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs" x-text="initials">
+                            {{ substr(auth()->user()->name ?? 'SA', 0, 2) }}
+                        </div>
+                    </template>
                     <div class="hidden sm:flex flex-col text-left">
-                        <span class="text-xs font-semibold text-slate-800 leading-tight">{{ auth()->user()->name ?? 'Administrador' }}</span>
+                        <span class="text-xs font-semibold text-slate-800 leading-tight group-hover:text-amber-600 transition-colors" x-text="name">
+                            {{ auth()->user()->name ?? 'Administrador' }}
+                        </span>
                         <span class="text-[11px] text-slate-500">Super Admin Global</span>
                     </div>
                 </div>
@@ -206,6 +226,8 @@
                 showConfirmButton: false
             });
          "></div>
+
+    @livewire('profile-drawer')
 
     @livewireScripts
 </body>
