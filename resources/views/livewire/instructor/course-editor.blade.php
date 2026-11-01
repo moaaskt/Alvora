@@ -58,6 +58,16 @@
                 Descartar Alterações
             </a>
 
+            @if($courseId && $slug)
+                <a href="{{ route('courses.public.show', $slug) }}" 
+                   target="_blank"
+                   class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors text-xs font-semibold border border-indigo-200/80 shadow-2xs"
+                   title="Visualizar a página pública deste treinamento corporativo em nova aba">
+                    <x-icon name="box-arrow-up-right" class="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span>Ver Página Pública</span>
+                </a>
+            @endif
+
             @if($courseId)
                 <a href="{{ route('instructor.courses.curriculum', $courseId) }}" 
                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-colors text-xs font-semibold border border-slate-200 shadow-2xs">
@@ -237,24 +247,69 @@
                         </div>
                     </div>
 
-                    <!-- Descrição Completa com Editor WYSIWYG Estilo Stitch -->
-                    <div class="flex flex-col gap-2">
+                    <!-- Descrição Completa com Editor WYSIWYG Estilo Stitch & Mini Preview -->
+                    <div class="flex flex-col gap-2" x-data="{ viewMode: 'editor' }">
                         <div class="flex items-center justify-between">
                             <label class="text-xs font-semibold text-slate-700" for="course-description">
                                 Descrição Completa e Objetivos Pedagógicos
                             </label>
-                            <span class="inline-flex items-center gap-1 text-[11px] text-blue-600 font-medium">
-                                <x-icon name="stars" class="w-3.5 h-3.5 text-blue-600" />
-                                <span>Assistente Alvora IA Habilitado</span>
-                            </span>
+
+                            <!-- Toggle de Modo: Editor vs Pré-visualização -->
+                            <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs">
+                                <button type="button" 
+                                        @click="viewMode = 'editor'" 
+                                        :class="viewMode === 'editor' ? 'bg-white text-blue-600 font-semibold shadow-2xs' : 'text-slate-500 hover:text-slate-800'"
+                                        class="flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-all cursor-pointer">
+                                    <x-icon name="pencil-square" class="w-3.5 h-3.5" />
+                                    <span>Editor</span>
+                                </button>
+                                <button type="button" 
+                                        @click="viewMode = 'preview'" 
+                                        :class="viewMode === 'preview' ? 'bg-white text-blue-600 font-semibold shadow-2xs' : 'text-slate-500 hover:text-slate-800'"
+                                        class="flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-all cursor-pointer">
+                                    <x-icon name="eye" class="w-3.5 h-3.5" />
+                                    <span>Mini Preview</span>
+                                </button>
+                            </div>
                         </div>
 
-                        <x-wysiwyg 
-                            id="course-description" 
-                            wire:model="description" 
-                            placeholder="Descreva a ementa do treinamento, competências desenvolvidas, metodologia e metas de aprendizagem para os colaboradores..."
-                            minHeight="180px"
-                        />
+                        <!-- Modo 1: Editor Visual WYSIWYG (blindado com wire:ignore) -->
+                        <div x-show="viewMode === 'editor'">
+                            <x-wysiwyg 
+                                id="course-description" 
+                                wire:model="description" 
+                                placeholder="Descreva a ementa do treinamento, competências desenvolvidas, metodologia e metas de aprendizagem para os colaboradores..."
+                                minHeight="180px"
+                            />
+                        </div>
+
+                        <!-- Modo 2: Mini Preview em Tempo Real idêntico à Página Pública -->
+                        <div x-show="viewMode === 'preview'" style="display: none;">
+                            <div class="border border-slate-200 rounded-xl p-4 sm:p-5 bg-slate-50/70 shadow-2xs flex flex-col gap-3">
+                                <div class="flex items-center justify-between border-b border-slate-200/80 pb-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <span class="text-xs font-semibold text-slate-700">Prévia da Vitrine Pública</span>
+                                    </div>
+                                    <span class="text-[11px] text-slate-400">Renderização fiel em tempo real</span>
+                                </div>
+
+                                <div class="bg-white rounded-lg p-5 border border-slate-200/90 shadow-2xs">
+                                    <h4 class="text-sm font-bold text-slate-900 mb-2.5">
+                                        Sobre este Treinamento Corporativo
+                                    </h4>
+                                    <template x-if="$wire.description && $wire.description.trim() !== '' && $wire.description !== '<p><br></p>'">
+                                        <div class="alvora-wysiwyg-content" x-html="$wire.description"></div>
+                                    </template>
+                                    <template x-if="!$wire.description || $wire.description.trim() === '' || $wire.description === '<p><br></p>'">
+                                        <p class="text-xs text-slate-400 italic py-6 text-center">
+                                            Nenhum conteúdo digitado ainda. Alterne para a aba "Editor" acima para redigir a ementa do treinamento.
+                                        </p>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
                         @error('description')
                             <span class="text-rose-500 text-xs">{{ $message }}</span>
                         @enderror

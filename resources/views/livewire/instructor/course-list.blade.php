@@ -229,6 +229,15 @@
                                          x-transition:leave-end="transform opacity-0 scale-95" 
                                          class="absolute right-0 z-50 mt-1 w-44 origin-top-right rounded-xl bg-white p-1 text-xs shadow-xl ring-1 ring-black/5 focus:outline-none border border-slate-200" 
                                          style="display: none;">
+                                        @if($course->slug)
+                                            <a href="{{ route('courses.public.show', $course->slug) }}" 
+                                               target="_blank"
+                                               class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors font-medium">
+                                                <x-icon name="box-arrow-up-right" class="w-4 h-4 text-emerald-600 shrink-0" />
+                                                <span>Ver Página Pública</span>
+                                            </a>
+                                        @endif
+
                                         <a href="{{ route('instructor.courses.edit', $course) }}" 
                                            class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors font-medium">
                                             <svg class="w-4 h-4 text-blue-600 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
