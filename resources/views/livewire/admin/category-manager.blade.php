@@ -115,11 +115,15 @@
                                 @if($rootCat->icon === 'code')
                                     <x-icon name="code-slash" class="w-6 h-6" />
                                 @elseif($rootCat->icon === 'paint-brush')
-                                    <x-icon name="brush-fill" class="w-6 h-6" />
+                                    <x-icon name="palette-fill" class="w-6 h-6" />
                                 @elseif($rootCat->icon === 'sparkles')
-                                    <x-icon name="stars" class="w-6 h-6" />
+                                    <x-icon name="cpu-fill" class="w-6 h-6" />
                                 @elseif($rootCat->icon === 'users')
-                                    <x-icon name="people-fill" class="w-6 h-6" />
+                                    <x-icon name="briefcase-fill" class="w-6 h-6" />
+                                @elseif($rootCat->icon === 'book-open')
+                                    <x-icon name="journal-bookmark-fill" class="w-6 h-6" />
+                                @elseif($rootCat->icon === 'chart-bar')
+                                    <x-icon name="bar-chart-fill" class="w-6 h-6" />
                                 @else
                                     <x-icon name="journal-bookmark-fill" class="w-6 h-6" />
                                 @endif
@@ -227,11 +231,15 @@
                                         @if($cat->icon === 'code')
                                             <x-icon name="code-slash" class="w-5 h-5" />
                                         @elseif($cat->icon === 'paint-brush')
-                                            <x-icon name="brush-fill" class="w-5 h-5" />
+                                            <x-icon name="palette-fill" class="w-5 h-5" />
                                         @elseif($cat->icon === 'sparkles')
-                                            <x-icon name="stars" class="w-5 h-5" />
+                                            <x-icon name="cpu-fill" class="w-5 h-5" />
                                         @elseif($cat->icon === 'users')
-                                            <x-icon name="people-fill" class="w-5 h-5" />
+                                            <x-icon name="briefcase-fill" class="w-5 h-5" />
+                                        @elseif($cat->icon === 'book-open')
+                                            <x-icon name="journal-bookmark-fill" class="w-5 h-5" />
+                                        @elseif($cat->icon === 'chart-bar')
+                                            <x-icon name="bar-chart-fill" class="w-5 h-5" />
                                         @else
                                             <x-icon name="journal-bookmark-fill" class="w-5 h-5" />
                                         @endif

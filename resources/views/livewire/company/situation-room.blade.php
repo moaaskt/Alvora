@@ -41,9 +41,12 @@
         <div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow border border-slate-200/60">
             <div class="flex items-center justify-between">
                 <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Alto Risco de Evasão</span>
-                <span class="inline-flex items-center rounded-md bg-error text-on-error px-2.5 py-0.5 text-xs font-semibold shadow-sm">
-                    Crítico
-                </span>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center rounded-md bg-error text-on-error px-2.5 py-0.5 text-xs font-semibold shadow-sm">
+                        Crítico
+                    </span>
+                    <x-icon name="exclamation-triangle-fill" class="w-4 h-4 text-rose-600" />
+                </div>
             </div>
             <div class="my-3 flex items-baseline gap-2">
                 <span class="font-stat-value text-stat-value text-on-surface font-bold tracking-tight">{{ $highRiskCount }}</span>
@@ -59,9 +62,12 @@
         <div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow border border-slate-200/60">
             <div class="flex items-center justify-between">
                 <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Atenção / Médio Risco</span>
-                <span class="inline-flex items-center rounded-md bg-amber-500 text-white px-2.5 py-0.5 text-xs font-semibold shadow-sm">
-                    Alerta Ativo
-                </span>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center rounded-md bg-amber-500 text-white px-2.5 py-0.5 text-xs font-semibold shadow-sm">
+                        Alerta Ativo
+                    </span>
+                    <x-icon name="hourglass-split" class="w-4 h-4 text-amber-600" />
+                </div>
             </div>
             <div class="my-3 flex items-baseline gap-2">
                 <span class="font-stat-value text-stat-value text-on-surface font-bold tracking-tight">{{ $mediumRiskCount }}</span>
@@ -79,9 +85,12 @@
         <div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow border border-slate-200/60">
             <div class="flex items-center justify-between">
                 <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Engajados / Baixo Risco</span>
-                <span class="inline-flex items-center rounded-md bg-emerald-600 text-white px-2.5 py-0.5 text-xs font-semibold shadow-sm">
-                    Saudável
-                </span>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center rounded-md bg-emerald-600 text-white px-2.5 py-0.5 text-xs font-semibold shadow-sm">
+                        Saudável
+                    </span>
+                    <x-icon name="check-circle-fill" class="w-4 h-4 text-emerald-600" />
+                </div>
             </div>
             <div class="my-3 flex items-baseline gap-2">
                 <span class="font-stat-value text-stat-value text-on-surface font-bold tracking-tight">{{ $lowRiskCount }}</span>
@@ -347,41 +356,111 @@
 
     <!-- Tabela de Dados e Gestão Preditiva de Colaboradores -->
     <div class="rounded-xl bg-surface-container-lowest shadow-sm overflow-hidden flex flex-col border border-slate-200/60">
-        <!-- Toolbar: Segmented Controls + Busca + Atalho ⌘K -->
-        <div class="p-space-md flex flex-col lg:flex-row lg:items-center justify-between gap-space-md bg-surface-container-lowest border-b border-slate-200/60">
-            <!-- Segmented Tabs shadcn -->
-            <div class="inline-flex items-center p-1 rounded-xl bg-surface-container-low gap-1 self-start border border-slate-200/60">
-                <button wire:click="setFilter('all')" type="button"
-                        class="px-3 py-1.5 rounded-lg text-body-sm font-label-md font-semibold transition-all flex items-center gap-1.5 {{ $filterLevel === 'all' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface' }}">
-                    <span>Todos</span>
-                    <span class="px-1.5 py-0.2 rounded-full font-label-sm text-label-sm bg-surface-container text-secondary">{{ $totalStudents }}</span>
-                </button>
-                <button wire:click="setFilter('high')" type="button"
-                        class="px-3 py-1.5 rounded-lg text-body-sm font-label-md font-medium transition-all flex items-center gap-1.5 {{ $filterLevel === 'high' ? 'bg-surface-container-lowest text-error font-semibold shadow-sm' : 'text-on-surface-variant hover:text-error' }}">
-                    <span>Críticos</span>
-                    <span class="px-1.5 py-0.2 rounded-full font-label-sm text-label-sm bg-error-container text-error font-bold">{{ $highRiskCount }}</span>
-                </button>
-                <button wire:click="setFilter('medium')" type="button"
-                        class="px-3 py-1.5 rounded-lg text-body-sm font-label-md font-medium transition-all flex items-center gap-1.5 {{ $filterLevel === 'medium' ? 'bg-surface-container-lowest text-amber-600 font-semibold shadow-sm' : 'text-on-surface-variant hover:text-amber-600' }}">
-                    <span>Atenção</span>
-                    <span class="px-1.5 py-0.2 rounded-full font-label-sm text-label-sm bg-surface-container text-secondary">{{ $mediumRiskCount }}</span>
-                </button>
-                <button wire:click="setFilter('low')" type="button"
-                        class="px-3 py-1.5 rounded-lg text-body-sm font-label-md font-medium transition-all flex items-center gap-1.5 {{ $filterLevel === 'low' ? 'bg-surface-container-lowest text-tertiary font-semibold shadow-sm' : 'text-on-surface-variant hover:text-tertiary' }}">
-                    <span>Engajados</span>
-                    <span class="px-1.5 py-0.2 rounded-full font-label-sm text-label-sm bg-surface-container text-secondary">{{ $lowRiskCount }}</span>
-                </button>
+        <!-- Toolbar: Segmented Controls + Busca + Filtros Avançados -->
+        <div class="p-space-md flex flex-col gap-3.5 bg-surface-container-lowest border-b border-slate-200/60">
+            <!-- Linha 1: Segmented Tabs Faixa de Risco + Busca -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+                <!-- Segmented Tabs shadcn -->
+                <div class="inline-flex items-center p-1 rounded-xl bg-surface-container-low gap-1 self-start border border-slate-200/60">
+                    <button wire:click="setFilter('all')" type="button"
+                            class="px-3 py-1.5 rounded-lg text-body-sm font-label-md font-semibold transition-all flex items-center gap-1.5 {{ $filterLevel === 'all' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface' }}">
+                        <span>Todos</span>
+                        <span class="px-1.5 py-0.2 rounded-full font-label-sm text-label-sm bg-surface-container text-secondary">{{ $totalStudents }}</span>
+                    </button>
+                    <button wire:click="setFilter('high')" type="button"
+                            class="px-3 py-1.5 rounded-lg text-body-sm font-label-md font-medium transition-all flex items-center gap-1.5 {{ $filterLevel === 'high' ? 'bg-surface-container-lowest text-error font-semibold shadow-sm' : 'text-on-surface-variant hover:text-error' }}">
+                        <span>Críticos</span>
+                        <span class="px-1.5 py-0.2 rounded-full font-label-sm text-label-sm bg-error-container text-error font-bold">{{ $highRiskCount }}</span>
+                    </button>
+                    <button wire:click="setFilter('medium')" type="button"
+                            class="px-3 py-1.5 rounded-lg text-body-sm font-label-md font-medium transition-all flex items-center gap-1.5 {{ $filterLevel === 'medium' ? 'bg-surface-container-lowest text-amber-600 font-semibold shadow-sm' : 'text-on-surface-variant hover:text-amber-600' }}">
+                        <span>Atenção</span>
+                        <span class="px-1.5 py-0.2 rounded-full font-label-sm text-label-sm bg-surface-container text-secondary">{{ $mediumRiskCount }}</span>
+                    </button>
+                    <button wire:click="setFilter('low')" type="button"
+                            class="px-3 py-1.5 rounded-lg text-body-sm font-label-md font-medium transition-all flex items-center gap-1.5 {{ $filterLevel === 'low' ? 'bg-surface-container-lowest text-tertiary font-semibold shadow-sm' : 'text-on-surface-variant hover:text-tertiary' }}">
+                        <span>Engajados</span>
+                        <span class="px-1.5 py-0.2 rounded-full font-label-sm text-label-sm bg-surface-container text-secondary">{{ $lowRiskCount }}</span>
+                    </button>
+                </div>
+
+                <!-- Busca Rápida -->
+                <div class="relative w-full sm:w-80">
+                    <svg class="w-4 h-4 absolute left-3 top-3 text-secondary stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                    </svg>
+                    <input wire:model.live.debounce.300ms="search"
+                           class="w-full h-10 pl-9 pr-12 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface placeholder:text-outline-variant shadow-sm border border-slate-200/80 focus:outline-none focus:ring-2 focus:ring-primary-container"
+                           placeholder="Buscar por colaborador ou email..." type="text">
+                    <span class="absolute right-2.5 top-2.5 px-1.5 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-mono">⌘K</span>
+                </div>
             </div>
 
-            <!-- Busca Rápida -->
-            <div class="relative w-full sm:w-80">
-                <svg class="w-4 h-4 absolute left-3 top-3 text-secondary stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                </svg>
-                <input wire:model.live.debounce.300ms="search"
-                       class="w-full h-10 pl-9 pr-12 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface placeholder:text-outline-variant shadow-sm border border-slate-200/80 focus:outline-none focus:ring-2 focus:ring-primary-container"
-                       placeholder="Buscar por colaborador ou email..." type="text">
-                <span class="absolute right-2.5 top-2.5 px-1.5 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-secondary font-mono">⌘K</span>
+            <!-- Linha 2: Filtros por Equipe, Trilha, Ordenação e Ação de Limpar -->
+            <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-3">
+                    <!-- Filtro por Equipe / Departamento -->
+                    <div class="flex items-center gap-1.5">
+                        <label for="filter_department" class="text-xs font-semibold text-slate-500 whitespace-nowrap flex items-center gap-1">
+                            <x-icon name="building" class="w-3.5 h-3.5 text-slate-400" />
+                            <span>Equipe:</span>
+                        </label>
+                        <select id="filter_department" wire:model.live="department"
+                                class="h-8 text-xs rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-slate-700 shadow-2xs focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none cursor-pointer">
+                            <option value="">Todas as Equipes</option>
+                            @foreach($departments as $dept)
+                                <option value="{{ $dept }}">{{ $dept }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Filtro por Trilha Corporativa -->
+                    <div class="flex items-center gap-1.5">
+                        <label for="filter_track" class="text-xs font-semibold text-slate-500 whitespace-nowrap flex items-center gap-1">
+                            <x-icon name="map" class="w-3.5 h-3.5 text-slate-400" />
+                            <span>Trilha:</span>
+                        </label>
+                        <select id="filter_track" wire:model.live="trackId"
+                                class="h-8 text-xs rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-slate-700 shadow-2xs focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none cursor-pointer">
+                            <option value="">Todas as Trilhas</option>
+                            @foreach($tracks as $t)
+                                <option value="{{ $t->id }}">{{ $t->title }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Ordenação Configurável -->
+                    <div class="flex items-center gap-1.5">
+                        <label for="filter_sort" class="text-xs font-semibold text-slate-500 whitespace-nowrap flex items-center gap-1">
+                            <x-icon name="arrow-right" class="w-3.5 h-3.5 text-slate-400 rotate-90" />
+                            <span>Ordenar:</span>
+                        </label>
+                        <select id="filter_sort" wire:model.live="sortBy"
+                                class="h-8 text-xs rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-slate-700 shadow-2xs focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none cursor-pointer">
+                            <option value="risk_desc">Maior Risco (Padrão)</option>
+                            <option value="risk_asc">Menor Risco</option>
+                            <option value="name_asc">Nome (A – Z)</option>
+                            <option value="name_desc">Nome (Z – A)</option>
+                            <option value="inactivity_desc">Maior Inatividade</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Resumo e Botão Limpar Filtros -->
+                <div class="flex items-center gap-3 ml-auto">
+                    <span class="text-xs text-slate-500">
+                        Exibindo <strong class="text-slate-800">{{ $filteredCount }}</strong> de {{ $totalStudents }} colaboradores
+                    </span>
+
+                    @if($hasActiveFilters)
+                        <button wire:click="clearFilters" type="button"
+                                title="Restaurar filtros padrão"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 transition-colors cursor-pointer">
+                            <x-icon name="x-circle" class="w-3.5 h-3.5" />
+                            <span>Limpar Filtros</span>
+                        </button>
+                    @endif
+                </div>
             </div>
         </div>
 
@@ -415,8 +494,22 @@
                                         {{ $initials }}
                                     </div>
                                     <div class="flex flex-col min-w-0">
-                                        <span class="font-headline-sm text-body-md text-on-surface font-semibold truncate">{{ $student->name }}</span>
-                                        <span class="font-body-sm text-xs text-secondary truncate">{{ $student->email }}</span>
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <span class="font-headline-sm text-body-md text-on-surface font-semibold truncate">{{ $student->name }}</span>
+                                            @if($student->department)
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200/60">
+                                                    {{ $student->department }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div class="flex items-center gap-2 flex-wrap mt-0.5">
+                                            <span class="font-body-sm text-xs text-secondary truncate">{{ $student->email }}</span>
+                                            @foreach($student->trackEnrollments->take(2) as $te)
+                                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200/60">
+                                                    {{ $te->track?->title }}
+                                                </span>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -479,7 +572,20 @@
                     @empty
                         <tr>
                             <td colspan="5" class="px-space-md py-12 text-center text-secondary">
-                                Nenhum colaborador encontrado com os filtros selecionados.
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                                        <x-icon name="search" class="w-5 h-5" />
+                                    </div>
+                                    <span class="text-sm font-semibold text-slate-700">Nenhum colaborador encontrado com os filtros selecionados</span>
+                                    <p class="text-xs text-slate-500 max-w-sm">Tente redefinir os critérios de busca ou limpar os filtros para visualizar a listagem completa.</p>
+                                    @if($hasActiveFilters)
+                                        <button wire:click="clearFilters" type="button"
+                                                class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-primary bg-primary/10 hover:bg-primary/20 transition-colors">
+                                            <x-icon name="arrow-counterclockwise" class="w-3.5 h-3.5" />
+                                            <span>Limpar todos os filtros</span>
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @endforelse

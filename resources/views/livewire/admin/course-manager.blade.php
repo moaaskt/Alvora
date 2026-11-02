@@ -287,8 +287,8 @@
                                 <button wire:click="togglePublish({{ $c->id }})" 
                                         type="button" 
                                         title="Clique para alternar publicação" 
-                                        class="cursor-pointer inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold {{ $c->status === 'published' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : ($c->status === 'draft' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-600 border border-slate-200') }}">
-                                    <span class="w-1.5 h-1.5 rounded-full {{ $c->status === 'published' ? 'bg-emerald-500' : ($c->status === 'draft' ? 'bg-amber-500' : 'bg-slate-400') }}"></span>
+                                        class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-white {{ $c->status === 'published' ? 'bg-emerald-600 hover:bg-emerald-700' : ($c->status === 'draft' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-slate-500 hover:bg-slate-600') }} transition-colors shadow-2xs">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
                                     <span>{{ $c->status === 'published' ? 'Publicado' : ($c->status === 'draft' ? 'Rascunho' : 'Arquivado') }}</span>
                                 </button>
                             </td>

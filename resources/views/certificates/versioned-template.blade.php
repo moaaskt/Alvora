@@ -59,7 +59,7 @@
     <div class="canvas-container">
         @if(!empty($compiled['background']['image_absolute_path']))
             <img src="{{ $compiled['background']['image_absolute_path'] }}"
-                 style="position: absolute; left: 0; top: 0; width: 1122px; height: 793px; z-index: 1; object-fit: cover;"
+                 style="position: absolute; left: 0; top: 0; width: 1122px; height: 793px; z-index: 1; object-fit: fill;"
                  alt="Fundo do Certificado" />
         @endif
 

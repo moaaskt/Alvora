@@ -175,6 +175,14 @@ class User extends Authenticatable
     }
 
     /**
+     * User track enrollments.
+     */
+    public function trackEnrollments(): HasMany
+    {
+        return $this->hasMany(TrackEnrollment::class);
+    }
+
+    /**
      * Courses taught by instructor.
      */
     public function courses(): HasMany

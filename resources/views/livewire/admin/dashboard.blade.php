@@ -160,11 +160,11 @@
                             </div>
                             <div class="shrink-0 flex items-center gap-2">
                                 @if($course->status === 'published')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-600 text-white shadow-2xs">
                                         Publicado
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-500 text-white shadow-2xs">
                                         Rascunho
                                     </span>
                                 @endif

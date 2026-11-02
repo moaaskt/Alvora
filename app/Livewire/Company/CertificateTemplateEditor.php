@@ -343,6 +343,126 @@ class CertificateTemplateEditor extends Component
     }
 
     /**
+     * Center the selected or specified element horizontally on the A4 canvas (1122px).
+     */
+    public function centerElementHorizontally(?string $elementId = null): void
+    {
+        $this->resetMessages();
+        $targetId = $elementId ?? $this->selectedElementId;
+        if (!$targetId) {
+            return;
+        }
+
+        $index = $this->findElementIndex($targetId);
+        if ($index === null) {
+            return;
+        }
+
+        $width = (int) ($this->schema['elements'][$index]['width'] ?? 200);
+        $newX = max(0, min(CertificateSchemaValidator::MAX_WIDTH - $width, (int) round((CertificateSchemaValidator::MAX_WIDTH - $width) / 2)));
+
+        $this->schema['elements'][$index]['x'] = $newX;
+        $this->selectedElementId = $targetId;
+        $this->dispatch('toast', message: 'Elemento centralizado na folha.', type: 'info');
+    }
+
+    /**
+     * Quickly adjust the font size of the selected element.
+     */
+    public function adjustFontSize(int $delta): void
+    {
+        $this->resetMessages();
+        if (!$this->selectedElementId) {
+            return;
+        }
+
+        $index = $this->findElementIndex($this->selectedElementId);
+        if ($index === null) {
+            return;
+        }
+
+        $currentSizeStr = $this->schema['elements'][$index]['style']['font_size'] ?? '16px';
+        $currentSize = (int) preg_replace('/[^0-9]/', '', $currentSizeStr) ?: 16;
+        $newSize = max(8, min(72, $currentSize + $delta));
+
+        $this->schema['elements'][$index]['style']['font_size'] = "{$newSize}px";
+    }
+
+    /**
+     * Quickly set a preset font size for the selected element.
+     */
+    public function setFontSizePreset(int $size): void
+    {
+        $this->resetMessages();
+        if (!$this->selectedElementId) {
+            return;
+        }
+
+        $index = $this->findElementIndex($this->selectedElementId);
+        if ($index === null) {
+            return;
+        }
+
+        $clamped = max(8, min(72, $size));
+        $this->schema['elements'][$index]['style']['font_size'] = "{$clamped}px";
+    }
+
+    /**
+     * Set a preset text color for the selected element.
+     */
+    public function setTextColorPreset(string $hexColor): void
+    {
+        $this->resetMessages();
+        if (!$this->selectedElementId) {
+            return;
+        }
+
+        $index = $this->findElementIndex($this->selectedElementId);
+        if ($index === null) {
+            return;
+        }
+
+        $this->schema['elements'][$index]['style']['color'] = $hexColor;
+    }
+
+    /**
+     * Toggle bold font weight for the selected element.
+     */
+    public function toggleBold(): void
+    {
+        $this->resetMessages();
+        if (!$this->selectedElementId) {
+            return;
+        }
+
+        $index = $this->findElementIndex($this->selectedElementId);
+        if ($index === null) {
+            return;
+        }
+
+        $currentWeight = $this->schema['elements'][$index]['style']['font_weight'] ?? 'normal';
+        $this->schema['elements'][$index]['style']['font_weight'] = ($currentWeight === 'bold') ? 'normal' : 'bold';
+    }
+
+    /**
+     * Set text alignment for the selected element.
+     */
+    public function setTextAlign(string $align): void
+    {
+        $this->resetMessages();
+        if (!$this->selectedElementId || !in_array($align, CertificateSchemaValidator::ALLOWED_TEXT_ALIGNS, true)) {
+            return;
+        }
+
+        $index = $this->findElementIndex($this->selectedElementId);
+        if ($index === null) {
+            return;
+        }
+
+        $this->schema['elements'][$index]['style']['text_align'] = $align;
+    }
+
+    /**
      * Save current schema as a draft.
      * Only mutates the current version if it is in 'draft' status and has no issued certificates.
      */
