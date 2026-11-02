@@ -41,9 +41,12 @@
         <div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow border border-slate-200/60">
             <div class="flex items-center justify-between">
                 <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Alto Risco de Evasão</span>
-                <span class="inline-flex items-center rounded-md bg-error text-on-error px-2.5 py-0.5 text-xs font-semibold shadow-sm">
-                    Crítico
-                </span>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center rounded-md bg-error text-on-error px-2.5 py-0.5 text-xs font-semibold shadow-sm">
+                        Crítico
+                    </span>
+                    <x-icon name="exclamation-triangle-fill" class="w-4 h-4 text-rose-600" />
+                </div>
             </div>
             <div class="my-3 flex items-baseline gap-2">
                 <span class="font-stat-value text-stat-value text-on-surface font-bold tracking-tight">{{ $highRiskCount }}</span>
@@ -59,9 +62,12 @@
         <div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow border border-slate-200/60">
             <div class="flex items-center justify-between">
                 <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Atenção / Médio Risco</span>
-                <span class="inline-flex items-center rounded-md bg-amber-500 text-white px-2.5 py-0.5 text-xs font-semibold shadow-sm">
-                    Alerta Ativo
-                </span>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center rounded-md bg-amber-500 text-white px-2.5 py-0.5 text-xs font-semibold shadow-sm">
+                        Alerta Ativo
+                    </span>
+                    <x-icon name="hourglass-split" class="w-4 h-4 text-amber-600" />
+                </div>
             </div>
             <div class="my-3 flex items-baseline gap-2">
                 <span class="font-stat-value text-stat-value text-on-surface font-bold tracking-tight">{{ $mediumRiskCount }}</span>
@@ -79,9 +85,12 @@
         <div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow border border-slate-200/60">
             <div class="flex items-center justify-between">
                 <span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Engajados / Baixo Risco</span>
-                <span class="inline-flex items-center rounded-md bg-emerald-600 text-white px-2.5 py-0.5 text-xs font-semibold shadow-sm">
-                    Saudável
-                </span>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center rounded-md bg-emerald-600 text-white px-2.5 py-0.5 text-xs font-semibold shadow-sm">
+                        Saudável
+                    </span>
+                    <x-icon name="check-circle-fill" class="w-4 h-4 text-emerald-600" />
+                </div>
             </div>
             <div class="my-3 flex items-baseline gap-2">
                 <span class="font-stat-value text-stat-value text-on-surface font-bold tracking-tight">{{ $lowRiskCount }}</span>
