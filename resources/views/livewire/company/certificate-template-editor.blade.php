@@ -1,10 +1,11 @@
-<div class="px-space-xl py-space-lg flex flex-col gap-5 max-w-[1680px] mx-auto w-full"
+<div class="px-space-xl py-space-lg flex flex-col gap-5 max-w-[1720px] mx-auto w-full"
      x-data="{
         previewUrl: null,
         previewLoading: false,
         previewError: null,
         showPreviewModal: false,
         showGuides: true,
+        activeTab: 'student',
         zoomScale: 0.72,
         draggingId: null,
         dragStartX: 0,
@@ -13,18 +14,31 @@
         elemStartY: 0,
         elemWidth: 100,
         elemHeight: 40,
+        resizeObserver: null,
 
         init() {
-            this.recalculateZoom();
-            window.addEventListener('resize', () => this.recalculateZoom());
+            this.$nextTick(() => {
+                this.recalculateZoom();
+            });
+
+            if (window.ResizeObserver && this.$refs.canvasViewport) {
+                this.resizeObserver = new ResizeObserver(() => {
+                    this.recalculateZoom();
+                });
+                this.resizeObserver.observe(this.$refs.canvasViewport);
+            } else {
+                window.addEventListener('resize', () => this.recalculateZoom());
+            }
         },
 
         recalculateZoom() {
             const viewport = this.$refs.canvasViewport;
             if (!viewport) return;
-            const availableWidth = Math.max(360, viewport.clientWidth - 48);
+            // Desconta o padding (p-4 = 16px de cada lado = 32px) com folga de segurança de 16px
+            const availableWidth = Math.max(320, viewport.clientWidth - 48);
             const fittedScale = availableWidth / 1122;
-            this.zoomScale = Math.min(1.0, Math.max(0.32, Number(fittedScale.toFixed(3))));
+            // Trava o zoom ajustado sem permitir overflow horizontal indesejado
+            this.zoomScale = Math.min(1.0, Math.max(0.28, Number(fittedScale.toFixed(3))));
         },
 
         startDrag(event, id, x, y, width, height, isReadOnly) {
@@ -287,148 +301,152 @@
         <!-- COLUNA ESQUERDA + CENTRO (8 COLUNAS): PALETA DE INSERÇÃO + CANVAS A4 PROPORCIONAL -->
         <div class="xl:col-span-8 flex flex-col gap-4">
 
-            <!-- BARRA DE FERRAMENTAS DE ELEMENTOS E VARIÁVEIS DO DOMÍNIO -->
+            <!-- BARRA DE FERRAMENTAS INTUITIVA E SIMPLIFICADA (UX MODERNA) -->
             <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col gap-3">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <div class="flex flex-wrap items-center gap-1.5">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-1">Adicionar Elemento:</span>
+                <!-- Abas da Toolbar & Zoom -->
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-1.5 p-1 bg-slate-100/80 rounded-xl">
                         <button type="button"
-                                wire:click="addElement('text')"
-                                @disabled($isReadOnlyVersion)
-                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
-                            <span>+ Texto</span>
+                                @click="activeTab = 'student'"
+                                :class="activeTab === 'student' ? 'bg-white text-blue-700 font-bold shadow-2xs' : 'text-slate-600 hover:text-slate-900 font-medium'"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                            </svg>
+                            <span>Campos do Aluno & Curso</span>
                         </button>
+
                         <button type="button"
-                                wire:click="addElement('signature_group')"
-                                @disabled($isReadOnlyVersion)
-                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
-                            <span>+ Bloco de Assinatura</span>
-                        </button>
-                        <button type="button"
-                                wire:click="addElement('auth_badge')"
-                                @disabled($isReadOnlyVersion)
-                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
-                            <span>+ Selo de Verificação</span>
-                        </button>
-                        <button type="button"
-                                wire:click="addElement('box')"
-                                @disabled($isReadOnlyVersion)
-                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
-                            <span>+ Caixa / Moldura</span>
-                        </button>
-                        <button type="button"
-                                wire:click="addElement('line')"
-                                @disabled($isReadOnlyVersion)
-                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
-                            <span>+ Linha Divisória</span>
+                                @click="activeTab = 'shapes'"
+                                :class="activeTab === 'shapes' ? 'bg-white text-blue-700 font-bold shadow-2xs' : 'text-slate-600 hover:text-slate-900 font-medium'"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+                            </svg>
+                            <span>Textos Livres & Elementos</span>
                         </button>
                     </div>
 
-                    <!-- Controle de Zoom Responsivo -->
+                    <!-- Enquadramento & Zoom Automático Inteligente -->
                     <div class="flex items-center gap-1.5 ml-auto">
-                        <span class="text-[11px] text-slate-400 font-mono" x-text="'Escala A4: ' + Math.round(zoomScale * 100) + '%'"></span>
-                        <button type="button" @click="zoomScale = Math.max(0.35, Number((zoomScale - 0.08).toFixed(2)))" class="px-2 py-0.5 text-xs bg-slate-100 hover:bg-slate-200 rounded border border-slate-200 font-bold cursor-pointer">-</button>
-                        <button type="button" @click="recalculateZoom()" class="px-2 py-0.5 text-[11px] bg-slate-100 hover:bg-slate-200 rounded border border-slate-200 font-semibold cursor-pointer">Ajustar</button>
-                        <button type="button" @click="zoomScale = Math.min(1.0, Number((zoomScale + 0.08).toFixed(2)))" class="px-2 py-0.5 text-xs bg-slate-100 hover:bg-slate-200 rounded border border-slate-200 font-bold cursor-pointer">+</button>
+                        <button type="button"
+                                @click="recalculateZoom()"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg border border-blue-200 font-semibold cursor-pointer transition-colors"
+                                title="Ajusta o certificado automaticamente para caber 100% na tela sem cortar nenhuma borda">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                            </svg>
+                            <span>Enquadrar Folha</span>
+                        </button>
+                        <span class="text-[11px] text-slate-400 font-mono pl-1" x-text="Math.round(zoomScale * 100) + '%'"></span>
+                        <button type="button" @click="zoomScale = Math.max(0.28, Number((zoomScale - 0.05).toFixed(2)))" class="w-6 h-6 flex items-center justify-center text-xs bg-slate-100 hover:bg-slate-200 rounded border border-slate-200 font-bold cursor-pointer transition-colors">-</button>
+                        <button type="button" @click="zoomScale = Math.min(1.0, Number((zoomScale + 0.05).toFixed(2)))" class="w-6 h-6 flex items-center justify-center text-xs bg-slate-100 hover:bg-slate-200 rounded border border-slate-200 font-bold cursor-pointer transition-colors">+</button>
                     </div>
                 </div>
 
-                <!-- Inserção Rápida de Variáveis Suportadas pelo Domínio -->
-                <div class="pt-2.5 border-t border-slate-100 flex flex-wrap items-center gap-1.5">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-1">Variáveis do Domínio:</span>
-                    @php
-                        $placeholderLabels = [
-                            '{{student_name}}' => 'Nome do Aluno',
-                            '{{course_title}}' => 'Título do Curso',
-                            '{{company_name}}' => 'Empresa',
-                            '{{workload}}' => 'Carga Horária',
-                            '{{issued_date}}' => 'Data de Emissão',
-                            '{{validation_code}}' => 'Código ALV-YYYY-XXXXXX',
-                            '{{verification_url}}' => 'URL de Verificação',
-                        ];
-                    @endphp
-                    @foreach($allowedPlaceholders as $placeholder)
-                        <button type="button"
-                                wire:click="insertPlaceholder('{{ $placeholder }}')"
-                                @disabled($isReadOnlyVersion || !$selectedElementId)
-                                title="Inserir {{ $placeholder }} no elemento selecionado"
-                                class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-mono bg-indigo-50/70 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/70 transition-colors disabled:opacity-40 cursor-pointer">
-                            <span>{{ $placeholder }}</span>
-                            <span class="text-[10px] font-sans text-indigo-500">({{ $placeholderLabels[$placeholder] ?? '' }})</span>
-                        </button>
-                    @endforeach
+                <!-- Conteúdo Aba 1: Campos Prontos com 1 Clique (Posicione sobre o Certificado) -->
+                <div x-show="activeTab === 'student'" class="flex flex-wrap items-center gap-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-1">Inserir no Diploma:</span>
+                    <button type="button"
+                            wire:click="addDynamicField('student_name')"
+                            @disabled($isReadOnlyVersion)
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition-colors disabled:opacity-40 cursor-pointer shadow-2xs">
+                        <span>+ Nome do Aluno</span>
+                    </button>
+                    <button type="button"
+                            wire:click="addDynamicField('course_title')"
+                            @disabled($isReadOnlyVersion)
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition-colors disabled:opacity-40 cursor-pointer shadow-2xs">
+                        <span>+ Nome do Curso</span>
+                    </button>
+                    <button type="button"
+                            wire:click="addDynamicField('workload')"
+                            @disabled($isReadOnlyVersion)
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 transition-colors disabled:opacity-40 cursor-pointer shadow-2xs">
+                        <span>+ Carga Horária</span>
+                    </button>
+                    <button type="button"
+                            wire:click="addDynamicField('signature_group')"
+                            @disabled($isReadOnlyVersion)
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 transition-colors disabled:opacity-40 cursor-pointer shadow-2xs">
+                        <span>+ Assinatura Diretoria</span>
+                    </button>
+                    <button type="button"
+                            wire:click="addDynamicField('issued_date')"
+                            @disabled($isReadOnlyVersion)
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer shadow-2xs">
+                        <span>+ Data de Emissão</span>
+                    </button>
+                    <button type="button"
+                            wire:click="addDynamicField('validation_code')"
+                            @disabled($isReadOnlyVersion)
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer shadow-2xs">
+                        <span>+ Código ALV</span>
+                    </button>
+                    <button type="button"
+                            wire:click="addDynamicField('verification_url')"
+                            @disabled($isReadOnlyVersion)
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer shadow-2xs">
+                        <span>+ Link Autenticidade</span>
+                    </button>
                 </div>
 
-                <!-- Adicionar Caixas Rápidas de Dados Dinâmicos (Para Arte Pronta) -->
-                <div class="pt-2.5 border-t border-slate-100 flex flex-col gap-1.5">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Adicionar Caixa Dinâmica (Posicione sobre a Arte Pronta):</span>
-                    <div class="flex flex-wrap items-center gap-1.5">
-                        <button type="button"
-                                wire:click="addDynamicField('student_name')"
-                                @disabled($isReadOnlyVersion)
-                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition-colors disabled:opacity-40 cursor-pointer">
-                            <span>+ Nome do Colaborador</span>
-                        </button>
-                        <button type="button"
-                                wire:click="addDynamicField('course_title')"
-                                @disabled($isReadOnlyVersion)
-                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition-colors disabled:opacity-40 cursor-pointer">
-                            <span>+ Curso Concluído</span>
-                        </button>
-                        <button type="button"
-                                wire:click="addDynamicField('company_name')"
-                                @disabled($isReadOnlyVersion)
-                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 transition-colors disabled:opacity-40 cursor-pointer">
-                            <span>+ Organização</span>
-                        </button>
-                        <button type="button"
-                                wire:click="addDynamicField('workload')"
-                                @disabled($isReadOnlyVersion)
-                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 transition-colors disabled:opacity-40 cursor-pointer">
-                            <span>+ Carga Horária</span>
-                        </button>
-                        <button type="button"
-                                wire:click="addDynamicField('issued_date')"
-                                @disabled($isReadOnlyVersion)
-                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
-                            <span>+ Data</span>
-                        </button>
-                        <button type="button"
-                                wire:click="addDynamicField('validation_code')"
-                                @disabled($isReadOnlyVersion)
-                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
-                            <span>+ Código ALV</span>
-                        </button>
-                        <button type="button"
-                                wire:click="addDynamicField('verification_url')"
-                                @disabled($isReadOnlyVersion)
-                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
-                            <span>+ Link Validação</span>
-                        </button>
-                    </div>
+                <!-- Conteúdo Aba 2: Textos Livres & Formas -->
+                <div x-show="activeTab === 'shapes'" style="display: none;" class="flex flex-wrap items-center gap-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-1">Elementos Livres:</span>
+                    <button type="button"
+                            wire:click="addElement('text')"
+                            @disabled($isReadOnlyVersion)
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
+                        <span>+ Texto Personalizado</span>
+                    </button>
+                    <button type="button"
+                            wire:click="addElement('signature_group')"
+                            @disabled($isReadOnlyVersion)
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
+                        <span>+ Bloco com Linha de Assinatura</span>
+                    </button>
+                    <button type="button"
+                            wire:click="addElement('auth_badge')"
+                            @disabled($isReadOnlyVersion)
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
+                        <span>+ Bloco de Autenticação</span>
+                    </button>
+                    <button type="button"
+                            wire:click="addElement('line')"
+                            @disabled($isReadOnlyVersion)
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
+                        <span>+ Linha Divisória</span>
+                    </button>
+                    <button type="button"
+                            wire:click="addElement('box')"
+                            @disabled($isReadOnlyVersion)
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors disabled:opacity-40 cursor-pointer">
+                        <span>+ Caixa / Moldura</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- VIEWPORT RESPONSIVO DO CANVAS A4 (1122 x 793 px) -->
+            <!-- VIEWPORT RESPONSIVO DO CANVAS A4 (1122 x 793 px - PROPORÇÃO A4 PADRÃO) -->
             <div x-ref="canvasViewport"
-                 class="bg-slate-200/80 rounded-2xl border border-slate-300/90 p-6 flex flex-col items-center justify-center overflow-x-auto shadow-inner select-none">
+                 class="bg-slate-200/90 rounded-2xl border border-slate-300 p-4 sm:p-6 flex flex-col items-center justify-center overflow-x-auto shadow-inner select-none transition-all">
 
                 <!-- Wrapper dimensionado pela escala para manter fluxo sem distorção -->
-                <div class="relative transition-all duration-75"
+                <div class="relative transition-all duration-75 shrink-0"
                      :style="`width: ${Math.round(1122 * zoomScale)}px; height: ${Math.round(793 * zoomScale)}px;`">
 
                     <!-- PÁGINA A4 REAL (1122px x 793px, Landscape) -->
                     <div id="certificate-a4-canvas"
-                         class="relative origin-top-left shadow-2xl"
+                         class="relative origin-top-left shadow-2xl rounded-xs"
                          style="width: 1122px; height: 793px; background-color: {{ $schema['background']['color'] ?? '#0b0f19' }}; font-family: Helvetica, Arial, sans-serif; overflow: hidden; box-sizing: border-box;"
                          :style="`transform: scale(${zoomScale}); background-color: {{ $schema['background']['color'] ?? '#0b0f19' }};`">
 
-                        <!-- Arte de Fundo Personalizada (se carregada) -->
+                        <!-- Arte de Fundo Personalizada (Preenchimento Total 100% sem cortes de bordas) -->
                         @if(!empty($backgroundImageUrl))
                             <img src="{{ $backgroundImageUrl }}"
                                  alt="Fundo do Certificado"
                                  class="pointer-events-none select-none"
-                                 style="position: absolute; top: 0; left: 0; width: 1122px; height: 793px; object-fit: cover; z-index: 1;" />
+                                 style="position: absolute; top: 0; left: 0; width: 1122px; height: 793px; object-fit: fill; z-index: 1;" />
                         @endif
 
                         <!-- Borda Externa Oficial do Certificado -->
@@ -659,9 +677,9 @@
                         <h2 class="text-sm font-bold text-slate-900">Painel de Propriedades</h2>
                         <p class="text-xs text-slate-500">
                             @if($selectedIndex !== null)
-                                Editando: <span class="font-mono font-semibold text-blue-600">{{ $selectedElementId }}</span>
+                                Selecionado: <span class="font-mono font-semibold text-blue-600">{{ $selectedElementId }}</span>
                             @else
-                                Nenhum elemento selecionado
+                                Clique em um elemento no canvas para editar
                             @endif
                         </p>
                     </div>
@@ -676,95 +694,130 @@
                     @endif
                 </div>
 
-                <!-- Seletor Rápido de Elementos (Camadas) -->
-                <div>
-                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                        Camadas / Elementos do Template
-                    </label>
-                    <div class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1 bg-slate-50 rounded-xl border border-slate-200/70">
-                        @foreach(($schema['elements'] ?? []) as $elItem)
-                            @php $itemId = $elItem['id'] ?? ''; @endphp
-                            <button type="button"
-                                    wire:click="selectElement('{{ $itemId }}')"
-                                    class="px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer {{ $selectedElementId === $itemId ? 'bg-blue-600 text-white font-semibold shadow-2xs' : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200' }}">
-                                {{ $itemId }}
-                            </button>
-                        @endforeach
-                    </div>
-                </div>
-
                 @if($selectedIndex !== null)
-                    <!-- Coordenadas e Dimensões (X, Y, Largura, Altura) -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-slate-100">
+                    <!-- AÇÕES RÁPIDAS INTUITIVAS: CENTRALIZAR NA FOLHA -->
+                    <div class="p-3 bg-gradient-to-r from-blue-50 to-indigo-50/40 rounded-xl border border-blue-100 flex items-center justify-between gap-2">
                         <div>
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Eixo X (px)</label>
-                            <input type="number"
-                                   min="0"
-                                   max="1122"
-                                   @disabled($isReadOnlyVersion)
-                                   wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.x"
-                                   class="w-full px-2.5 py-1.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            <span class="text-xs font-bold text-blue-900 block">Alinhamento Perfeito A4</span>
+                            <span class="text-[11px] text-blue-700">Centralize o elemento na folha com 1 clique</span>
                         </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Eixo Y (px)</label>
-                            <input type="number"
-                                   min="0"
-                                   max="793"
-                                   @disabled($isReadOnlyVersion)
-                                   wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.y"
-                                   class="w-full px-2.5 py-1.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Largura (px)</label>
-                            <input type="number"
-                                   min="10"
-                                   max="1122"
-                                   @disabled($isReadOnlyVersion)
-                                   wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.width"
-                                   class="w-full px-2.5 py-1.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Altura (px)</label>
-                            <input type="number"
-                                   min="4"
-                                   max="793"
-                                   @disabled($isReadOnlyVersion)
-                                   wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.height"
-                                   class="w-full px-2.5 py-1.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500">
-                        </div>
-                    </div>
-
-                    <!-- Tipo do Elemento (Whitelist do Schema) -->
-                    <div class="pt-2 border-t border-slate-100">
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Tipo de Elemento</label>
-                        <select wire:model.live="schema.elements.{{ $selectedIndex }}.type"
+                        <button type="button"
+                                wire:click="centerElementHorizontally"
                                 @disabled($isReadOnlyVersion)
-                                class="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500">
-                            @foreach($allowedElementTypes as $typeOption)
-                                <option value="{{ $typeOption }}">{{ $typeOption }}</option>
-                            @endforeach
-                        </select>
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs cursor-pointer transition-colors shrink-0">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 6.75h16.5M7.5 12h9m-6 5.25h3" />
+                            </svg>
+                            <span>Centralizar na Folha</span>
+                        </button>
                     </div>
 
                     <!-- Conteúdo Textual / Variáveis -->
-                    <div class="pt-2 border-t border-slate-100">
+                    <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">
-                            Conteúdo do Elemento (Texto e Variáveis)
+                            Texto do Elemento
                         </label>
                         <textarea rows="3"
                                   @disabled($isReadOnlyVersion)
                                   wire:model.live.debounce.300ms="schema.elements.{{ $selectedIndex }}.content"
-                                  placeholder="Digite o texto estático ou insira variáveis @{{student_name}}..."
+                                  placeholder="Digite o texto aqui..."
                                   class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 font-sans"></textarea>
-                        <span class="text-[11px] text-slate-400 block mt-0.5">
-                            HTML não é permitido. Utilize apenas texto simples e marcadores oficiais.
-                        </span>
                     </div>
 
-                    <!-- Tipografia (Fonte, Tamanho, Peso, Alinhamento, Cor) -->
-                    <div class="pt-2 border-t border-slate-100 flex flex-col gap-3">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tipografia & Estilo</span>
+                    <!-- TIPOGRAFIA VISUAL DESCOMPLICADA -->
+                    <div class="pt-3 border-t border-slate-100 flex flex-col gap-3">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Estilo e Formatação</span>
 
+                        <!-- Alinhamento e Negrito Rápidos -->
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Alinhamento</label>
+                                <div class="grid grid-cols-3 gap-1 p-1 bg-slate-100 rounded-lg border border-slate-200">
+                                    <button type="button"
+                                            wire:click="setTextAlign('left')"
+                                            @disabled($isReadOnlyVersion)
+                                            class="py-1 flex items-center justify-center rounded text-xs transition-colors cursor-pointer {{ ($schema['elements'][$selectedIndex]['style']['text_align'] ?? '') === 'left' ? 'bg-white text-blue-700 font-bold shadow-2xs' : 'text-slate-600 hover:text-slate-900' }}"
+                                            title="Alinhar à Esquerda">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 6.75h16.5M3.75 12h10.5m-10.5 5.25h16.5"/></svg>
+                                    </button>
+                                    <button type="button"
+                                            wire:click="setTextAlign('center')"
+                                            @disabled($isReadOnlyVersion)
+                                            class="py-1 flex items-center justify-center rounded text-xs transition-colors cursor-pointer {{ ($schema['elements'][$selectedIndex]['style']['text_align'] ?? '') === 'center' ? 'bg-white text-blue-700 font-bold shadow-2xs' : 'text-slate-600 hover:text-slate-900' }}"
+                                            title="Centralizar Texto">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 6.75h16.5M7.5 12h9m-6 5.25h3"/></svg>
+                                    </button>
+                                    <button type="button"
+                                            wire:click="setTextAlign('right')"
+                                            @disabled($isReadOnlyVersion)
+                                            class="py-1 flex items-center justify-center rounded text-xs transition-colors cursor-pointer {{ ($schema['elements'][$selectedIndex]['style']['text_align'] ?? '') === 'right' ? 'bg-white text-blue-700 font-bold shadow-2xs' : 'text-slate-600 hover:text-slate-900' }}"
+                                            title="Alinhar à Direita">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 6.75h16.5M9.75 12h10.5m-16.5 5.25h16.5"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Destaque</label>
+                                <button type="button"
+                                        wire:click="toggleBold"
+                                        @disabled($isReadOnlyVersion)
+                                        class="w-full py-2 flex items-center justify-center gap-1.5 rounded-lg text-xs border font-bold transition-colors cursor-pointer {{ ($schema['elements'][$selectedIndex]['style']['font_weight'] ?? '') === 'bold' ? 'bg-blue-50 text-blue-700 border-blue-300 ring-1 ring-blue-300' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100' }}">
+                                    <span class="font-black text-sm">B</span>
+                                    <span>Negrito</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tamanho da Fonte com Controles Rápidos -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="text-[11px] font-semibold text-slate-600">Tamanho da Fonte</label>
+                                <div class="flex items-center gap-1">
+                                    <button type="button"
+                                            wire:click="adjustFontSize(-2)"
+                                            @disabled($isReadOnlyVersion)
+                                            class="w-5 h-5 flex items-center justify-center text-xs bg-slate-100 hover:bg-slate-200 rounded border border-slate-200 font-bold cursor-pointer">-</button>
+                                    <button type="button"
+                                            wire:click="adjustFontSize(2)"
+                                            @disabled($isReadOnlyVersion)
+                                            class="w-5 h-5 flex items-center justify-center text-xs bg-slate-100 hover:bg-slate-200 rounded border border-slate-200 font-bold cursor-pointer">+</button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-4 gap-1.5">
+                                <button type="button" wire:click="setFontSizePreset(13)" class="py-1 px-1.5 text-[11px] bg-slate-50 hover:bg-slate-100 rounded border border-slate-200 text-slate-700 cursor-pointer text-center">P (13px)</button>
+                                <button type="button" wire:click="setFontSizePreset(18)" class="py-1 px-1.5 text-[11px] bg-slate-50 hover:bg-slate-100 rounded border border-slate-200 text-slate-700 cursor-pointer text-center">M (18px)</button>
+                                <button type="button" wire:click="setFontSizePreset(28)" class="py-1 px-1.5 text-[11px] bg-slate-50 hover:bg-slate-100 rounded border border-slate-200 text-slate-700 cursor-pointer text-center">G (28px)</button>
+                                <button type="button" wire:click="setFontSizePreset(36)" class="py-1 px-1.5 text-[11px] bg-slate-50 hover:bg-slate-100 rounded border border-slate-200 text-slate-700 cursor-pointer text-center">XG (36px)</button>
+                            </div>
+                        </div>
+
+                        <!-- Paleta de Cores Rápida para Certificados -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1.5">Cor do Texto</label>
+                            <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" wire:click="setTextColorPreset('#000000')" title="Preto Clássico" class="w-6 h-6 rounded-full bg-black border border-slate-300 shadow-2xs cursor-pointer hover:scale-110 transition-transform"></button>
+                                    <button type="button" wire:click="setTextColorPreset('#ffffff')" title="Branco" class="w-6 h-6 rounded-full bg-white border border-slate-300 shadow-2xs cursor-pointer hover:scale-110 transition-transform"></button>
+                                    <button type="button" wire:click="setTextColorPreset('#0b6ef9')" title="Azul Alvora" class="w-6 h-6 rounded-full bg-[#0b6ef9] border border-slate-300 shadow-2xs cursor-pointer hover:scale-110 transition-transform"></button>
+                                    <button type="button" wire:click="setTextColorPreset('#d97706')" title="Dourado Nobre" class="w-6 h-6 rounded-full bg-[#d97706] border border-slate-300 shadow-2xs cursor-pointer hover:scale-110 transition-transform"></button>
+                                    <button type="button" wire:click="setTextColorPreset('#475569')" title="Cinza Grafite" class="w-6 h-6 rounded-full bg-[#475569] border border-slate-300 shadow-2xs cursor-pointer hover:scale-110 transition-transform"></button>
+                                </div>
+                                <div class="flex items-center gap-1.5 flex-1">
+                                    <input type="color"
+                                           @disabled($isReadOnlyVersion)
+                                           wire:model.live="schema.elements.{{ $selectedIndex }}.style.color"
+                                           class="w-7 h-7 rounded border border-slate-200 cursor-pointer p-0.5 bg-white shrink-0">
+                                    <input type="text"
+                                           @disabled($isReadOnlyVersion)
+                                           wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.style.color"
+                                           placeholder="#000000"
+                                           class="w-full px-2 py-1 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fonte e Caixa Alta -->
                         <div class="grid grid-cols-2 gap-2.5">
                             <div>
                                 <label class="block text-[11px] font-semibold text-slate-600 mb-1">Família da Fonte</label>
@@ -778,132 +831,86 @@
                             </div>
 
                             <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tamanho (ex: 16px)</label>
-                                <input type="text"
-                                       @disabled($isReadOnlyVersion)
-                                       wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.style.font_size"
-                                       placeholder="16px"
-                                       class="w-full px-2.5 py-1.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg">
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Peso da Fonte</label>
-                                <select wire:model.live="schema.elements.{{ $selectedIndex }}.style.font_weight"
-                                        @disabled($isReadOnlyVersion)
-                                        class="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800">
-                                    @foreach($allowedFontWeights as $weight)
-                                        <option value="{{ $weight }}">{{ $weight }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Alinhamento</label>
-                                <select wire:model.live="schema.elements.{{ $selectedIndex }}.style.text_align"
-                                        @disabled($isReadOnlyVersion)
-                                        class="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800">
-                                    @foreach($allowedTextAligns as $align)
-                                        <option value="{{ $align }}">{{ $align }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2.5">
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Cor do Texto (Hex)</label>
-                                <div class="flex items-center gap-1.5">
-                                    <input type="color"
-                                           @disabled($isReadOnlyVersion)
-                                           wire:model.live="schema.elements.{{ $selectedIndex }}.style.color"
-                                           class="w-8 h-8 rounded border border-slate-200 cursor-pointer p-0.5 bg-white">
-                                    <input type="text"
-                                           @disabled($isReadOnlyVersion)
-                                           wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.style.color"
-                                           placeholder="#ffffff"
-                                           class="w-full px-2.5 py-1.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Transformação</label>
+                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Letras</label>
                                 <select wire:model.live="schema.elements.{{ $selectedIndex }}.style.text_transform"
                                         @disabled($isReadOnlyVersion)
                                         class="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800">
-                                    <option value="none">Normal (none)</option>
+                                    <option value="none">Normal</option>
                                     <option value="uppercase">MAIÚSCULAS</option>
                                     <option value="capitalize">Capitalizado</option>
-                                    <option value="lowercase">minúsculas</option>
                                 </select>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2.5">
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Espaçamento (ex: 2px)</label>
-                                <input type="text"
-                                       @disabled($isReadOnlyVersion)
-                                       wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.style.letter_spacing"
-                                       placeholder="0px"
-                                       class="w-full px-2.5 py-1.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg">
-                            </div>
-
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Altura de Linha</label>
-                                <input type="text"
-                                       @disabled($isReadOnlyVersion)
-                                       wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.style.line_height"
-                                       placeholder="1.5"
-                                       class="w-full px-2.5 py-1.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Fundo e Borda do Elemento -->
-                    <div class="pt-2 border-t border-slate-100 flex flex-col gap-2.5">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Caixa & Borda do Elemento</span>
+                    <!-- AJUSTE FINO DE POSIÇÃO (COLAPSÁVEL / ACORDEÃO PARA NÃO POLUIR) -->
+                    <div x-data="{ openPos: false }" class="pt-3 border-t border-slate-100 flex flex-col gap-2">
+                        <button type="button"
+                                @click="openPos = !openPos"
+                                class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
+                            <span>Ajuste Manual de Coordenadas (px)</span>
+                            <svg class="w-3.5 h-3.5 transition-transform" :class="openPos ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </button>
 
-                        <div class="grid grid-cols-2 gap-2.5">
+                        <div x-show="openPos" style="display: none;" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
                             <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Cor da Borda</label>
-                                <input type="text"
-                                       @disabled($isReadOnlyVersion)
-                                       wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.style.border_color"
-                                       placeholder="#475569"
-                                       class="w-full px-2.5 py-1.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Espessura Borda (px)</label>
+                                <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Posição X</label>
                                 <input type="number"
                                        min="0"
-                                       max="20"
+                                       max="1122"
                                        @disabled($isReadOnlyVersion)
-                                       wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.style.border_width"
-                                       class="w-full px-2.5 py-1.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg">
+                                       wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.x"
+                                       class="w-full px-2 py-1 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Estilo da Borda</label>
-                                <select wire:model.live="schema.elements.{{ $selectedIndex }}.style.border_style"
-                                        @disabled($isReadOnlyVersion)
-                                        class="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800">
-                                    <option value="">Sem borda</option>
-                                    @foreach($allowedBorderStyles as $bStyle)
-                                        <option value="{{ $bStyle }}">{{ $bStyle }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Padding Interno (px)</label>
+                                <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Posição Y</label>
                                 <input type="number"
                                        min="0"
-                                       max="60"
+                                       max="793"
                                        @disabled($isReadOnlyVersion)
-                                       wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.style.padding"
-                                       class="w-full px-2.5 py-1.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg">
+                                       wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.y"
+                                       class="w-full px-2 py-1 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Largura</label>
+                                <input type="number"
+                                       min="10"
+                                       max="1122"
+                                       @disabled($isReadOnlyVersion)
+                                       wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.width"
+                                       class="w-full px-2 py-1 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Altura</label>
+                                <input type="number"
+                                       min="4"
+                                       max="793"
+                                       @disabled($isReadOnlyVersion)
+                                       wire:model.live.debounce.250ms="schema.elements.{{ $selectedIndex }}.height"
+                                       class="w-full px-2 py-1 text-xs font-mono bg-slate-50 border border-slate-200 rounded-lg">
                             </div>
                         </div>
                     </div>
                 @endif
+
+                <!-- Seletor Rápido de Elementos (Camadas) no final do card -->
+                <div class="pt-3 border-t border-slate-100">
+                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                        Camadas no Documento
+                    </label>
+                    <div class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-slate-50 rounded-xl border border-slate-200/70">
+                        @foreach(($schema['elements'] ?? []) as $elItem)
+                            @php $itemId = $elItem['id'] ?? ''; @endphp
+                            <button type="button"
+                                    wire:click="selectElement('{{ $itemId }}')"
+                                    class="px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer {{ $selectedElementId === $itemId ? 'bg-blue-600 text-white font-semibold shadow-2xs' : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200' }}">
+                                {{ $itemId }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
             </div>
 
             <!-- CARD 2: ESTILO GLOBAL DA PÁGINA A4 (FUNDO & MOLDURA EXTERNA) -->
