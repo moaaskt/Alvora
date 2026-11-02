@@ -3,6 +3,7 @@
 namespace App\Livewire\Company;
 
 use App\Models\AiIntervention;
+use App\Models\LearningTrack;
 use App\Models\RiskScore;
 use App\Models\User;
 use App\Services\EvasionInterventionService;
@@ -16,6 +17,10 @@ class SituationRoom extends Component
 
     public string $filterLevel = 'all'; // all, high, medium, low
     public string $search = '';
+    public ?string $department = null;
+    public $trackId = null;
+    public string $sortBy = 'risk_desc'; // risk_desc, risk_asc, name_asc, name_desc, inactivity_desc
+
     public ?int $selectedUserId = null;
     public string $manualMessage = '';
     public bool $showModal = false;
@@ -28,6 +33,46 @@ class SituationRoom extends Component
     public function updatedSearch(): void
     {
         $this->resetPage();
+    }
+
+    public function updatedDepartment(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedTrackId(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSortBy(): void
+    {
+        $this->resetPage();
+    }
+
+    public function setFilter(string $level): void
+    {
+        $this->filterLevel = $level;
+        $this->resetPage();
+    }
+
+    public function clearFilters(): void
+    {
+        $this->filterLevel = 'all';
+        $this->search = '';
+        $this->department = null;
+        $this->trackId = null;
+        $this->sortBy = 'risk_desc';
+        $this->resetPage();
+    }
+
+    public function hasActiveFilters(): bool
+    {
+        return $this->filterLevel !== 'all'
+            || !empty(trim($this->search))
+            || !empty($this->department)
+            || !empty($this->trackId)
+            || $this->sortBy !== 'risk_desc';
     }
 
     public function openInterventionModal(int $userId): void
@@ -74,47 +119,79 @@ class SituationRoom extends Component
     {
         $companyId = auth()->user()->company_id;
 
-        // Base query for students in company
-        $query = User::where('company_id', $companyId)
+        // Opções de Departamentos existentes da empresa
+        $departments = User::where('company_id', $companyId)
             ->where('role', 'student')
-            ->with(['latestRiskScore', 'interventions']);
+            ->whereNotNull('department')
+            ->where('department', '!=', '')
+            ->distinct()
+            ->orderBy('department')
+            ->pluck('department');
 
-        if (!empty($this->search)) {
-            $query->where(function ($q) {
-                $q->where('name', 'like', "%{$this->search}%")
-                  ->orWhere('email', 'like', "%{$this->search}%");
+        // Opções de Trilhas da empresa
+        $tracks = LearningTrack::where('company_id', $companyId)
+            ->orderBy('title')
+            ->get(['id', 'title']);
+
+        // Query Base com escopo de Equipe, Trilha e Busca
+        $baseQuery = User::where('company_id', $companyId)
+            ->where('role', 'student')
+            ->with(['latestRiskScore', 'interventions', 'trackEnrollments.track']);
+
+        if (!empty($this->department)) {
+            $baseQuery->where('department', $this->department);
+        }
+
+        if (!empty($this->trackId)) {
+            $trackId = (int) $this->trackId;
+            $baseQuery->whereHas('trackEnrollments', fn($q) => $q->where('track_id', $trackId));
+        }
+
+        if (!empty(trim($this->search))) {
+            $search = trim($this->search);
+            $baseQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
-        $allStudents = (clone $query)->get();
+        $scopedStudents = $baseQuery->get();
 
-        // Calculate KPI metrics
-        $totalStudents = $allStudents->count();
-        $highRiskCount = $allStudents->filter(fn($u) => $u->latestRiskScore?->isHighRisk())->count();
-        $mediumRiskCount = $allStudents->filter(fn($u) => $u->latestRiskScore?->isMediumRisk())->count();
-        $lowRiskCount = $allStudents->filter(fn($u) => $u->latestRiskScore?->isLowRisk())->count();
+        // KPIs calculados sobre o escopo selecionado
+        $totalStudents = $scopedStudents->count();
+        $highRiskCount = $scopedStudents->filter(fn($u) => $u->latestRiskScore?->isHighRisk())->count();
+        $mediumRiskCount = $scopedStudents->filter(fn($u) => $u->latestRiskScore?->isMediumRisk())->count();
+        $lowRiskCount = $scopedStudents->filter(fn($u) => $u->latestRiskScore?->isLowRisk())->count();
 
         $highRiskPercent = $totalStudents > 0 ? round(($highRiskCount / $totalStudents) * 100) : 0;
         $averageScore = $totalStudents > 0
-            ? round($allStudents->avg(fn($u) => $u->latestRiskScore?->score ?? 0))
+            ? round($scopedStudents->avg(fn($u) => $u->latestRiskScore?->score ?? 0))
             : 0;
 
         $interventionsCount = AiIntervention::where('company_id', $companyId)
             ->where('created_at', '>=', now()->startOfMonth())
             ->count();
 
-        // Filter list by selected risk level
+        // Cohorts para o Heatmap (dentro do escopo selecionado)
+        $safeStudents = $scopedStudents->filter(fn($u) => $u->latestRiskScore?->isLowRisk() || (!$u->latestRiskScore));
+        $warningStudents = $scopedStudents->filter(fn($u) => $u->latestRiskScore?->isMediumRisk());
+        $criticalStudents = $scopedStudents->filter(fn($u) => $u->latestRiskScore?->isHighRisk());
+
+        // Filtragem da tabela pelo Nível de Risco selecionado
         if ($this->filterLevel !== 'all') {
-            $studentsList = $allStudents->filter(fn($u) => $u->latestRiskScore?->level === $this->filterLevel);
+            $tableStudents = $scopedStudents->filter(fn($u) => $u->latestRiskScore?->level === $this->filterLevel);
         } else {
-            // High risk first by default
-            $studentsList = $allStudents->sortByDesc(fn($u) => $u->latestRiskScore?->score ?? 0);
+            $tableStudents = $scopedStudents;
         }
 
-        // Cohorts for Heatmap
-        $safeStudents = $allStudents->filter(fn($u) => $u->latestRiskScore?->isLowRisk() || (!$u->latestRiskScore));
-        $warningStudents = $allStudents->filter(fn($u) => $u->latestRiskScore?->isMediumRisk());
-        $criticalStudents = $allStudents->filter(fn($u) => $u->latestRiskScore?->isHighRisk());
+        // Ordenação da tabela
+        $studentsList = match ($this->sortBy) {
+            'risk_asc' => $tableStudents->sortBy(fn($u) => $u->latestRiskScore?->score ?? 0),
+            'name_asc' => $tableStudents->sortBy(fn($u) => strtolower($u->name)),
+            'name_desc' => $tableStudents->sortByDesc(fn($u) => strtolower($u->name)),
+            'inactivity_desc' => $tableStudents->sortByDesc(fn($u) => (int) ($u->latestRiskScore?->breakdown['inactivity']['score'] ?? 0)),
+            default => $tableStudents->sortByDesc(fn($u) => $u->latestRiskScore?->score ?? 0), // risk_desc
+        };
 
         return view('livewire.company.situation-room', [
             'totalStudents' => $totalStudents,
@@ -125,6 +202,10 @@ class SituationRoom extends Component
             'averageScore' => $averageScore,
             'interventionsCount' => $interventionsCount,
             'students' => $studentsList,
+            'filteredCount' => $studentsList->count(),
+            'departments' => $departments,
+            'tracks' => $tracks,
+            'hasActiveFilters' => $this->hasActiveFilters(),
             'safeStudents' => $safeStudents,
             'warningStudents' => $warningStudents,
             'criticalStudents' => $criticalStudents,
@@ -132,11 +213,5 @@ class SituationRoom extends Component
             'title' => 'Sala de Situação — Telemetria Preditiva & Retenção IA — ALVORA',
             'breadcrumb' => 'Sala de Situação',
         ]);
-    }
-
-    public function setFilter(string $level): void
-    {
-        $this->filterLevel = $level;
-        $this->resetPage();
     }
 }

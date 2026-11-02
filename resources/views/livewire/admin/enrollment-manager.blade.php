@@ -59,7 +59,7 @@
                 <button wire:click="exportCsv" 
                         type="button" 
                         class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all shadow-2xs cursor-pointer">
-                    <span class="material-symbols-outlined text-lg text-slate-500">download</span>
+                    <x-icon name="download" class="w-4 h-4 text-slate-500" />
                     <span>Exportar Relatório</span>
                 </button>
 
@@ -67,91 +67,85 @@
                 <a href="{{ route('admin.enrollments.create') }}" 
                    wire:click.prevent="switchToCreate"
                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:bg-blue-800 transition-all shadow-sm shadow-blue-500/25 cursor-pointer">
-                    <span class="material-symbols-outlined text-lg">person_add</span>
+                    <x-icon name="plus-lg" class="w-4 h-4 text-white" />
                     <span>Matricular Aluno</span>
                 </a>
             </div>
         </div>
 
-        <!-- 3. KPI CARDS (4 COLUNAS) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- 3. KPI CARDS (4 COLUNAS - BOOTSTRAP ICONS PADRÃO DASHBOARD) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Card 1: Total Geral -->
-            <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Geral de Matrículas</span>
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-xl">how_to_reg</span>
+            <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-colors">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total de Matrículas</span>
+                    <x-icon name="mortarboard-fill" class="w-5 h-5 text-emerald-600 shrink-0" />
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-slate-900 tracking-tight">{{ number_format($totalEnrollments, 0, ',', '.') }}</div>
+                    <div class="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
+                        <span class="inline-flex items-center text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded">
+                            +{{ $monthEnrollments }}
+                        </span>
+                        <span>neste mês corrente</span>
                     </div>
-                </div>
-                <div class="mt-3 flex items-baseline gap-2">
-                    <span class="text-2xl md:text-3xl font-extrabold text-slate-900">{{ number_format($totalEnrollments, 0, ',', '.') }}</span>
-                </div>
-                <div class="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
-                    <span class="inline-flex items-center text-emerald-600 font-bold">
-                        <span class="material-symbols-outlined text-sm mr-0.5">arrow_upward</span>
-                        +{{ $monthEnrollments }}
-                    </span>
-                    <span>neste mês corrente</span>
                 </div>
             </div>
 
             <!-- Card 2: Matrículas Ativas -->
-            <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow">
-                <div class="flex items-center justify-between">
+            <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-colors">
+                <div class="flex items-center justify-between mb-3">
                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Matrículas Ativas</span>
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-xl">verified_user</span>
+                    <x-icon name="check-circle-fill" class="w-5 h-5 text-blue-600 shrink-0" />
+                </div>
+                <div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-bold text-slate-900 tracking-tight">{{ number_format($activeEnrollments, 0, ',', '.') }}</span>
+                        <span class="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
+                            {{ $totalEnrollments > 0 ? round(($activeEnrollments / $totalEnrollments) * 100, 1) : 100 }}% ativação
+                        </span>
                     </div>
-                </div>
-                <div class="mt-3 flex items-baseline gap-2">
-                    <span class="text-2xl md:text-3xl font-extrabold text-slate-900">{{ number_format($activeEnrollments, 0, ',', '.') }}</span>
-                    <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-800 border border-slate-200">
-                        {{ $totalEnrollments > 0 ? round(($activeEnrollments / $totalEnrollments) * 100, 1) : 100 }}% ativação
-                    </span>
-                </div>
-                <div class="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
-                    <span class="w-2 h-2 rounded-full bg-slate-600"></span>
-                    <span>Engajamento em conformidade</span>
+                    <p class="text-xs text-slate-500 mt-2 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                        <span>Engajamento em conformidade</span>
+                    </p>
                 </div>
             </div>
 
             <!-- Card 3: Acessos Vitalícios -->
-            <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow">
-                <div class="flex items-center justify-between">
+            <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-colors">
+                <div class="flex items-center justify-between mb-3">
                     <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Acessos Vitalícios</span>
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-xl">all_inclusive</span>
+                    <x-icon name="infinity" class="w-5 h-5 text-indigo-600 shrink-0" />
+                </div>
+                <div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-bold text-slate-900 tracking-tight">{{ number_format($lifetimeEnrollments, 0, ',', '.') }}</span>
+                        <span class="text-xs font-medium text-slate-500">
+                            ({{ $totalEnrollments > 0 ? round(($lifetimeEnrollments / $totalEnrollments) * 100, 1) : 0 }}% do total)
+                        </span>
                     </div>
-                </div>
-                <div class="mt-3 flex items-baseline gap-2">
-                    <span class="text-2xl md:text-3xl font-extrabold text-slate-900">{{ number_format($lifetimeEnrollments, 0, ',', '.') }}</span>
-                    <span class="text-xs text-slate-500 font-medium">
-                        ({{ $totalEnrollments > 0 ? round(($lifetimeEnrollments / $totalEnrollments) * 100, 1) : 0 }}% do total)
-                    </span>
-                </div>
-                <div class="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
-                    <span class="material-symbols-outlined text-sm text-slate-500">corporate_fare</span>
-                    <span>Contratos corporativos perenes</span>
+                    <p class="text-xs text-slate-500 mt-2">Contratos corporativos perenes</p>
                 </div>
             </div>
 
             <!-- Card 4: Novas no Mês -->
-            <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Novas Matrículas no Mês</span>
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-xl">trending_up</span>
+            <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition-colors">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Novas no Mês</span>
+                    <x-icon name="graph-up-arrow" class="w-5 h-5 text-cyan-600 shrink-0" />
+                </div>
+                <div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-bold text-cyan-600 tracking-tight">+{{ $monthEnrollments }}</span>
+                        <span class="text-xs font-semibold text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded-full border border-cyan-100">
+                            Mês Atual
+                        </span>
                     </div>
-                </div>
-                <div class="mt-3 flex items-baseline gap-2">
-                    <span class="text-2xl md:text-3xl font-extrabold text-blue-600">+{{ $monthEnrollments }}</span>
-                    <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                        Mês Atual
-                    </span>
-                </div>
-                <div class="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
-                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                    <span>Taxa contínua de onboarding</span>
+                    <p class="text-xs text-slate-500 mt-2 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                        <span>Taxa contínua de onboarding</span>
+                    </p>
                 </div>
             </div>
         </div>
