@@ -28,22 +28,22 @@ See: `.planning/PROJECT.md` e `.planning/milestones/v1.0-ROADMAP.md`
 
 Phase: 08 (Governança de Rotas, Permissões Contextuais e Isolamento) — EM ANDAMENTO
 Plan: 08-01 (In Execution)
-Status: Tasks 8.1 and 8.2 executed and committed; Task 8.3 ready
-Last activity: 2026-11-04 — Implementação das Tarefas 8.1 e 8.2 concluída.
+Status: Tasks 8.1, 8.2 and 8.3 executed and committed; Task 8.4 ready
+Last activity: 2026-11-04 — Implementação das Tarefas 8.1, 8.2 e 8.3 concluída.
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 85%
 
 ## Performance & Test Status
 
 **Suíte de Testes Automatizados (PHPUnit / Feature):**
-- Testes Legados: 304 testes baseline mantidos.
-- Novos testes: `UserContextualPermissionsTest` (3 testes / 16 asserções) e `DecoupledRoutesAndNavigationTest` (7 testes / 61 asserções) 100% aprovados.
+- Total de Testes da Aplicação: 322 testes executados (321 aprovados, 1 skipped, 0 falhas).
+- Novos testes: `UserContextualPermissionsTest` (3 testes), `DecoupledRoutesAndNavigationTest` (7 testes), `CourseAccessScopeAndPoliciesTest` (6 testes) — 100% aprovados.
 
 ## Roadmap das Fases B2B + B2C (08 a 13)
 
 | Phase | Nome | Status |
 |---|---|---|
-| **08** | **Governança de Rotas, Permissões Contextuais e Isolamento** | **Em Execução (Tarefas 8.1 e 8.2 concluídas)** 🔨 |
+| **08** | **Governança de Rotas, Permissões Contextuais e Isolamento** | **Em Execução (Tarefas 8.1, 8.2 e 8.3 concluídas)** 🔨 |
 | 09 | Suporte a Instrutores Independentes e Schema de Cursos | Futura |
 | 10 | Catálogo Público e Ciclo de Vida de Matrículas | Futura |
 | 11 | Progresso, Avaliações e Certificados Híbridos | Futura |

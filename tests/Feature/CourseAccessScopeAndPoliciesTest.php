@@ -265,12 +265,15 @@ class CourseAccessScopeAndPoliciesTest extends TestCase
     {
         // Configuração de curso com aula para carga horária
         $module = Module::create([
+            'company_id' => $this->companyA->id,
             'course_id' => $this->coursePublishedA->id,
             'title' => 'Módulo 1',
             'order' => 1,
         ]);
 
         Lesson::create([
+            'company_id' => $this->companyA->id,
+            'course_id' => $this->coursePublishedA->id,
             'module_id' => $module->id,
             'title' => 'Aula 1',
             'slug' => 'aula-1',
