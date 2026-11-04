@@ -12,6 +12,13 @@
             </a>
         </div>
 
+        @php
+            $sidebarUser = auth()->user();
+            $sidebarCompanyId = $sidebarUser?->company_id ?? 0;
+            $canManage = $sidebarUser?->canManageCompany($sidebarCompanyId) ?? false;
+            $canTeach = $sidebarUser?->canTeachInContext($sidebarCompanyId) ?? false;
+        @endphp
+
         <!-- Navigation Links -->
         <div class="px-space-md py-space-xs" x-data="{ openMenu: {{ request()->routeIs('settings.*') ? "'configuracoes'" : "null" }} }">
             <nav class="flex flex-col gap-1">
@@ -23,72 +30,76 @@
                     </div>
                 </a>
 
-                <!-- Cursos -->
-                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('instructor.courses.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('instructor.courses.index') }}">
-                    <div class="flex items-center gap-space-sm">
-                        <x-icon name="journal-bookmark-fill" class="w-5 h-5 shrink-0" />
-                        <span>Cursos</span>
-                    </div>
-                    <span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm {{ request()->routeIs('instructor.courses.*') ? 'bg-white/20 text-white font-semibold' : 'bg-surface-container text-on-surface-variant font-semibold' }}">
-                        {{ \App\Models\Course::count() }}
-                    </span>
-                </a>
+                @if($canTeach)
+                    <!-- Cursos -->
+                    <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('instructor.courses.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('instructor.courses.index') }}">
+                        <div class="flex items-center gap-space-sm">
+                            <x-icon name="journal-bookmark-fill" class="w-5 h-5 shrink-0" />
+                            <span>Cursos</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm {{ request()->routeIs('instructor.courses.*') ? 'bg-white/20 text-white font-semibold' : 'bg-surface-container text-on-surface-variant font-semibold' }}">
+                            {{ \App\Models\Course::count() }}
+                        </span>
+                    </a>
 
-                <!-- Trilhas de Aprendizado -->
-                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('company.tracks.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('company.tracks.index') }}">
-                    <div class="flex items-center gap-space-sm">
-                        <x-icon name="map" class="w-5 h-5 shrink-0" />
-                        <span>Trilhas de Aprendizado</span>
-                    </div>
-                </a>
+                    <!-- Templates de Certificados -->
+                    <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('instructor.certificate-templates.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('instructor.certificate-templates.index') }}">
+                        <div class="flex items-center gap-space-sm">
+                            <x-icon name="award-fill" class="w-5 h-5 shrink-0" />
+                            <span>Certificados</span>
+                        </div>
+                    </a>
+                @endif
 
-                <!-- Gestão de Alunos -->
-                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('employees.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('employees.index') }}">
-                    <div class="flex items-center gap-space-sm">
-                        <x-icon name="people-fill" class="w-5 h-5 shrink-0" />
-                        <span>Gestão de Alunos</span>
-                    </div>
-                    <span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm {{ request()->routeIs('employees.*') ? 'bg-white/20 text-white font-semibold' : 'bg-surface-container text-on-surface-variant font-semibold' }}">
-                        {{ \App\Models\User::where('role', 'student')->when(auth()->user()?->company_id, fn($q, $c) => $q->where('company_id', $c))->count() }}
-                    </span>
-                </a>
+                @if($canManage)
+                    <!-- Trilhas de Aprendizado -->
+                    <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('company.tracks.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('company.tracks.index') }}">
+                        <div class="flex items-center gap-space-sm">
+                            <x-icon name="map" class="w-5 h-5 shrink-0" />
+                            <span>Trilhas de Aprendizado</span>
+                        </div>
+                    </a>
 
-                <!-- Sala de Situação -->
-                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('company.situation-room') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('company.situation-room') }}">
-                    <div class="flex items-center gap-space-sm">
-                        <x-icon name="activity" class="w-5 h-5 shrink-0" />
-                        <span>Sala de Situação</span>
-                    </div>
-                    <span class="flex h-2 w-2 relative">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-error"></span>
-                    </span>
-                </a>
+                    <!-- Gestão de Alunos / Colaboradores -->
+                    <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('employees.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('employees.index') }}">
+                        <div class="flex items-center gap-space-sm">
+                            <x-icon name="people-fill" class="w-5 h-5 shrink-0" />
+                            <span>Gestão de Alunos</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm {{ request()->routeIs('employees.*') ? 'bg-white/20 text-white font-semibold' : 'bg-surface-container text-on-surface-variant font-semibold' }}">
+                            {{ \App\Models\User::where('role', 'student')->when(auth()->user()?->company_id, fn($q, $c) => $q->where('company_id', $c))->count() }}
+                        </span>
+                    </a>
 
-                <!-- Insights de IA -->
-                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('company.ai-insights') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('company.ai-insights') }}">
-                    <div class="flex items-center gap-space-sm">
-                        <x-icon name="stars" class="w-5 h-5 shrink-0" />
-                        <span>Insights de IA</span>
-                    </div>
-                    <span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-tertiary-fixed text-on-tertiary-fixed font-semibold">Novo</span>
-                </a>
+                    <!-- Sala de Situação -->
+                    <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('company.situation-room') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('company.situation-room') }}">
+                        <div class="flex items-center gap-space-sm">
+                            <x-icon name="activity" class="w-5 h-5 shrink-0" />
+                            <span>Sala de Situação</span>
+                        </div>
+                        <span class="flex h-2 w-2 relative">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-error"></span>
+                        </span>
+                    </a>
 
-                <!-- Assinatura & Plano / Faturamento Global B2B -->
-                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ (request()->routeIs('company.billing*') || request()->routeIs('admin.billing*')) ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ auth()->user()?->isAlvoraAdmin() ? route('admin.billing') : route('company.billing') }}">
-                    <div class="flex items-center gap-space-sm">
-                        <x-icon name="credit-card-2-front-fill" class="w-5 h-5 shrink-0" />
-                        <span>{{ auth()->user()?->isAlvoraAdmin() ? 'Faturamento Global B2B' : 'Assinatura & Plano' }}</span>
-                    </div>
-                </a>
+                    <!-- Insights de IA -->
+                    <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('company.ai-insights') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('company.ai-insights') }}">
+                        <div class="flex items-center gap-space-sm">
+                            <x-icon name="stars" class="w-5 h-5 shrink-0" />
+                            <span>Insights de IA</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-tertiary-fixed text-on-tertiary-fixed font-semibold">Novo</span>
+                    </a>
 
-                <!-- Templates de Certificados -->
-                <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ request()->routeIs('instructor.certificate-templates.*') ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ route('instructor.certificate-templates.index') }}">
-                    <div class="flex items-center gap-space-sm">
-                        <x-icon name="award-fill" class="w-5 h-5 shrink-0" />
-                        <span>Certificados</span>
-                    </div>
-                </a>
+                    <!-- Assinatura & Plano / Faturamento Global B2B -->
+                    <a class="flex items-center justify-between px-space-sm py-2 rounded-lg font-body-md text-body-md transition-colors {{ (request()->routeIs('company.billing*') || request()->routeIs('admin.billing*')) ? 'bg-primary-container text-on-primary font-semibold shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface' }}" href="{{ auth()->user()?->isAlvoraAdmin() ? route('admin.billing') : route('company.billing') }}">
+                        <div class="flex items-center gap-space-sm">
+                            <x-icon name="credit-card-2-front-fill" class="w-5 h-5 shrink-0" />
+                            <span>{{ auth()->user()?->isAlvoraAdmin() ? 'Faturamento Global B2B' : 'Assinatura & Plano' }}</span>
+                        </div>
+                    </a>
+                @endif
 
                 <!-- Configurações (Com Sublink: Meu Perfil) -->
                 <div class="flex flex-col">
