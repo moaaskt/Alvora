@@ -69,31 +69,25 @@ class CoursePolicy
 
     /**
      * Determine whether the user can delete the course.
-     * Enforces the pessimistic lock synchronization protocol (GOV-8.4)
-     * and strictly blocks deletion if certificates were issued.
+     * Authorized ONLY for the course author with active corporate teaching rights,
+     * or admin_alvora (handled in before / check).
+     * Physical deletion must be orchestrated via CourseDeletionService under
+     * an atomic transaction with pessimistic locking.
      */
     public function delete(User $user, Course $course): bool
     {
-        if (!$user->isAlvoraAdmin() && ($course->instructor_id !== $user->id || !$user->canTeachInContext($course->company_id))) {
+        if (!$user->isAlvoraAdmin()) {
+            if ($course->instructor_id !== $user->id || !$user->canTeachInContext($course->company_id)) {
+                return false;
+            }
+        }
+
+        // Bloqueia se existirem certificados históricos emitidos para o curso
+        if ($course->certificates()->exists()) {
             return false;
         }
 
-        return DB::transaction(function () use ($course) {
-            $lockedCourse = Course::withoutGlobalScopes()
-                ->where('id', $course->id)
-                ->lockForUpdate()
-                ->first();
-
-            if (!$lockedCourse) {
-                return false;
-            }
-
-            if ($lockedCourse->certificates()->exists()) {
-                return false;
-            }
-
-            return true;
-        });
+        return true;
     }
 }
 
