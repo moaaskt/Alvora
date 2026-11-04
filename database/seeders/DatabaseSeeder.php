@@ -22,6 +22,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // 0. Estrutura Taxonômica de Categorias
+        $this->call(CategorySeeder::class);
+
         // 1. Criar Empresa de Demonstração
         $company = Company::firstOrCreate(
             ['cnpj' => '12.345.678/0001-90'],

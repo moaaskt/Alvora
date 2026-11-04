@@ -13,37 +13,35 @@ class CourseAccessScope implements Scope
      * Apply the scope to a given Eloquent query builder.
      * Governs internal visibility within tenant and across roles:
      * - admin_alvora: global visibility of all courses and drafts.
-     * - Console / Artisan / Seeders: unrestricted when no HTTP session exists.
      * - Author (instructor_id === user.id): sees their own courses in any status (draft, published, archived).
-     * - Company Manager / Student: sees published courses or courses with active enrollment.
-     *   Drafts by third-party instructors are strictly omitted.
-     * - Unauthenticated visitors: only published global courses without company_id.
+     * - Other corporate users (manager, student, other instructors): sees only published courses or enrolled courses.
+     *   Drafts by other instructors are strictly omitted.
+     * - Unauthenticated processes (HTTP visitors, non-context CLI / queues):
+     *   No implicit global bypass. Only published courses are accessible unless explicitly bypassed via withoutGlobalScopes().
+     *   Never anticipates B2C schema (no company_id IS NULL).
      */
     public function apply(Builder $builder, Model $model): void
     {
+        $table = $model->getTable();
         $user = Auth::user();
 
-        // 1. Super Admin Alvora has global bypass for audit and oversight
+        // 1. Super Admin Alvora has global audit bypass
         if ($user && method_exists($user, 'isAlvoraAdmin') && $user->isAlvoraAdmin()) {
             return;
         }
 
-        // 2. Unauthenticated processes
+        // 2. Unauthenticated processes or public visitors:
+        // Do NOT grant implicit global bypass to CLI, queues or seeders.
+        // Explicitly authorized system operations must call withoutGlobalScopes() or specify context.
+        // Unauthenticated requests can only access published courses. Never assume B2C (no company_id IS NULL).
         if (!$user) {
-            // CLI commands, seeders and background queues without session operate unrestricted
-            if (app()->runningInConsole()) {
-                return;
-            }
-
-            // Public unauthenticated HTTP requests only access published independent courses
-            $table = $model->getTable();
-            $builder->where($table . '.status', 'published')
-                ->whereNull($table . '.company_id');
+            $builder->where($table . '.status', 'published');
             return;
         }
 
-        // 3. Authenticated users: Author sees everything; others see only published or enrolled courses
-        $table = $model->getTable();
+        // 3. Authenticated corporate users:
+        // Author sees their own courses (drafts, published, etc.);
+        // Other corporate users only see published courses or courses they are enrolled in.
         $builder->where(function (Builder $query) use ($user, $table) {
             $query->where($table . '.instructor_id', $user->id)
                 ->orWhere($table . '.status', 'published')
@@ -53,4 +51,3 @@ class CourseAccessScope implements Scope
         });
     }
 }
-

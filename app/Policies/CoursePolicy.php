@@ -4,21 +4,16 @@ namespace App\Policies;
 
 use App\Models\Course;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 
 class CoursePolicy
 {
     /**
      * Perform pre-authorization checks.
-     * Super Admin (admin_alvora) has audited global governance,
-     * except for delete where certificates physical integrity must be enforced.
+     * Super Admin (admin_alvora) has audited global governance rights.
      */
     public function before(User $user, string $ability): ?bool
     {
         if ($user->isAlvoraAdmin()) {
-            if ($ability === 'delete') {
-                return null;
-            }
             return true;
         }
 
@@ -70,24 +65,18 @@ class CoursePolicy
     /**
      * Determine whether the user can delete the course.
      * Authorized ONLY for the course author with active corporate teaching rights,
-     * or admin_alvora (handled in before / check).
+     * or admin_alvora (handled in before).
+     * Corporate managers CANNOT delete courses created by other instructors.
      * Physical deletion must be orchestrated via CourseDeletionService under
      * an atomic transaction with pessimistic locking.
      */
     public function delete(User $user, Course $course): bool
     {
-        if (!$user->isAlvoraAdmin()) {
-            if ($course->instructor_id !== $user->id || !$user->canTeachInContext($course->company_id)) {
-                return false;
-            }
-        }
-
-        // Bloqueia se existirem certificados históricos emitidos para o curso
-        if ($course->certificates()->exists()) {
+        if ($course->instructor_id !== $user->id) {
             return false;
         }
 
-        return true;
+        return $user->canTeachInContext($course->company_id);
     }
 }
 

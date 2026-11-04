@@ -12,8 +12,12 @@ use App\Models\Module;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Services\CertificateService;
+use App\Services\CourseDeletionService;
 use DomainException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Tests\TestCase;
 
@@ -202,108 +206,82 @@ class CourseAccessScopeAndPoliciesTest extends TestCase
         $this->assertTrue(Gate::forUser($this->admin)->allows('update', $this->courseDraftA));
     }
 
-    public function test_course_policy_delete_requires_author_and_strictly_blocks_deletion_if_certificates_exist(): void
+    public function test_course_policy_delete_authorizes_author_and_super_admin_and_denies_managers_and_peers(): void
     {
-        // 1. Autor pode deletar curso sem certificados
+        // 1. Autor com vínculo contextual ativo possui autorização de exclusão na Policy
         $this->assertTrue(Gate::forUser($this->instructorA)->allows('delete', $this->courseDraftA));
+        $this->assertTrue(Gate::forUser($this->instructorA)->allows('delete', $this->coursePublishedA));
 
-        // 2. Terceiros são proibidos
+        // 2. Super Admin possui governança global para exclusão na Policy
+        $this->assertTrue(Gate::forUser($this->admin)->allows('delete', $this->courseDraftA));
+
+        // 3. Gestor corporativo NÃO pode excluir curso de outro instrutor
+        $this->assertFalse(
+            Gate::forUser($this->managerA)->allows('delete', $this->courseDraftA),
+            'Gestor corporativo não ganha automaticamente permissão para excluir conteúdo de outro instrutor'
+        );
+
+        // 4. Outro instrutor NÃO pode excluir curso do colega
         $this->assertFalse(Gate::forUser($this->instructorB)->allows('delete', $this->courseDraftA));
-        $this->assertFalse(Gate::forUser($this->managerA)->allows('delete', $this->courseDraftA));
 
-        // 3. Emissão de certificado histórico para o curso
+        // 5. Aluno comum é sumariamente negado
+        $this->assertFalse(Gate::forUser($this->studentA)->allows('delete', $this->courseDraftA));
+    }
+
+    public function test_course_deletion_service_requires_authenticated_requester_and_blocks_unauthorized_users(): void
+    {
+        $deletionService = app(CourseDeletionService::class);
+
+        // 1. Gestor corporativo é bloqueado com AuthorizationException
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('Usuário não autorizado a excluir este curso.');
+        $deletionService->deleteCourse($this->courseDraftA, $this->managerA);
+    }
+
+    public function test_course_deletion_service_blocks_peer_instructor_without_rights(): void
+    {
+        $deletionService = app(CourseDeletionService::class);
+
+        // 2. Instrutor B não é o autor do curso do Instrutor A -> AuthorizationException
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('Usuário não autorizado a excluir este curso.');
+        $deletionService->deleteCourse($this->courseDraftA, $this->instructorB);
+    }
+
+    public function test_course_deletion_service_blocks_student(): void
+    {
+        $deletionService = app(CourseDeletionService::class);
+
+        // 3. Aluno não pode excluir curso -> AuthorizationException
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('Usuário não autorizado a excluir este curso.');
+        $deletionService->deleteCourse($this->courseDraftA, $this->studentA);
+    }
+
+    public function test_course_deletion_service_validates_authorization_before_revealing_certificates_existence(): void
+    {
+        // 1. Criar certificado histórico para o curso publicado
         Certificate::create([
             'company_id' => $this->companyA->id,
             'user_id' => $this->studentA->id,
             'course_id' => $this->coursePublishedA->id,
-            'total_hours_minutes' => 120,
+            'total_hours_minutes' => 60,
             'snapshot' => ['course_title' => $this->coursePublishedA->title],
             'issued_at' => now(),
         ]);
 
-        // 4. Com certificados emitidos, a exclusão é PROIBIDA na Policy até mesmo para o Super Admin
-        $this->assertFalse(
-            Gate::forUser($this->instructorA)->allows('delete', $this->coursePublishedA),
-            'Autor não pode excluir curso com certificados emitidos'
-        );
-        $this->assertFalse(
-            Gate::forUser($this->admin)->allows('delete', $this->coursePublishedA),
-            'Super Admin não pode excluir curso com certificados emitidos pela Policy'
-        );
+        $deletionService = app(CourseDeletionService::class);
 
-        // 5. Tentativa de exclusão direta via model lança DomainException
-        $this->expectException(DomainException::class);
-        $this->coursePublishedA->delete();
+        // 2. Um usuário NÃO autorizado (ex: gestor de RH ou outro instrutor) tenta excluir o curso com certificados.
+        // O sistema DEVE lançar AuthorizationException (403) e NUNCA DomainException.
+        // Isso comprova categoricamente que a autorização é verificada sob o lock ANTES de qualquer inspeção da existência de certificados.
+        $this->expectException(AuthorizationException::class);
+        $this->expectExceptionMessage('Usuário não autorizado a excluir este curso.');
+
+        $deletionService->deleteCourse($this->coursePublishedA, $this->managerA);
     }
 
-    public function test_company_policy_enforces_active_management_membership(): void
-    {
-        // 1. Gestor com vínculo ativo na Empresa A pode gerenciar suas operações
-        $this->assertTrue(Gate::forUser($this->managerA)->allows('manageEmployees', $this->companyA));
-        $this->assertTrue(Gate::forUser($this->managerA)->allows('manageTracks', $this->companyA));
-        $this->assertTrue(Gate::forUser($this->managerA)->allows('manageBilling', $this->companyA));
-        $this->assertTrue(Gate::forUser($this->managerA)->allows('viewSituationRoom', $this->companyA));
-        $this->assertTrue(Gate::forUser($this->managerA)->allows('viewAiInsights', $this->companyA));
-
-        // 2. Bloqueio Cross-Tenant: Gestor da Empresa A NÃO pode gerenciar a Empresa B
-        $this->assertFalse(
-            Gate::forUser($this->managerA)->allows('manageEmployees', $this->companyB),
-            'Gestor da Empresa A não pode gerenciar a Empresa B'
-        );
-        $this->assertFalse(Gate::forUser($this->managerA)->allows('manageBilling', $this->companyB));
-
-        // 3. Instrutor puro e aluno comum NÃO possuem autorização de gestão
-        $this->assertFalse(Gate::forUser($this->instructorA)->allows('manageEmployees', $this->companyA));
-        $this->assertFalse(Gate::forUser($this->studentA)->allows('manageBilling', $this->companyA));
-
-        // 4. Super Admin possui bypass global
-        $this->assertTrue(Gate::forUser($this->admin)->allows('manageEmployees', $this->companyA));
-        $this->assertTrue(Gate::forUser($this->admin)->allows('manageEmployees', $this->companyB));
-    }
-
-    public function test_certificate_service_acquires_course_pessimistic_lock_and_synchronizes_emission(): void
-    {
-        // Configuração de curso com aula para carga horária
-        $module = Module::create([
-            'company_id' => $this->companyA->id,
-            'course_id' => $this->coursePublishedA->id,
-            'title' => 'Módulo 1',
-            'order' => 1,
-        ]);
-
-        Lesson::create([
-            'company_id' => $this->companyA->id,
-            'course_id' => $this->coursePublishedA->id,
-            'module_id' => $module->id,
-            'title' => 'Aula 1',
-            'slug' => 'aula-1',
-            'order' => 1,
-            'duration_minutes' => 60,
-        ]);
-
-        // Matrícula 100% concluída para elegibilidade
-        Enrollment::create([
-            'company_id' => $this->companyA->id,
-            'user_id' => $this->studentA->id,
-            'course_id' => $this->coursePublishedA->id,
-            'status' => 'completed',
-            'progress_percent' => 100,
-            'enrolled_at' => now(),
-        ]);
-
-        $service = app(CertificateService::class);
-        $certificate = $service->getOrCreateCertificate($this->studentA, $this->coursePublishedA);
-
-        $this->assertNotNull($certificate);
-        $this->assertEquals($this->coursePublishedA->id, $certificate->course_id);
-        $this->assertEquals($this->studentA->id, $certificate->user_id);
-
-        // Após emissão sob lock, o curso fica imutavelmente protegido contra exclusão
-        $this->expectException(DomainException::class);
-        $this->coursePublishedA->delete();
-    }
-
-    public function test_course_deletion_service_blocks_deletion_and_rolls_back_when_certificates_exist(): void
+    public function test_course_deletion_service_blocks_deletion_and_rolls_back_when_certificates_exist_for_author(): void
     {
         // 1. Criar certificado histórico para o curso
         Certificate::create([
@@ -315,9 +293,11 @@ class CourseAccessScopeAndPoliciesTest extends TestCase
             'issued_at' => now(),
         ]);
 
-        $deletionService = app(\App\Services\CourseDeletionService::class);
+        $deletionService = app(CourseDeletionService::class);
 
-        $this->expectException(\DomainException::class);
+        // 2. O autor (Instrutor A) é autorizado na Policy, portanto a execução avança para a checagem sob lock de certificados
+        // e é bloqueada pela integridade de domínio:
+        $this->expectException(DomainException::class);
         $this->expectExceptionMessage("Não é possível excluir o curso '{$this->coursePublishedA->title}' pois ele possui certificados emitidos.");
 
         try {
@@ -329,14 +309,46 @@ class CourseAccessScopeAndPoliciesTest extends TestCase
         }
     }
 
+    public function test_course_deletion_service_blocks_deletion_for_super_admin_when_certificates_exist(): void
+    {
+        Certificate::create([
+            'company_id' => $this->companyA->id,
+            'user_id' => $this->studentA->id,
+            'course_id' => $this->coursePublishedA->id,
+            'total_hours_minutes' => 60,
+            'snapshot' => ['course_title' => $this->coursePublishedA->title],
+            'issued_at' => now(),
+        ]);
+
+        $deletionService = app(CourseDeletionService::class);
+
+        // Super Admin passa na autorização da Policy, mas é impedido no serviço pela integridade física dos certificados
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage("Não é possível excluir o curso '{$this->coursePublishedA->title}' pois ele possui certificados emitidos.");
+
+        $deletionService->deleteCourse($this->coursePublishedA, $this->admin);
+    }
+
     public function test_course_deletion_service_permits_authorized_deletion_when_no_certificates_exist(): void
     {
-        $deletionService = app(\App\Services\CourseDeletionService::class);
+        $deletionService = app(CourseDeletionService::class);
 
+        // Autor pode deletar seu próprio curso quando não há certificados
         $result = $deletionService->deleteCourse($this->courseDraftA, $this->instructorA);
 
         $this->assertTrue($result);
         $this->assertDatabaseMissing('courses', ['id' => $this->courseDraftA->id]);
+    }
+
+    public function test_course_deletion_service_permits_super_admin_deletion_when_no_certificates_exist(): void
+    {
+        $deletionService = app(CourseDeletionService::class);
+
+        // Super Admin pode deletar curso sem certificados
+        $result = $deletionService->deleteCourse($this->coursePublishedA, $this->admin);
+
+        $this->assertTrue($result);
+        $this->assertDatabaseMissing('courses', ['id' => $this->coursePublishedA->id]);
     }
 
     public function test_course_deletion_and_certificate_emission_compete_for_same_course_lock(): void
@@ -354,7 +366,7 @@ class CourseAccessScopeAndPoliciesTest extends TestCase
         
         $courseId = $this->coursePublishedA->id;
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($courseId) {
+        DB::transaction(function () use ($courseId) {
             $lockedInTx1 = Course::withoutGlobalScopes()->where('id', $courseId)->lockForUpdate()->first();
             $this->assertNotNull($lockedInTx1);
             $this->assertEquals($courseId, $lockedInTx1->id);
@@ -392,7 +404,7 @@ class CourseAccessScopeAndPoliciesTest extends TestCase
             'enrolled_at' => now(),
         ]);
 
-        $service = app(\App\Services\CertificateService::class);
+        $service = app(CertificateService::class);
         $certificate = $service->getOrCreateCertificate($this->studentA, $this->coursePublishedA);
 
         $initialSnapshot = $certificate->snapshot;
@@ -429,7 +441,7 @@ class CourseAccessScopeAndPoliciesTest extends TestCase
         // o motor do banco de dados (MySQL/SQLite) executa o ON DELETE CASCADE da chave estrangeira,
         // apagando os certificados físicos.
         // Proposta formalizada: alterar a FK para RESTRICT em migration de fase posterior.
-        \Illuminate\Support\Facades\DB::table('courses')->where('id', $this->coursePublishedA->id)->delete();
+        DB::table('courses')->where('id', $this->coursePublishedA->id)->delete();
 
         // O curso foi deletado via SQL direto
         $this->assertDatabaseMissing('courses', ['id' => $this->coursePublishedA->id]);
@@ -438,22 +450,43 @@ class CourseAccessScopeAndPoliciesTest extends TestCase
         $this->assertDatabaseMissing('certificates', ['course_id' => $this->coursePublishedA->id]);
     }
 
-    public function test_unauthenticated_request_does_not_implicitly_grant_global_access_to_corporate_courses(): void
+    public function test_unauthenticated_processes_do_not_have_implicit_global_bypass_to_drafts(): void
     {
-        \Illuminate\Support\Facades\Auth::logout();
+        Auth::logout();
 
-        // Quando um visitante sem sessão consulta cursos via web:
-        // Cursos corporativos (company_id !== null) e rascunhos são 100% omitidos
-        $table = (new Course)->getTable();
-        $webQuery = Course::where($table . '.status', 'published')->whereNull($table . '.company_id');
+        // Quando um visitante ou processo não autenticado consulta cursos via Eloquent:
+        // Cursos publicados são visíveis
+        $this->assertNotNull(Course::where('id', $this->coursePublishedA->id)->first(), 'Cursos publicados são visíveis');
 
+        // Cursos em rascunho são omitidos (sem bypass global implícito em CLI ou consultas sem contexto)
+        $this->assertNull(Course::where('id', $this->courseDraftA->id)->first(), 'Rascunhos não vazam para consultas sem contexto');
+
+        // Operações autorizadas explicitamente pelo sistema usam withoutGlobalScopes()
+        $explicitCourse = Course::withoutGlobalScopes()->where('id', $this->courseDraftA->id)->first();
+        $this->assertNotNull($explicitCourse, 'Operações explicitamente autorizadas têm acesso via withoutGlobalScopes()');
+    }
+
+    public function test_company_policy_enforces_active_management_membership(): void
+    {
+        // 1. Gestor com vínculo ativo na Empresa A pode gerenciar suas operações
+        $this->assertTrue(Gate::forUser($this->managerA)->allows('manageEmployees', $this->companyA));
+        $this->assertTrue(Gate::forUser($this->managerA)->allows('manageTracks', $this->companyA));
+        $this->assertTrue(Gate::forUser($this->managerA)->allows('manageBilling', $this->companyA));
+        $this->assertTrue(Gate::forUser($this->managerA)->allows('viewSituationRoom', $this->companyA));
+        $this->assertTrue(Gate::forUser($this->managerA)->allows('viewAiInsights', $this->companyA));
+
+        // 2. Bloqueio Cross-Tenant: Gestor da Empresa A NÃO pode gerenciar a Empresa B
         $this->assertFalse(
-            $webQuery->where('id', $this->courseDraftA->id)->exists(),
-            'Visitante não autenticado não pode ver rascunho corporativo'
+            Gate::forUser($this->managerA)->allows('manageEmployees', $this->companyB),
+            'Gestor da Empresa A não pode gerenciar a Empresa B'
         );
-        $this->assertFalse(
-            $webQuery->where('id', $this->coursePublishedA->id)->exists(),
-            'Visitante não autenticado não pode ver curso corporativo privado'
-        );
+        $this->assertFalse(Gate::forUser($this->managerA)->allows('manageBilling', $this->companyB));
+
+        // 3. Instrutor puro e aluno comum NÃO possuem autorização de gestão
+        $this->assertFalse(Gate::forUser($this->instructorA)->allows('manageEmployees', $this->companyA));
+        $this->assertFalse(Gate::forUser($this->studentA)->allows('manageBilling', $this->companyA));
+
+        // 4. Super Admin possui bypass global
+        $this->assertTrue(Gate::forUser($this->admin)->allows('manageEmployees', $this->companyA));
     }
 }

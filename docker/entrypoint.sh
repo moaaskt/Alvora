@@ -35,6 +35,12 @@ if [ "$RUN_MIGRATIONS" = "true" ]; then
     fi
 fi
 
+# Executa seeders caso configurado (idempotente com firstOrCreate)
+if [ "$RUN_SEEDERS" = "true" ]; then
+    echo "Running database seeders..."
+    php artisan db:seed --force || true
+fi
+
 # Se a porta foi customizada via PORT (ex: no Render) e o comando for artisan serve
 if [ "$1" = "php" ] && [ "$2" = "artisan" ] && [ "$3" = "serve" ] && [ -n "$PORT" ]; then
     echo "Starting application process on port $PORT..."
