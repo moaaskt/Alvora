@@ -29,6 +29,10 @@ class CurriculumTest extends TestCase
             'company_id' => $company->id,
             'role' => UserRole::INSTRUCTOR,
         ]);
+        $instructor->companies()->attach($company->id, [
+            'role' => 'instructor',
+            'status' => 'active',
+        ]);
 
         $course = Course::create([
             'company_id' => $company->id,
