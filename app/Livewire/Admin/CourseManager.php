@@ -72,12 +72,18 @@ class CourseManager extends Component
 
     public function deleteCourse(int $courseId): void
     {
+        $user = auth()->user();
+        if (!$user) {
+            $this->dispatch('toast', message: 'Acesso não autorizado.', type: 'error');
+            return;
+        }
+
         $deletionService = app(\App\Services\CourseDeletionService::class);
         $course = Course::withoutGlobalScopes()->findOrFail($courseId);
         $title = $course->title;
 
         try {
-            $deletionService->deleteCourse($course, auth()->user());
+            $deletionService->deleteCourse($course, $user);
             $this->dispatch('toast', message: "Curso '{$title}' removido com sucesso.", type: 'info');
         } catch (\DomainException $e) {
             $this->dispatch('toast', message: $e->getMessage(), type: 'error');
