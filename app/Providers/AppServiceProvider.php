@@ -4,7 +4,12 @@ namespace App\Providers;
 
 use App\Events\CourseProgressUpdated;
 use App\Listeners\RecalculateTrackEnrollmentProgress;
+use App\Models\Company;
+use App\Models\Course;
+use App\Policies\CompanyPolicy;
+use App\Policies\CoursePolicy;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(Course::class, CoursePolicy::class);
+        Gate::policy(Company::class, CompanyPolicy::class);
+
         Event::listen(
             CourseProgressUpdated::class,
             RecalculateTrackEnrollmentProgress::class

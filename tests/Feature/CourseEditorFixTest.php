@@ -76,6 +76,10 @@ class CourseEditorFixTest extends TestCase
             'role' => UserRole::INSTRUCTOR,
             'company_id' => $company->id,
         ]);
+        $instructor->companies()->attach($company->id, [
+            'role' => 'instructor',
+            'status' => 'active',
+        ]);
 
         $course = Course::create([
             'company_id' => $company->id,

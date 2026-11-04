@@ -27,6 +27,10 @@ class CourseTest extends TestCase
             'company_id' => $company->id,
             'role' => UserRole::INSTRUCTOR,
         ]);
+        $instructor->companies()->attach($company->id, [
+            'role' => 'instructor',
+            'status' => 'active',
+        ]);
 
         $this->actingAs($instructor);
 
@@ -282,6 +286,10 @@ class CourseTest extends TestCase
             'company_id' => $company->id,
             'role' => UserRole::INSTRUCTOR,
         ]);
+        $instructor->companies()->attach($company->id, [
+            'role' => 'instructor',
+            'status' => 'active',
+        ]);
 
         $this->actingAs($instructor);
 
@@ -302,6 +310,10 @@ class CourseTest extends TestCase
             'password' => bcrypt('password'),
             'company_id' => $company->id,
             'role' => UserRole::INSTRUCTOR,
+        ]);
+        $instructor->companies()->attach($company->id, [
+            'role' => 'instructor',
+            'status' => 'active',
         ]);
 
         $course = Course::create([
@@ -332,6 +344,10 @@ class CourseTest extends TestCase
             'password' => bcrypt('password'),
             'company_id' => $company->id,
             'role' => UserRole::INSTRUCTOR,
+        ]);
+        $instructor->companies()->attach($company->id, [
+            'role' => 'instructor',
+            'status' => 'active',
         ]);
 
         $course = Course::create([

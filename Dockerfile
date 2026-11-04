@@ -9,14 +9,15 @@ COPY . .
 RUN npm run build
 
 # =========================================================
-# Stage 2: Imagem Base de Produção com FrankenPHP e Octane
+# Stage 2: Imagem Base de Produção com PHP 8.3
 # =========================================================
 FROM dunglas/frankenphp:1-php8.3-alpine AS production
 
 WORKDIR /app
 
-# Instala extensões PHP de alta performance para Laravel e Horizon
-RUN install-php-extensions \
+# Instala ca-certificates e extensões PHP de alta performance para Laravel
+RUN apk add --no-cache ca-certificates && \
+    install-php-extensions \
     pdo_mysql \
     pcntl \
     posix \
@@ -48,13 +49,14 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progre
 
 # Configura script de entrypoint e permissões
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh && \
+RUN sed -i -e 's/\r$//' /usr/local/bin/entrypoint.sh && \
+    chmod +x /usr/local/bin/entrypoint.sh && \
     chown -R www-data:www-data /app/storage /app/bootstrap/cache && \
     chmod -R 775 /app/storage /app/bootstrap/cache
 
-# Porta HTTP do Octane / FrankenPHP
+# Porta HTTP da Aplicação
 EXPOSE 8000
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-CMD ["php", "artisan", "octane:start", "--server=frankenphp", "--host=0.0.0.0", "--port=8000"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
