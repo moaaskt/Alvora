@@ -137,26 +137,35 @@ class MercadoPagoCheckoutTest extends TestCase
             'role' => UserRole::COMPANY_ADMIN,
         ]);
 
-        $responseSuccess = $this->actingAs($admin)->get('/instrutor/faturamento/sucesso?payment_id=987654');
+        $admin->companies()->attach($company->id, [
+            'role' => 'company_admin',
+            'status' => 'active',
+        ]);
+
+        // Rota canônica /empresa/faturamento/sucesso responde com sucesso
+        $responseSuccess = $this->actingAs($admin)->get('/empresa/faturamento/sucesso?payment_id=987654');
         $responseSuccess->assertOk();
         $responseSuccess->assertSee('Assinatura Corporativa Ativada com Sucesso!');
         $responseSuccess->assertSee('987654');
 
-        // Testar que acesso legado a /empresa/faturamento/sucesso redireciona suavemente
-        $this->actingAs($admin)->get('/empresa/faturamento/sucesso')->assertRedirect('/instrutor/faturamento/sucesso');
+        // Testar que acesso ao alias legado /instrutor/faturamento/sucesso redireciona para a canônica
+        $this->actingAs($admin)->get('/instrutor/faturamento/sucesso?payment_id=987654')->assertRedirect('/empresa/faturamento/sucesso');
 
-        $responsePending = $this->actingAs($admin)->get('/instrutor/faturamento/pendente');
+        // Rotas canônicas de pendente e erro respondem 200 e aliases legados redirecionam
+        $responsePending = $this->actingAs($admin)->get('/empresa/faturamento/pendente');
         $responsePending->assertOk();
         $responsePending->assertSee('Pagamento em Análise');
+        $this->actingAs($admin)->get('/instrutor/faturamento/pendente')->assertRedirect('/empresa/faturamento/pendente');
 
-        $responseFailure = $this->actingAs($admin)->get('/instrutor/faturamento/erro');
+        $responseFailure = $this->actingAs($admin)->get('/empresa/faturamento/erro');
         $responseFailure->assertOk();
         $responseFailure->assertSee('Não Foi Possível Concluir o Pagamento');
+        $this->actingAs($admin)->get('/instrutor/faturamento/erro')->assertRedirect('/empresa/faturamento/erro');
     }
 
     public function test_unauthenticated_user_cannot_access_billing_return(): void
     {
-        $response = $this->get('/instrutor/faturamento/sucesso');
-        $response->assertRedirect('/login');
+        $this->get('/empresa/faturamento/sucesso')->assertRedirect('/login');
+        $this->get('/instrutor/faturamento/sucesso')->assertRedirect('/login');
     }
 }

@@ -156,15 +156,11 @@ class User extends Authenticatable
             return $this->role === UserRole::INSTRUCTOR;
         }
 
-        if ($this->companies()
+        return $this->companies()
             ->where('companies.id', $companyId)
             ->wherePivot('role', 'instructor')
             ->wherePivot('status', 'active')
-            ->exists()) {
-            return true;
-        }
-
-        return $this->role === UserRole::INSTRUCTOR && (int) $this->company_id === (int) $companyId;
+            ->exists();
     }
 
     /**

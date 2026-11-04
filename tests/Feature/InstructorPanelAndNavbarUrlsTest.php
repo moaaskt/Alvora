@@ -15,6 +15,7 @@ class InstructorPanelAndNavbarUrlsTest extends TestCase
 
     protected Company $company;
     protected User $instructor;
+    protected User $companyAdmin;
     protected User $student;
     protected User $admin;
 
@@ -48,6 +49,7 @@ class InstructorPanelAndNavbarUrlsTest extends TestCase
             'company_id' => null,
         ]);
 
+        // Instrutor corporativo (papel didático ativo em company_users)
         $this->instructor = User::create([
             'name' => 'Prof. Instrutor Empresa',
             'email' => 'instrutor@acme.test',
@@ -55,7 +57,25 @@ class InstructorPanelAndNavbarUrlsTest extends TestCase
             'role' => UserRole::INSTRUCTOR,
             'company_id' => $this->company->id,
         ]);
+        $this->instructor->companies()->attach($this->company->id, [
+            'role' => 'instructor',
+            'status' => 'active',
+        ]);
 
+        // Gestor corporativo (papel de gestão ativo em company_users)
+        $this->companyAdmin = User::create([
+            'name' => 'Gestor RH Empresa',
+            'email' => 'gestor@acme.test',
+            'password' => bcrypt('password'),
+            'role' => UserRole::COMPANY_ADMIN,
+            'company_id' => $this->company->id,
+        ]);
+        $this->companyAdmin->companies()->attach($this->company->id, [
+            'role' => 'company_admin',
+            'status' => 'active',
+        ]);
+
+        // Aluno / Colaborador (papel de estudante ativo em company_users)
         $this->student = User::create([
             'name' => 'Aluno Colaborador',
             'email' => 'aluno@acme.test',
@@ -63,43 +83,95 @@ class InstructorPanelAndNavbarUrlsTest extends TestCase
             'role' => UserRole::STUDENT,
             'company_id' => $this->company->id,
         ]);
+        $this->student->companies()->attach($this->company->id, [
+            'role' => 'student',
+            'status' => 'active',
+        ]);
     }
 
-    public function test_instructor_can_access_colaboradores_at_instrutor_prefix(): void
+    public function test_company_admin_can_access_colaboradores_at_canonical_empresa_route(): void
     {
-        $response = $this->actingAs($this->instructor)->get('/instrutor/colaboradores');
+        $response = $this->actingAs($this->companyAdmin)->get('/empresa/colaboradores');
 
         $response->assertOk();
         $response->assertSee('Colaboradores & Acessos', false);
     }
 
-    public function test_legacy_empresa_colaboradores_redirects_to_instrutor_colaboradores(): void
+    public function test_legacy_instrutor_colaboradores_redirects_to_canonical_empresa_colaboradores(): void
     {
-        $response = $this->actingAs($this->instructor)->get('/empresa/colaboradores');
+        // 1. Gestor corporativo acessando alias legado é redirecionado suavemente para o canônico
+        $response = $this->actingAs($this->companyAdmin)->get('/instrutor/colaboradores');
+        $response->assertRedirect('/empresa/colaboradores');
 
-        $response->assertRedirect('/instrutor/colaboradores');
+        $canonicalResponse = $this->actingAs($this->companyAdmin)->get('/empresa/colaboradores');
+        $canonicalResponse->assertOk();
     }
 
-    public function test_navbar_for_instructor_contains_correct_instrutor_urls_and_badge(): void
+    public function test_instructor_without_management_role_cannot_access_company_management(): void
+    {
+        // Instrutor puro não possui autorização de gestão corporativa
+        $this->actingAs($this->instructor)->get('/empresa/colaboradores')->assertForbidden();
+
+        // Alias legado redireciona para o canônico onde é barrado
+        $response = $this->actingAs($this->instructor)->get('/instrutor/colaboradores');
+        $response->assertRedirect('/empresa/colaboradores');
+    }
+
+    public function test_navbar_for_instructor_contains_didactic_urls_and_badge(): void
     {
         $response = $this->actingAs($this->instructor)->get('/dashboard');
 
         $response->assertOk();
         $response->assertSee('Painel do Instrutor');
-        $response->assertSee('/instrutor/colaboradores');
-        $response->assertSee('/instrutor/trilhas');
-        $response->assertSee('/instrutor/sala-de-situacao');
-        $response->assertSee('/instrutor/faturamento');
         $response->assertSee('/instrutor/cursos');
-        $response->assertSee('Instrutor');
+
+        // Garante que instrutor puro não vê links de gestão corporativa na navegação do dashboard
+        $response->assertDontSee('/empresa/colaboradores');
+        $response->assertDontSee('/empresa/faturamento');
+
+        // Valida contrato da navbar layouts.navigation
+        $view = $this->actingAs($this->instructor)->view('layouts.navigation');
+        $view->assertSee('Instrutor');
+        $view->assertSee('/instrutor/cursos');
+        $view->assertDontSee('/empresa/colaboradores');
     }
 
-    public function test_student_cannot_access_instructor_management_routes(): void
+    public function test_navbar_for_company_admin_contains_management_urls_and_badge(): void
     {
-        $this->actingAs($this->student)->get('/instrutor/colaboradores')->assertForbidden();
-        $this->actingAs($this->student)->get('/instrutor/trilhas')->assertForbidden();
-        $this->actingAs($this->student)->get('/instrutor/sala-de-situacao')->assertForbidden();
-        $this->actingAs($this->student)->get('/instrutor/faturamento')->assertForbidden();
+        $response = $this->actingAs($this->companyAdmin)->get('/dashboard');
+
+        $response->assertOk();
+        $response->assertSee('/empresa/colaboradores');
+        $response->assertSee('/empresa/trilhas');
+        $response->assertSee('/empresa/sala-de-situacao');
+        $response->assertSee('/empresa/faturamento');
+
+        // Valida contrato da navbar layouts.navigation
+        $view = $this->actingAs($this->companyAdmin)->view('layouts.navigation');
+        $view->assertSee('Gestor Corporativo');
+        $view->assertSee('Colaboradores & Convites', false);
+        $view->assertSee('/empresa/colaboradores');
+        $view->assertSee('/empresa/trilhas');
+        $view->assertSee('/empresa/sala-de-situacao');
+        $view->assertSee('/empresa/faturamento');
+    }
+
+    public function test_student_cannot_access_management_or_didactic_routes(): void
+    {
+        // Rotas corporativas canônicas são proibidas para alunos
+        $this->actingAs($this->student)->get('/empresa/colaboradores')->assertForbidden();
+        $this->actingAs($this->student)->get('/empresa/trilhas')->assertForbidden();
+        $this->actingAs($this->student)->get('/empresa/sala-de-situacao')->assertForbidden();
+        $this->actingAs($this->student)->get('/empresa/faturamento')->assertForbidden();
+
+        // Aliases legados redirecionam para as canônicas
+        $this->actingAs($this->student)->get('/instrutor/colaboradores')->assertRedirect('/empresa/colaboradores');
+        $this->actingAs($this->student)->get('/instrutor/trilhas')->assertRedirect('/empresa/trilhas');
+        $this->actingAs($this->student)->get('/instrutor/sala-de-situacao')->assertRedirect('/empresa/sala-de-situacao');
+        $this->actingAs($this->student)->get('/instrutor/faturamento')->assertRedirect('/empresa/faturamento');
+
+        // Rota didática é proibida para alunos
+        $this->actingAs($this->student)->get('/instrutor/cursos')->assertForbidden();
     }
 
     public function test_login_page_renders_sandbox_in_exact_order_admin_instrutor_aluno(): void

@@ -96,27 +96,41 @@ class DecoupledRoutesAndNavigationTest extends TestCase
         $this->get('/empresa/insights-executivos')->assertForbidden();
     }
 
-    public function test_dual_role_user_can_access_both_portals(): void
+    public function test_contextual_roles_strictly_separate_corporate_management_and_teaching(): void
     {
-        $dualUser = User::create([
-            'name' => 'Gestor e Professor',
-            'email' => 'dual@empresa.test',
+        // 1. Usuário com papel contextual company_admin pode gerenciar, mas NÃO pode lecionar
+        $managerUser = User::create([
+            'name' => 'Gestor Corporativo',
+            'email' => 'gestor-estrito@empresa.test',
             'password' => bcrypt('password'),
-            'role' => UserRole::INSTRUCTOR,
+            'role' => UserRole::STUDENT,
             'company_id' => $this->company->id,
         ]);
-
-        // Ativação contextual de ambas as capacidades na mesma empresa
-        $dualUser->companies()->attach($this->company->id, [
+        $managerUser->companies()->attach($this->company->id, [
             'role' => 'company_admin',
             'status' => 'active',
         ]);
 
-        $this->actingAs($dualUser);
-
-        // Ambas as rotas devem responder com sucesso
+        $this->actingAs($managerUser);
         $this->get('/empresa/colaboradores')->assertOk();
+        $this->get('/instrutor/cursos')->assertForbidden();
+
+        // 2. Usuário com papel contextual instructor pode lecionar, mas NÃO pode gerenciar
+        $instructorUser = User::create([
+            'name' => 'Instrutor Corporativo',
+            'email' => 'instrutor-estrito@empresa.test',
+            'password' => bcrypt('password'),
+            'role' => UserRole::STUDENT,
+            'company_id' => $this->company->id,
+        ]);
+        $instructorUser->companies()->attach($this->company->id, [
+            'role' => 'instructor',
+            'status' => 'active',
+        ]);
+
+        $this->actingAs($instructorUser);
         $this->get('/instrutor/cursos')->assertOk();
+        $this->get('/empresa/colaboradores')->assertForbidden();
     }
 
     public function test_student_is_forbidden_from_both_empresa_and_instructor_routes(): void
@@ -230,24 +244,19 @@ class DecoupledRoutesAndNavigationTest extends TestCase
         $navInstructor->assertDontSee(route('employees.index'));
         $navInstructor->assertDontSee(route('company.situation-room'));
 
-        // 3. Usuário com Ambas as Capacidades (Dual Role)
-        $dual = User::create([
-            'name' => 'Dual Leader',
-            'email' => 'dual-leader@empresa.test',
+        // 3. Super Admin possui bypass e vê ferramentas administrativas globais
+        $admin = User::create([
+            'name' => 'Super Admin',
+            'email' => 'superadmin-nav@alvora.test',
             'password' => bcrypt('password'),
-            'role' => UserRole::INSTRUCTOR,
-            'company_id' => $this->company->id,
-        ]);
-        $dual->companies()->attach($this->company->id, [
-            'role' => 'company_admin',
-            'status' => 'active',
+            'role' => UserRole::ADMIN_ALVORA,
+            'company_id' => null,
         ]);
 
-        $this->actingAs($dual);
-        $navDual = $this->view('layouts.navigation');
-        $navDual->assertSee('Gestor & Instrutor');
-        $navDual->assertSee(route('employees.index'));
-        $navDual->assertSee(route('instructor.courses.index'));
+        $this->actingAs($admin);
+        $navAdmin = $this->view('layouts.navigation');
+        $navAdmin->assertSee('Administrador Alvora');
+        $navAdmin->assertSee(route('admin.billing'));
 
         // 4. Colaborador / Aluno Puro
         $student = User::create([
