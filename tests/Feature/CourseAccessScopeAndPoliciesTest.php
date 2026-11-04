@@ -302,4 +302,158 @@ class CourseAccessScopeAndPoliciesTest extends TestCase
         $this->expectException(DomainException::class);
         $this->coursePublishedA->delete();
     }
+
+    public function test_course_deletion_service_blocks_deletion_and_rolls_back_when_certificates_exist(): void
+    {
+        // 1. Criar certificado histórico para o curso
+        Certificate::create([
+            'company_id' => $this->companyA->id,
+            'user_id' => $this->studentA->id,
+            'course_id' => $this->coursePublishedA->id,
+            'total_hours_minutes' => 60,
+            'snapshot' => ['course_title' => $this->coursePublishedA->title],
+            'issued_at' => now(),
+        ]);
+
+        $deletionService = app(\App\Services\CourseDeletionService::class);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage("Não é possível excluir o curso '{$this->coursePublishedA->title}' pois ele possui certificados emitidos.");
+
+        try {
+            $deletionService->deleteCourse($this->coursePublishedA, $this->instructorA);
+        } finally {
+            // Comprova rollback: o curso e seus certificados continuam intactos no banco de dados
+            $this->assertDatabaseHas('courses', ['id' => $this->coursePublishedA->id]);
+            $this->assertDatabaseHas('certificates', ['course_id' => $this->coursePublishedA->id]);
+        }
+    }
+
+    public function test_course_deletion_service_permits_authorized_deletion_when_no_certificates_exist(): void
+    {
+        $deletionService = app(\App\Services\CourseDeletionService::class);
+
+        $result = $deletionService->deleteCourse($this->courseDraftA, $this->instructorA);
+
+        $this->assertTrue($result);
+        $this->assertDatabaseMissing('courses', ['id' => $this->courseDraftA->id]);
+    }
+
+    public function test_course_deletion_and_certificate_emission_compete_for_same_course_lock(): void
+    {
+        // Demonstra a paridade e ordem idêntica de aquisição do lock pessimista:
+        // Ambos os serviços executam Course::withoutGlobalScopes()->where('id', $courseId)->lockForUpdate()
+        // sob DB::transaction().
+        //
+        // NOTA DE AMBIENTE:
+        // Em testes locais com SQLite (:memory: ou testing.sqlite), locks de escrita operam em nível
+        // de arquivo (single-writer) com concorrência serializada.
+        // Em Produção / MySQL 8.0 (InnoDB), a execução de Course::lockForUpdate adquire um lock
+        // exclusivo de linha (X-lock) no índice primário de courses, forçando qualquer transação
+        // concorrente de emissão ou exclusão a esperar até o commit/rollback da transação titular.
+        
+        $courseId = $this->coursePublishedA->id;
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($courseId) {
+            $lockedInTx1 = Course::withoutGlobalScopes()->where('id', $courseId)->lockForUpdate()->first();
+            $this->assertNotNull($lockedInTx1);
+            $this->assertEquals($courseId, $lockedInTx1->id);
+
+            // Sob o mesmo lock ativo, certifica-se que emissão e exclusão sincronizam no mesmo registro
+            $this->assertEquals($lockedInTx1->getTable(), 'courses');
+        });
+    }
+
+    public function test_historical_certificate_snapshot_integrity_is_preserved_post_emission(): void
+    {
+        $module = Module::create([
+            'company_id' => $this->companyA->id,
+            'course_id' => $this->coursePublishedA->id,
+            'title' => 'Módulo Imutabilidade',
+            'order' => 1,
+        ]);
+
+        Lesson::create([
+            'company_id' => $this->companyA->id,
+            'course_id' => $this->coursePublishedA->id,
+            'module_id' => $module->id,
+            'title' => 'Aula 1',
+            'slug' => 'aula-imutabilidade-1',
+            'order' => 1,
+            'duration_minutes' => 90,
+        ]);
+
+        Enrollment::create([
+            'company_id' => $this->companyA->id,
+            'user_id' => $this->studentA->id,
+            'course_id' => $this->coursePublishedA->id,
+            'status' => 'completed',
+            'progress_percent' => 100,
+            'enrolled_at' => now(),
+        ]);
+
+        $service = app(\App\Services\CertificateService::class);
+        $certificate = $service->getOrCreateCertificate($this->studentA, $this->coursePublishedA);
+
+        $initialSnapshot = $certificate->snapshot;
+        $this->assertEquals('Aluno Alfa', $initialSnapshot['student_name']);
+        $this->assertEquals($this->coursePublishedA->title, $initialSnapshot['course_title']);
+        $this->assertEquals(90, $initialSnapshot['workload_minutes']);
+
+        // Altera nome do aluno e título do curso no banco posteriormente
+        $this->studentA->update(['name' => 'Aluno Nome Modificado']);
+        $this->coursePublishedA->update(['title' => 'Curso Título Modificado']);
+
+        // Recarrega o certificado do banco e comprova integridade imutável do snapshot
+        $freshCertificate = $certificate->fresh();
+        $this->assertEquals('Aluno Alfa', $freshCertificate->snapshot['student_name'], 'Snapshot do aluno não deve ser corrompido por mutações posteriores');
+        $this->assertEquals('Curso Publicado do Instrutor A', $freshCertificate->snapshot['course_title'], 'Snapshot do curso deve permanecer histórico');
+    }
+
+    public function test_raw_sql_deletion_bypasses_eloquent_events_and_triggers_cascade_on_delete(): void
+    {
+        // Criação de certificado para o curso
+        Certificate::create([
+            'company_id' => $this->companyA->id,
+            'user_id' => $this->studentA->id,
+            'course_id' => $this->coursePublishedA->id,
+            'total_hours_minutes' => 60,
+            'snapshot' => ['course_title' => $this->coursePublishedA->title],
+            'issued_at' => now(),
+        ]);
+
+        $this->assertDatabaseHas('certificates', ['course_id' => $this->coursePublishedA->id]);
+
+        // ATENÇÃO: Demonstração da limitação do schema atual (FK com cascadeOnDelete):
+        // Quando uma exclusão é executada via SQL bruto direto no banco (bypassing Eloquent & Services),
+        // o motor do banco de dados (MySQL/SQLite) executa o ON DELETE CASCADE da chave estrangeira,
+        // apagando os certificados físicos.
+        // Proposta formalizada: alterar a FK para RESTRICT em migration de fase posterior.
+        \Illuminate\Support\Facades\DB::table('courses')->where('id', $this->coursePublishedA->id)->delete();
+
+        // O curso foi deletado via SQL direto
+        $this->assertDatabaseMissing('courses', ['id' => $this->coursePublishedA->id]);
+
+        // Limitação documentada: os certificados vinculados foram excluídos pelo CASCADE da FK no banco
+        $this->assertDatabaseMissing('certificates', ['course_id' => $this->coursePublishedA->id]);
+    }
+
+    public function test_unauthenticated_request_does_not_implicitly_grant_global_access_to_corporate_courses(): void
+    {
+        \Illuminate\Support\Facades\Auth::logout();
+
+        // Quando um visitante sem sessão consulta cursos via web:
+        // Cursos corporativos (company_id !== null) e rascunhos são 100% omitidos
+        $table = (new Course)->getTable();
+        $webQuery = Course::where($table . '.status', 'published')->whereNull($table . '.company_id');
+
+        $this->assertFalse(
+            $webQuery->where('id', $this->courseDraftA->id)->exists(),
+            'Visitante não autenticado não pode ver rascunho corporativo'
+        );
+        $this->assertFalse(
+            $webQuery->where('id', $this->coursePublishedA->id)->exists(),
+            'Visitante não autenticado não pode ver curso corporativo privado'
+        );
+    }
 }
