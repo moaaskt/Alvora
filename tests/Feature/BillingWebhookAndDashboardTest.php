@@ -189,17 +189,25 @@ class BillingWebhookAndDashboardTest extends TestCase
         $studentResponse->assertRedirect(route('student.dashboard'));
         $studentResponse->assertSessionHas('error');
 
-        // 2. Instrutor / Gestor tentando acessar rotas internas operacionais é redirecionado para a tela de faturamento
-        $adminResponse = $this->actingAs($companyAdmin)->get('/instrutor/colaboradores');
+        $companyAdmin->companies()->attach($company->id, [
+            'role' => 'company_admin',
+            'status' => 'active',
+        ]);
+
+        // 2. Gestor tentando acessar rotas internas operacionais da empresa quando suspenso é redirecionado para a tela de faturamento
+        $adminResponse = $this->actingAs($companyAdmin)->get('/empresa/colaboradores');
         $adminResponse->assertRedirect(route('company.billing'));
         $adminResponse->assertSessionHas('warning');
 
-        // Testar que acesso a /empresa/colaboradores quando suspenso redireciona para faturamento
-        $this->actingAs($companyAdmin)->get('/empresa/colaboradores')->assertRedirect(route('company.billing'));
+        // Alias legado /instrutor/colaboradores também redireciona para a tela de faturamento
+        $this->actingAs($companyAdmin)->get('/instrutor/colaboradores')->assertRedirect(route('company.billing'));
 
-        // 3. Instrutor / Gestor pode acessar a rota de faturamento para regularizar a assinatura
-        $billingResponse = $this->actingAs($companyAdmin)->get('/instrutor/faturamento');
+        // 3. Gestor pode acessar a rota canônica de faturamento para regularizar a assinatura
+        $billingResponse = $this->actingAs($companyAdmin)->get('/empresa/faturamento');
         $billingResponse->assertOk();
+
+        // Alias legado /instrutor/faturamento redireciona para a rota canônica de faturamento
+        $this->actingAs($companyAdmin)->get('/instrutor/faturamento')->assertRedirect(route('company.billing'));
     }
 
     public function test_company_billing_livewire_component_renders_and_handles_cancellation(): void
