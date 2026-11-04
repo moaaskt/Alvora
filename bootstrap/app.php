@@ -21,6 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
+            'can.manage-company' => \App\Http\Middleware\EnsureUserCanManageCompany::class,
+            'can.teach' => \App\Http\Middleware\EnsureUserCanTeach::class,
             'subscription.active' => \App\Http\Middleware\CheckSubscriptionStatus::class,
         ]);
     })

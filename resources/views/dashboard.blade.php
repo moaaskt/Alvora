@@ -198,7 +198,24 @@
                     <div class="hidden md:flex flex-col text-left">
                         <span class="text-xs font-bold text-on-surface leading-tight">{{ $user->name ?? auth()->user()?->name ?? 'Instrutor' }}</span>
                         <span class="text-[11px] text-on-surface-variant font-medium">
-                            {{ auth()->user()?->isAlvoraAdmin() ? 'Administrador Alvora' : ((auth()->user()?->isInstructor() || auth()->user()?->isCompanyAdmin()) ? 'Instrutor / T&D' : 'Colaborador') }}
+                            @php
+                                $dashUser = auth()->user();
+                                $dashCompanyId = $dashUser?->company_id ?? 0;
+                                $dashCanManage = $dashUser?->canManageCompany($dashCompanyId) ?? false;
+                                $dashCanTeach = $dashUser?->canTeachInContext($dashCompanyId) ?? false;
+                                if ($dashUser?->isAlvoraAdmin()) {
+                                    $dashLabel = 'Administrador Alvora';
+                                } elseif ($dashCanManage && $dashCanTeach) {
+                                    $dashLabel = 'Gestor & Instrutor';
+                                } elseif ($dashCanManage) {
+                                    $dashLabel = 'Gestor Corporativo';
+                                } elseif ($dashCanTeach) {
+                                    $dashLabel = 'Instrutor';
+                                } else {
+                                    $dashLabel = 'Colaborador';
+                                }
+                            @endphp
+                            {{ $dashLabel }}
                         </span>
                     </div>
                 </div>

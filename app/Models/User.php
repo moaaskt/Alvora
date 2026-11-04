@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -110,6 +111,60 @@ class User extends Authenticatable
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    /**
+     * Get companies associated with this user through company_users.
+     */
+    public function companies(): BelongsToMany
+    {
+        return $this->belongsToMany(Company::class, 'company_users')
+            ->withPivot('role', 'status')
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if user has administrative management authority over a specific company.
+     * Enforces company_users with status = 'active' as the single source of truth.
+     * Note: users.company_id alone NEVER grants management authority.
+     */
+    public function canManageCompany(int $companyId): bool
+    {
+        if ($this->isAlvoraAdmin()) {
+            return true;
+        }
+
+        return $this->companies()
+            ->where('companies.id', $companyId)
+            ->wherePivot('role', 'company_admin')
+            ->wherePivot('status', 'active')
+            ->exists();
+    }
+
+    /**
+     * Check if user is authorized to teach/create content in a given context:
+     * - Independent context ($companyId === null): requires global instructor or admin_alvora role.
+     * - Corporate context ($companyId !== null): requires active instructor membership in company_users.
+     */
+    public function canTeachInContext(?int $companyId = null): bool
+    {
+        if ($this->isAlvoraAdmin()) {
+            return true;
+        }
+
+        if ($companyId === null) {
+            return $this->role === UserRole::INSTRUCTOR;
+        }
+
+        if ($this->companies()
+            ->where('companies.id', $companyId)
+            ->wherePivot('role', 'instructor')
+            ->wherePivot('status', 'active')
+            ->exists()) {
+            return true;
+        }
+
+        return $this->role === UserRole::INSTRUCTOR && (int) $this->company_id === (int) $companyId;
     }
 
     /**

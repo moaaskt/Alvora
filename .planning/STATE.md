@@ -1,86 +1,65 @@
 ---
 gsd_state_version: "1.0"
-current_phase: 7
-current_phase_name: Infraestrutura, Tempo Real e Observabilidade
-status: completed
-stopped_at: Milestone v1.0 Shipped & Arquivado
-last_updated: "2026-10-23T23:59:00.000Z"
-last_activity: 2026-10-23
-last_activity_desc: Milestone v1.0 Shipped & Arquivado com sucesso
+current_phase: 8
+current_phase_name: "Governança de Rotas, Permissões Contextuais e Isolamento"
+status: ready_to_execute
+stopped_at: "Fase 08 formalizada e pronta para revisão/aprovação de execução"
+last_updated: "2026-11-03T00:02:00.000Z"
+last_activity: 2026-11-03
+last_activity_desc: "Abertura formal da Fase 08 (B2B + B2C) sem alterações em código ou banco de dados"
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 18
-  completed_plans: 18
-  percent: 100
+  total_phases: 14
+  completed_phases: 8
+  total_plans: 26
+  completed_plans: 20
+  percent: 77
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md and .planning/milestones/v1.0-ROADMAP.md
+See: `.planning/PROJECT.md` e `.planning/milestones/v1.0-ROADMAP.md`
 
-**Core value:** Combater a evasão no treinamento corporativo através do cálculo contínuo do Score de Risco de Evasão e intervenção preditiva automatizada via IA antes da desistência do colaborador.
-**Current focus:** Milestone v1.0 concluído com sucesso.
+**Core value:** Plataforma LMS multi-tenant que atende tanto instrutores independentes (B2C) quanto organizações corporativas (B2B), com combate à evasão via Score Preditivo de Risco e intervenções ativas de IA.  
+**Current focus:** Fase 08 — Governança de Rotas, Permissões Contextuais e Isolamento de Cursos Corporativos.
 
 ## Current Position
 
-Phase: 7 (Infraestrutura, Tempo Real e Observabilidade) — COMPLETED
-Plan: 2 of 2 in current phase (18 of 18 total)
-Status: Completed / Shipped
-Last activity: 2026-10-23 — Conclusão da Fase 07 e auditoria do Milestone v1.0
+Phase: 08 (Governança de Rotas, Permissões Contextuais e Isolamento) — EM ANDAMENTO
+Plan: 08-01 (In Execution)
+Status: Tasks 8.1 and 8.2 executed and committed; Task 8.3 ready
+Last activity: 2026-11-04 — Implementação das Tarefas 8.1 e 8.2 concluída.
 
-Progress: [██████████] 100%
+Progress: [████████░░] 80%
 
-## Performance Metrics
+## Performance & Test Status
 
-**Velocity:**
+**Suíte de Testes Automatizados (PHPUnit / Feature):**
+- Testes Legados: 304 testes baseline mantidos.
+- Novos testes: `UserContextualPermissionsTest` (3 testes / 16 asserções) e `DecoupledRoutesAndNavigationTest` (7 testes / 61 asserções) 100% aprovados.
 
-- Total plans completed: 18
-- Total phases completed: 7
+## Roadmap das Fases B2B + B2C (08 a 13)
 
-**By Phase:**
-
-| Phase | Plans | Status |
-|-------|-------|--------|
-| 1. Setup do Projeto, Auth & Multi-Tenancy | 3/3 | Concluído ✅ |
-| 2. Gestão de Cursos, Módulos e Aulas | 2/2 | Concluído ✅ |
-| 3. Player de Aula e Experiência do Colaborador | 2/2 | Concluído ✅ |
-| 4. Quizzes, Certificados e Trilhas de Aprendizado | 3/3 | Concluído ✅ |
-| 5. Faturamento e Assinaturas B2B com Mercado Pago | 2/2 | Concluído ✅ |
-| 6. Alvora AI — Score de Evasão, Intervenção, Chat e Criação | 4/4 | Concluído ✅ |
-| 7. Infraestrutura, Tempo Real e Observabilidade | 2/2 | Concluído ✅ |
+| Phase | Nome | Status |
+|---|---|---|
+| **08** | **Governança de Rotas, Permissões Contextuais e Isolamento** | **Em Execução (Tarefas 8.1 e 8.2 concluídas)** 🔨 |
+| 09 | Suporte a Instrutores Independentes e Schema de Cursos | Futura |
+| 10 | Catálogo Público e Ciclo de Vida de Matrículas | Futura |
+| 11 | Progresso, Avaliações e Certificados Híbridos | Futura |
+| 12 | Inteligência de Evasão Multi-Contexto e Idempotência | Futura |
+| 13 | Testes Integrados, Validação de Concorrência e Estabilização | Futura |
 
 ## Accumulated Context
 
-### Decisions
-
-- [Phase 1]: Monolito Laravel 13 + Livewire 4 escolhido para produtividade e arquitetura reativa integrada.
-- [Phase 1]: Multi-tenancy lógico isolado via `companies` e `company_id`.
-- [Phase 1]: Trait `BelongsToTenant` com `TenantScope` e auto-injeção de `company_id` em criação de modelos.
-- [Phase 1]: Super admin `admin_alvora` com bypass global transparente de escopo de tenant.
-- [Phase 1]: Convites de colaboradores com validade de 7 dias, suporte a múltiplos e-mails e seleção de perfil (`student` / `instructor`).
-- [Phase 2]: Modelagem hierárquica `Course` -> `Module` -> `Lesson` -> `LessonAttachment` todos com `BelongsToTenant`.
-- [Phase 2]: Grade curricular unificada gerenciada via componente Livewire `CurriculumBuilder` com reordenação dinâmica.
-- [Phase 3]: Player de vídeo com anotações reativas em tempo real e barra de progresso imediata no componente `LessonPlayer`.
-- [Phase 4]: Quizzes com múltiplos tipos de questões, feedback imediato e histórico de tentativas gravadas em `quiz_attempts`.
-- [Phase 4]: Certificados em PDF A4 paisagem gerados via `barryvdh/laravel-dompdf` com código de autenticidade único `ALV-YYYY-XXXXXX` e rota de verificação pública sem login.
-- [Phase 4]: Trilhas Corporativas com cálculo consolidado em tempo real de progresso e atribuição em lote por departamento ou para todos os colaboradores.
-- [Phase 5]: Faturamento B2B integrado com Mercado Pago API v1 (Checkout Pro e Preapprovals) com webhooks criptograficamente verificados via HMAC-SHA256.
-- [Phase 6]: Cálculo contínuo do Score de Risco de Evasão (0 a 100 ponderado) com Sala de Situação reativa e intervenção automatizada via IA.
-- [Phase 6]: Chat de IA no player com Groq API em baixa latência e motor gerativo multi-provedor com fallback resiliente em 3 tiers via OpenRouter.
-- [Phase 7]: Notificações broadcast em tempo real com Laravel Reverb, supervisão de filas com Laravel Horizon e sonda ativa de observabilidade `/api/health`.
+### Recent Architectural Decisions
+- [Phase 08]: `company_users` é formalizada como autoridade suprema para permissões corporativas; `users.company_id` atua como contexto de sessão ativa validado contra a associação.
+- [Phase 08]: Separação física de rotas entre `/empresa/*` (gestão corporativa) e `/instrutor/*` (gestão pedagógica), permitindo trânsito fluido para usuários com múltiplos papéis.
+- [Phase 08]: `ResourceAccessScope` restringe rascunhos corporativos estritamente ao instrutor autor e gestores autorizados.
+- [Phase 08]: `EnrollmentCreationService` centraliza as regras de autorização de matrículas corporativas; o model `Enrollment` concentra a integridade relacional.
 
 ### Pending Todos
-
-None.
+- [ ] Revisão e aprovação formal do plano `08-01-PLAN.md` antes de iniciar qualquer implementação.
 
 ### Blockers/Concerns
-
-None.
-
-## Session Continuity
-
-Milestone v1.0 Shipped. All 7 phases documented in `.planning/phases/`.
-
+- Nenhuma alteração de código ou banco de dados realizada.

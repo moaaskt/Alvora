@@ -37,46 +37,72 @@
                         <a href="{{ route('dashboard') }}" class="text-slate-300 hover:text-white transition-colors py-2">
                             Configurações IA
                         </a>
-                    @elseif(auth()->user()->isInstructor() || auth()->user()->isCompanyAdmin())
-                        <!-- Painel do Instrutor (O instrutor é a própria empresa) -->
-                        <a href="{{ route('dashboard') }}" class="text-white hover:text-indigo-400 transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('dashboard') ? 'text-indigo-400 font-semibold' : '' }}">
-                            <x-icon name="bar-chart-fill" class="w-4 h-4 text-indigo-400" />
-                            Painel do Instrutor
-                        </a>
-                        <a href="{{ route('instructor.courses.index') }}" class="text-slate-300 hover:text-white transition-colors py-2 {{ request()->routeIs('instructor.courses.*') ? 'text-indigo-400 font-semibold' : '' }}">
-                            Cursos & Conteúdos
-                        </a>
-                        <a href="{{ route('employees.index') }}" class="text-slate-300 hover:text-white transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('employees.*') ? 'text-indigo-400 font-semibold' : '' }}">
-                            <x-icon name="people-fill" class="w-4 h-4 text-emerald-400" />
-                            Colaboradores & Convites
-                        </a>
-                        <a href="{{ route('company.tracks.index') }}" class="text-slate-300 hover:text-white transition-colors py-2 {{ request()->routeIs('company.tracks.*') ? 'text-indigo-400 font-semibold' : '' }}">
-                            Trilhas Corporativas
-                        </a>
-                        <a href="{{ route('company.situation-room') }}" class="text-slate-300 hover:text-white transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('company.situation-room*') ? 'text-rose-400 font-semibold' : '' }}">
-                            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-                            Sala de Situação
-                        </a>
-                        <a href="{{ route('company.ai-insights') }}" class="text-slate-300 hover:text-white transition-colors py-2 {{ request()->routeIs('company.ai-insights*') ? 'text-indigo-400 font-semibold' : '' }}">
-                            Insights de IA
-                        </a>
-                        <a href="{{ route('company.billing') }}" class="text-slate-300 hover:text-white transition-colors py-2 {{ request()->routeIs('company.billing*') ? 'text-indigo-400 font-semibold' : '' }}">
-                            Assinatura & Plano
-                        </a>
-                    @else
-                        <!-- Aluno / Colaborador Links -->
-                        <a href="{{ route('student.dashboard') }}" class="text-white hover:text-indigo-400 transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('student.dashboard') ? 'text-indigo-400 font-semibold' : '' }}">
-                            Meu Aprendizado
-                        </a>
-                        <a href="{{ route('student.dashboard') }}#catalogo" class="text-slate-300 hover:text-white transition-colors py-2">
-                            Catálogo de Cursos
-                        </a>
-                        <a href="{{ route('student.dashboard') }}" class="text-slate-300 hover:text-white transition-colors py-2">
-                            Minhas Trilhas
-                        </a>
-                        <a href="{{ route('student.dashboard') }}" class="text-slate-300 hover:text-white transition-colors py-2">
-                            Meus Certificados
-                        </a>
+                    @elseif(auth()->user())
+                        @php
+                            $navUser = auth()->user();
+                            $navCompanyId = $navUser->company_id ?? 0;
+                            $canManageCompany = $navUser->canManageCompany($navCompanyId);
+                            $canTeach = $navUser->canTeachInContext($navCompanyId);
+                        @endphp
+
+                        @if($canManageCompany)
+                            <!-- Painel da Empresa (Gestão Corporativa) -->
+                            <a href="{{ route('dashboard') }}" class="text-white hover:text-indigo-400 transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('dashboard') ? 'text-indigo-400 font-semibold' : '' }}">
+                                <x-icon name="bar-chart-fill" class="w-4 h-4 text-indigo-400" />
+                                Visão Geral
+                            </a>
+                            <a href="{{ route('employees.index') }}" class="text-slate-300 hover:text-white transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('employees.*') ? 'text-indigo-400 font-semibold' : '' }}">
+                                <x-icon name="people-fill" class="w-4 h-4 text-emerald-400" />
+                                Colaboradores & Convites
+                            </a>
+                            <a href="{{ route('company.tracks.index') }}" class="text-slate-300 hover:text-white transition-colors py-2 {{ request()->routeIs('company.tracks.*') ? 'text-indigo-400 font-semibold' : '' }}">
+                                Trilhas Corporativas
+                            </a>
+                            <a href="{{ route('company.situation-room') }}" class="text-slate-300 hover:text-white transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('company.situation-room*') ? 'text-rose-400 font-semibold' : '' }}">
+                                <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                                Sala de Situação
+                            </a>
+                            <a href="{{ route('company.ai-insights') }}" class="text-slate-300 hover:text-white transition-colors py-2 {{ request()->routeIs('company.ai-insights*') ? 'text-indigo-400 font-semibold' : '' }}">
+                                Insights de IA
+                            </a>
+                            <a href="{{ route('company.billing') }}" class="text-slate-300 hover:text-white transition-colors py-2 {{ request()->routeIs('company.billing*') ? 'text-indigo-400 font-semibold' : '' }}">
+                                Assinatura & Plano
+                            </a>
+                        @endif
+
+                        @if($canTeach)
+                            <!-- Painel do Instrutor (Gestão Didática) -->
+                            @if(!$canManageCompany)
+                                <a href="{{ route('dashboard') }}" class="text-white hover:text-indigo-400 transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('dashboard') ? 'text-indigo-400 font-semibold' : '' }}">
+                                    <x-icon name="bar-chart-fill" class="w-4 h-4 text-indigo-400" />
+                                    Painel do Instrutor
+                                </a>
+                            @endif
+                            <a href="{{ route('instructor.courses.index') }}" class="text-slate-300 hover:text-white transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('instructor.courses.*') ? 'text-indigo-400 font-semibold' : '' }}">
+                                <x-icon name="journal-bookmark-fill" class="w-4 h-4 text-purple-400" />
+                                Cursos & Conteúdos
+                            </a>
+                            <a href="{{ route('instructor.certificate-templates.index') }}" class="text-slate-300 hover:text-white transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('instructor.certificate-templates.*') ? 'text-indigo-400 font-semibold' : '' }}">
+                                <x-icon name="award" class="w-4 h-4 text-amber-400" />
+                                Templates de Certificados
+                            </a>
+                        @endif
+
+                        @if(!$canManageCompany && !$canTeach)
+                            <!-- Aluno / Colaborador Links -->
+                            <a href="{{ route('student.dashboard') }}" class="text-white hover:text-indigo-400 transition-colors py-2 flex items-center gap-1.5 {{ request()->routeIs('student.dashboard') ? 'text-indigo-400 font-semibold' : '' }}">
+                                Meu Aprendizado
+                            </a>
+                            <a href="{{ route('student.dashboard') }}#catalogo" class="text-slate-300 hover:text-white transition-colors py-2">
+                                Catálogo de Cursos
+                            </a>
+                            <a href="{{ route('student.dashboard') }}" class="text-slate-300 hover:text-white transition-colors py-2">
+                                Minhas Trilhas
+                            </a>
+                            <a href="{{ route('student.dashboard') }}" class="text-slate-300 hover:text-white transition-colors py-2">
+                                Meus Certificados
+                            </a>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -84,12 +110,31 @@
             <!-- Right Side: User Profile & Logout -->
             <div class="flex items-center space-x-4">
                 <!-- Role Badge -->
-                <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
-                    @if(auth()->user()->isAlvoraAdmin()) bg-indigo-500/20 text-indigo-300 border border-indigo-500/30
-                    @elseif(auth()->user()->isInstructor() || auth()->user()->isCompanyAdmin()) bg-purple-500/20 text-purple-300 border border-purple-500/30
-                    @else bg-slate-800 text-slate-300 border border-slate-700
-                    @endif">
-                    {{ auth()->user()->isAlvoraAdmin() ? 'Administrador Alvora' : ((auth()->user()->isInstructor() || auth()->user()->isCompanyAdmin()) ? 'Instrutor' : 'Aluno') }}
+                @php
+                    $badgeUser = auth()->user();
+                    $badgeCompanyId = $badgeUser->company_id ?? 0;
+                    $badgeCanManage = $badgeUser->canManageCompany($badgeCompanyId);
+                    $badgeCanTeach = $badgeUser->canTeachInContext($badgeCompanyId);
+
+                    if ($badgeUser->isAlvoraAdmin()) {
+                        $roleLabel = 'Administrador Alvora';
+                        $roleBadgeClasses = 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30';
+                    } elseif ($badgeCanManage && $badgeCanTeach) {
+                        $roleLabel = 'Gestor & Instrutor';
+                        $roleBadgeClasses = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+                    } elseif ($badgeCanManage) {
+                        $roleLabel = 'Gestor Corporativo';
+                        $roleBadgeClasses = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+                    } elseif ($badgeCanTeach) {
+                        $roleLabel = 'Instrutor';
+                        $roleBadgeClasses = 'bg-purple-500/20 text-purple-300 border border-purple-500/30';
+                    } else {
+                        $roleLabel = 'Aluno';
+                        $roleBadgeClasses = 'bg-slate-800 text-slate-300 border border-slate-700';
+                    }
+                @endphp
+                <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ $roleBadgeClasses }}">
+                    {{ $roleLabel }}
                 </span>
 
                 <!-- User Info & Dropdown ("Select": Meu Perfil + Logout) -->
