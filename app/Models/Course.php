@@ -45,6 +45,8 @@ class Course extends Model
     {
         parent::boot();
 
+        static::addGlobalScope(new \App\Models\Scopes\CourseAccessScope);
+
         static::creating(function (Course $course) {
             if (empty($course->slug) && !empty($course->title)) {
                 $baseSlug = Str::slug($course->title);
@@ -53,8 +55,17 @@ class Course extends Model
         });
 
         static::deleting(function (Course $course) {
-            if ($course->certificates()->exists()) {
-                throw new \DomainException("Não é possível excluir o curso '{$course->title}' pois ele possui certificados emitidos.");
+            $verifyAndLock = function () use ($course) {
+                $locked = Course::withoutGlobalScopes()->where('id', $course->id)->lockForUpdate()->first();
+                if ($locked && $locked->certificates()->exists()) {
+                    throw new \DomainException("Não é possível excluir o curso '{$locked->title}' pois ele possui certificados emitidos.");
+                }
+            };
+
+            if (\Illuminate\Support\Facades\DB::transactionLevel() > 0) {
+                $verifyAndLock();
+            } else {
+                \Illuminate\Support\Facades\DB::transaction($verifyAndLock);
             }
         });
     }

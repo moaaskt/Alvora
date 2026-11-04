@@ -42,71 +42,87 @@ class CertificateService
      */
     public function getOrCreateCertificate(User $user, Course $course): Certificate
     {
-        // Garante leitura de dados vigentes atualizados do banco (evita stale models)
-        if ($user->exists) {
-            $user->refresh();
-        }
-        if ($course->exists) {
-            $course->refresh();
-        }
-        $course->loadMissing('company');
-        $user->loadMissing('company');
-
-        $existing = Certificate::where('user_id', $user->id)
-            ->where('course_id', $course->id)
-            ->where('company_id', $user->company_id)
-            ->first();
-
-        if ($existing) {
-            return $existing;
-        }
-
-        if (!$this->isEligible($user, $course)) {
-            throw new DomainException('Colaborador não atingiu os requisitos de 100% de conclusão ou aprovação nos quizzes para emissão do certificado.');
-        }
-
-        // Calculate total workload in minutes from all lessons of the course
-        $totalMinutes = (int) $course->lessons()->sum('duration_minutes');
-
-        // Consistência temporal estrita: unifica o instante de emissão e de captura do snapshot
-        $issuedAt = now();
-
-        // Nome da empresa estritamente comprovável (sem fallback fictício 'Empresa Cliente')
-        $companyName = $course->company?->name ?? $user->company?->name ?? null;
-
-        $snapshot = [
-            'mode' => 'original',
-            'student_name' => $user->name,
-            'course_title' => $course->title,
-            'company_name' => $companyName,
-            'workload_minutes' => $totalMinutes,
-            'captured_at' => $issuedAt->toIso8601String(),
-        ];
-
-        // Resolução hierárquica do template ativo (tenant -> global padrão)
-        $activeVersion = app(CertificateTemplateResolver::class)->resolveActiveTemplate($user->company_id);
-        $templateVersionId = $activeVersion?->id;
-
-        try {
-            return Certificate::create([
-                'company_id' => $user->company_id,
-                'user_id' => $user->id,
-                'course_id' => $course->id,
-                'template_version_id' => $templateVersionId,
-                'total_hours_minutes' => $totalMinutes,
-                'snapshot' => $snapshot,
-                'issued_at' => $issuedAt,
-            ]);
-        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
-            return $this->resolveConcurrentCertificate($user, $course, $e);
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($this->isUniqueConstraintViolation($e)) {
-                return $this->resolveConcurrentCertificate($user, $course, $e);
+        $issueCertificate = function () use ($user, $course) {
+            // Garante leitura de dados vigentes atualizados do banco (evita stale models)
+            if ($user->exists) {
+                $user->refresh();
+            }
+            if ($course->exists) {
+                $course->refresh();
             }
 
-            // Falhas de banco não relacionadas a unicidade nunca são mascaradas
-            throw $e;
+            // Protocolo de bloqueio pessimista na mesma ordem de aquisição que a exclusão:
+            // Obtém lock exclusivo na linha correspondente de courses antes de checar/criar certificados
+            $lockedCourse = Course::withoutGlobalScopes()
+                ->where('id', $course->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $lockedCourse->loadMissing('company');
+            $user->loadMissing('company');
+
+            $existing = Certificate::where('user_id', $user->id)
+                ->where('course_id', $lockedCourse->id)
+                ->where('company_id', $user->company_id)
+                ->first();
+
+            if ($existing) {
+                return $existing;
+            }
+
+            if (!$this->isEligible($user, $lockedCourse)) {
+                throw new DomainException('Colaborador não atingiu os requisitos de 100% de conclusão ou aprovação nos quizzes para emissão do certificado.');
+            }
+
+            // Calculate total workload in minutes from all lessons of the course
+            $totalMinutes = (int) $lockedCourse->lessons()->sum('duration_minutes');
+
+            // Consistência temporal estrita: unifica o instante de emissão e de captura do snapshot
+            $issuedAt = now();
+
+            // Nome da empresa estritamente comprovável (sem fallback fictício 'Empresa Cliente')
+            $companyName = $lockedCourse->company?->name ?? $user->company?->name ?? null;
+
+            $snapshot = [
+                'mode' => 'original',
+                'student_name' => $user->name,
+                'course_title' => $lockedCourse->title,
+                'company_name' => $companyName,
+                'workload_minutes' => $totalMinutes,
+                'captured_at' => $issuedAt->toIso8601String(),
+            ];
+
+            // Resolução hierárquica do template ativo (tenant -> global padrão)
+            $activeVersion = app(CertificateTemplateResolver::class)->resolveActiveTemplate($user->company_id);
+            $templateVersionId = $activeVersion?->id;
+
+            try {
+                return Certificate::create([
+                    'company_id' => $user->company_id,
+                    'user_id' => $user->id,
+                    'course_id' => $lockedCourse->id,
+                    'template_version_id' => $templateVersionId,
+                    'total_hours_minutes' => $totalMinutes,
+                    'snapshot' => $snapshot,
+                    'issued_at' => $issuedAt,
+                ]);
+            } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                return $this->resolveConcurrentCertificate($user, $lockedCourse, $e);
+            } catch (\Illuminate\Database\QueryException $e) {
+                if ($this->isUniqueConstraintViolation($e)) {
+                    return $this->resolveConcurrentCertificate($user, $lockedCourse, $e);
+                }
+
+                // Falhas de banco não relacionadas a unicidade nunca são mascaradas
+                throw $e;
+            }
+        };
+
+        if (DB::transactionLevel() > 0) {
+            return $issueCertificate();
         }
+
+        return DB::transaction($issueCertificate);
     }
 
     /**
