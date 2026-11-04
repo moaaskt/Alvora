@@ -72,17 +72,18 @@ class CourseManager extends Component
 
     public function deleteCourse(int $courseId): void
     {
+        $deletionService = app(\App\Services\CourseDeletionService::class);
         $course = Course::withoutGlobalScopes()->findOrFail($courseId);
-
-        if ($course->certificates()->exists()) {
-            $this->dispatch('toast', message: "Não é possível excluir o curso '{$course->title}' pois ele possui certificados emitidos.", type: 'error');
-            return;
-        }
-
         $title = $course->title;
-        $course->delete();
 
-        $this->dispatch('toast', message: "Curso '{$title}' removido com sucesso.", type: 'info');
+        try {
+            $deletionService->deleteCourse($course, auth()->user());
+            $this->dispatch('toast', message: "Curso '{$title}' removido com sucesso.", type: 'info');
+        } catch (\DomainException $e) {
+            $this->dispatch('toast', message: $e->getMessage(), type: 'error');
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            $this->dispatch('toast', message: $e->getMessage(), type: 'error');
+        }
     }
 
     public function exportCsv(): StreamedResponse
