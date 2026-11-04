@@ -60,3 +60,4 @@ class CompanyPolicy
         return $user->canManageCompany($company->id);
     }
 }
+

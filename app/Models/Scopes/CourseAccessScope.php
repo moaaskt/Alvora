@@ -53,3 +53,4 @@ class CourseAccessScope implements Scope
         });
     }
 }
+
