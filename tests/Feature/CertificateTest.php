@@ -989,6 +989,10 @@ class CertificateTest extends TestCase
             'company_id' => $company->id,
             'role' => UserRole::INSTRUCTOR,
         ]);
+        $instructor->companies()->attach($company->id, [
+            'role' => 'instructor',
+            'status' => 'active',
+        ]);
 
         $student = User::create([
             'name' => 'Aluno Componente',
