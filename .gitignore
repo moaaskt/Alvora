@@ -29,3 +29,6 @@ yarn-error.log*
 screenshots
 demo-clips
 public\videos
+public/videos/demo-lesson.mp4
+public/images/sala-de-situacao-demo.png
+record-demo.mjs
