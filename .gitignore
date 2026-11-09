@@ -27,3 +27,5 @@ yarn-error.log*
 # agentes
 .planning
 screenshots
+demo-clips
+public\videos
