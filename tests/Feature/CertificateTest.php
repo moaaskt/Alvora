@@ -1302,7 +1302,9 @@ class CertificateTest extends TestCase
 
         // Atualiza os registros diretamente no banco sem atualizar os objetos em memória $student e $course
         User::where('id', $student->id)->update(['name' => 'Nome Fresco Atualizado no Banco']);
-        Course::where('id', $course->id)->update(['title' => 'Título Fresco Atualizado no Banco']);
+        Course::withoutGlobalScopes()->where('id', $course->id)->update(['title' => 'Título Fresco Atualizado no Banco']);
+
+        $this->actingAs($student);
 
         /** @var \App\Services\CertificateService $service */
         $service = app(\App\Services\CertificateService::class);
