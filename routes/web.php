@@ -37,19 +37,21 @@ Route::get('/', function () {
 
     if ($demoCompany) {
         // Consulta explícita restrita a $demoCompany->id e status 'published'
-        // Seleciona exclusivamente campos públicos, sem expor dados internos de negócio
-        $showcaseCourses = \App\Models\Course::where('company_id', $demoCompany->id)
-            ->where('status', 'published')
-            ->select(['id', 'company_id', 'instructor_id', 'category_id', 'title', 'slug', 'description', 'thumbnail', 'status'])
-            ->with([
-                'instructor' => fn ($query) => $query->select(['id', 'company_id', 'name', 'role', 'avatar']),
-                'category' => fn ($query) => $query->select(['id', 'name', 'slug']),
-            ])
-            ->withCount(['lessons', 'modules'])
-            ->withSum('lessons as total_duration_minutes', 'duration_minutes')
-            ->latest('id')
-            ->take(6)
-            ->get();
+        // Executada dentro do contexto de vitrine pública explicitamente autorizado pelo servidor
+        $showcaseCourses = \App\Models\Course::runAsPublicShowcase(function () use ($demoCompany) {
+            return \App\Models\Course::where('company_id', $demoCompany->id)
+                ->where('status', 'published')
+                ->select(['id', 'company_id', 'instructor_id', 'category_id', 'title', 'slug', 'description', 'thumbnail', 'status'])
+                ->with([
+                    'instructor' => fn ($query) => $query->select(['id', 'company_id', 'name', 'role', 'avatar']),
+                    'category' => fn ($query) => $query->select(['id', 'name', 'slug']),
+                ])
+                ->withCount(['lessons', 'modules'])
+                ->withSum('lessons as total_duration_minutes', 'duration_minutes')
+                ->latest('id')
+                ->take(6)
+                ->get();
+        });
 
         // Instrutores públicos atuantes nesses cursos de demonstração (somente nome e id)
         $instructorIds = $showcaseCourses->pluck('instructor_id')->filter()->unique();

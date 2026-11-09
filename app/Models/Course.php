@@ -90,6 +90,14 @@ class Course extends Model
     }
 
     /**
+     * Execute a query callback inside the server-authorized public demo showcase context.
+     */
+    public static function runAsPublicShowcase(callable $callback): mixed
+    {
+        return \App\Models\Scopes\CourseAccessScope::runAsPublicShowcase($callback);
+    }
+
+    /**
      * Categoria vinculada ao curso.
      */
     public function category(): BelongsTo
