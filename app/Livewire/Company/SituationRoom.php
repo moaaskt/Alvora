@@ -24,6 +24,7 @@ class SituationRoom extends Component
     public ?int $selectedUserId = null;
     public string $manualMessage = '';
     public bool $showModal = false;
+    public ?User $selectedUser = null;
 
     public function updatedFilterLevel(): void
     {
@@ -78,8 +79,17 @@ class SituationRoom extends Component
     public function openInterventionModal(int $userId): void
     {
         $this->selectedUserId = $userId;
-        $user = User::find($userId);
-        $this->manualMessage = "Olá, {$user?->name}! Gostaria de conversar com você sobre o seu andamento nos cursos da empresa e como podemos te apoiar no seu desenvolvimento.";
+        $user = User::with(['latestRiskScore', 'interventions'])->find($userId);
+        $this->selectedUser = $user;
+
+        // Se houver mensagem de intervenção pré-gerada no banco, carregar ela
+        $latestIntervention = $user?->interventions()->latest('id')->first();
+        if ($latestIntervention && !empty($latestIntervention->message)) {
+            $this->manualMessage = $latestIntervention->message;
+        } else {
+            $this->manualMessage = "Olá, {$user?->name}! Gostaria de conversar com você sobre o seu andamento nos cursos da empresa e como podemos te apoiar no seu desenvolvimento.";
+        }
+
         $this->showModal = true;
     }
 
@@ -87,6 +97,7 @@ class SituationRoom extends Component
     {
         $this->showModal = false;
         $this->selectedUserId = null;
+        $this->selectedUser = null;
         $this->manualMessage = '';
     }
 
