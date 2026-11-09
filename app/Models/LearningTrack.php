@@ -87,9 +87,19 @@ class LearningTrack extends Model
      */
     public function courses(): BelongsToMany
     {
-        return $this->belongsToMany(Course::class, 'track_courses', 'track_id', 'course_id')
+        $relation = $this->belongsToMany(Course::class, 'track_courses', 'track_id', 'course_id')
+            ->withoutGlobalScope(\App\Models\Scopes\CourseAccessScope::class)
+            ->join('learning_tracks', 'learning_tracks.id', '=', 'track_courses.track_id')
+            ->whereColumn('courses.company_id', 'learning_tracks.company_id')
+            ->select('courses.*')
             ->withPivot('order')
             ->orderBy('pivot_order');
+
+        if ($this->exists && !empty($this->company_id)) {
+            $relation->where('courses.company_id', $this->company_id);
+        }
+
+        return $relation;
     }
 
     /**
