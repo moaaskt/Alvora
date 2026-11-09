@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Events\CourseProgressUpdated;
 use App\Traits\BelongsToTenant;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -57,7 +59,57 @@ class Enrollment extends Model
      */
     public function course(): BelongsTo
     {
-        return $this->belongsTo(Course::class);
+        $relation = $this->belongsTo(Course::class)
+            ->withoutGlobalScope(\App\Models\Scopes\CourseAccessScope::class);
+
+        if ($this->exists && !empty($this->company_id)) {
+            $relation->where('courses.company_id', $this->company_id);
+        }
+
+        return $relation;
+    }
+
+    /**
+     * Create a new BelongsTo relationship instance, enforcing tenant isolation on eager loading.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $child
+     * @param  string  $foreignKey
+     * @param  string  $ownerKey
+     * @param  string  $relation
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    protected function newBelongsTo(Builder $query, Model $child, $foreignKey, $ownerKey, $relation)
+    {
+        if ($relation === 'course') {
+            return new class($query, $child, $foreignKey, $ownerKey, $relation) extends BelongsTo {
+                public function match(array $models, Collection $results, $relation)
+                {
+                    $foreign = $this->foreignKey;
+                    $owner = $this->ownerKey;
+
+                    $dictionary = [];
+                    foreach ($results as $result) {
+                        $dictionary[$result->{$owner}] = $result;
+                    }
+
+                    foreach ($models as $model) {
+                        if (isset($dictionary[$model->{$foreign}])) {
+                            $candidate = $dictionary[$model->{$foreign}];
+                            if (!empty($model->company_id) && (int) $model->company_id === (int) $candidate->company_id) {
+                                $model->setRelation($relation, $candidate);
+                            } else {
+                                $model->setRelation($relation, null);
+                            }
+                        }
+                    }
+
+                    return $models;
+                }
+            };
+        }
+
+        return parent::newBelongsTo($query, $child, $foreignKey, $ownerKey, $relation);
     }
 
     /**

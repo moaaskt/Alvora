@@ -10,6 +10,43 @@ use Illuminate\Support\Facades\Auth;
 class CourseAccessScope implements Scope
 {
     /**
+     * Whether the public showcase context is explicitly active in the current server execution.
+     */
+    protected static bool $publicShowcaseActive = false;
+
+    /**
+     * Execute a callback strictly within the authorized public demo showcase context.
+     * Preserves and restores previous state for full reentrancy and exception safety.
+     */
+    public static function runAsPublicShowcase(callable $callback): mixed
+    {
+        $previousState = static::$publicShowcaseActive;
+        static::$publicShowcaseActive = true;
+
+        try {
+            return $callback();
+        } finally {
+            static::$publicShowcaseActive = $previousState;
+        }
+    }
+
+    /**
+     * Explicitly reset public showcase state (e.g., between Octane / persistent worker ticks).
+     */
+    public static function resetPublicShowcase(): void
+    {
+        static::$publicShowcaseActive = false;
+    }
+
+    /**
+     * Check if public showcase context is active.
+     */
+    public static function isPublicShowcaseActive(): bool
+    {
+        return static::$publicShowcaseActive;
+    }
+
+    /**
      * Apply the scope to a given Eloquent query builder.
      * Governs internal visibility within tenant and across roles:
      * - admin_alvora: global visibility of all courses and drafts.
@@ -17,8 +54,10 @@ class CourseAccessScope implements Scope
      * - Other corporate users (manager, student, other instructors): sees only published courses or enrolled courses.
      *   Drafts by other instructors are strictly omitted.
      * - Unauthenticated processes (HTTP visitors, non-context CLI / queues):
-     *   No implicit global bypass. Only published courses are accessible unless explicitly bypassed via withoutGlobalScopes().
-     *   Never anticipates B2C schema (no company_id IS NULL).
+     *   Strictly zero courses by default (whereRaw('1 = 0')).
+     *   Only when explicitly running inside the server-authorized public showcase context (runAsPublicShowcase),
+     *   the official demo tenant's published courses can be retrieved.
+     *   Never assumes B2C schema (no company_id IS NULL).
      */
     public function apply(Builder $builder, Model $model): void
     {
@@ -30,12 +69,22 @@ class CourseAccessScope implements Scope
             return;
         }
 
-        // 2. Unauthenticated processes or public visitors:
-        // Do NOT grant implicit global bypass to CLI, queues or seeders.
-        // Explicitly authorized system operations must call withoutGlobalScopes() or specify context.
-        // Unauthenticated requests can only access published courses. Never assume B2C (no company_id IS NULL).
+        // 2. Unauthenticated processes, CLI, background jobs, or public visitors:
         if (!$user) {
-            $builder->where($table . '.status', 'published');
+            // Strictly check if executed inside the server-authorized public showcase context
+            if (static::$publicShowcaseActive) {
+                $demoCnpj = config('app.demo_tenant_cnpj', '12.345.678/0001-90');
+                $demoCompanyId = \App\Models\Company::where('cnpj', $demoCnpj)->value('id');
+
+                if ($demoCompanyId) {
+                    $builder->where($table . '.company_id', $demoCompanyId)
+                        ->where($table . '.status', 'published');
+                    return;
+                }
+            }
+
+            // Zero records for any unauthenticated query without authorized context
+            $builder->whereRaw('1 = 0');
             return;
         }
 
