@@ -595,19 +595,24 @@
     </div>
 
     <!-- Modal de Intervenção Manual / Alvora Copilot IA -->
-    @if ($showModal)
+    @if ($showModal && $selectedUser)
+        @php
+            $modalRiskScore = $selectedUser->latestRiskScore;
+            $modalBreakdown = $modalRiskScore?->breakdown ?? [];
+        @endphp
         <div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-            <div class="w-full max-w-lg rounded-2xl bg-surface-container-lowest border border-slate-200/80 p-6 shadow-2xl relative flex flex-col gap-4">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-200/60">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
-                            <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                            </svg>
+            <div class="w-full max-w-xl rounded-2xl bg-surface-container-lowest border border-slate-200/80 p-6 shadow-2xl relative flex flex-col gap-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-200/60">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-error/10 text-error flex items-center justify-center font-bold text-sm">
+                            {{ strtoupper(substr($selectedUser->name, 0, 2)) }}
                         </div>
                         <div>
-                            <h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Enviar Intervenção Personalizada</h3>
-                            <p class="font-body-sm text-xs text-on-surface-variant">Esta mensagem será entregue diretamente ao colaborador no painel de treinamentos.</p>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">{{ $selectedUser->name }}</h3>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-error text-white">Score: {{ $modalRiskScore?->score ?? 0 }} pts</span>
+                            </div>
+                            <p class="font-body-sm text-xs text-on-surface-variant">{{ $selectedUser->department ?? 'Equipe' }} • {{ $selectedUser->job_title ?? 'Colaborador' }}</p>
                         </div>
                     </div>
                     <button wire:click="closeModal" type="button" class="p-1 rounded-lg text-secondary hover:text-on-surface transition-colors">
@@ -615,11 +620,39 @@
                     </button>
                 </div>
 
+                <!-- Breakdown do Score de Risco -->
+                @if ($modalBreakdown)
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col gap-2">
+                        <span class="text-xs font-semibold text-slate-700">Fatores Preditivos de Risco (Breakdown):</span>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                            <div class="p-2 rounded-lg bg-white border border-slate-200 shadow-2xs">
+                                <span class="text-[10px] text-slate-500 uppercase font-medium block">Inatividade</span>
+                                <span class="text-xs font-bold text-error">{{ $modalBreakdown['inactivity']['score'] ?? 0 }}%</span>
+                            </div>
+                            <div class="p-2 rounded-lg bg-white border border-slate-200 shadow-2xs">
+                                <span class="text-[10px] text-slate-500 uppercase font-medium block">Estagnação</span>
+                                <span class="text-xs font-bold text-amber-600">{{ $modalBreakdown['stagnation']['score'] ?? 0 }}%</span>
+                            </div>
+                            <div class="p-2 rounded-lg bg-white border border-slate-200 shadow-2xs">
+                                <span class="text-[10px] text-slate-500 uppercase font-medium block">Quiz</span>
+                                <span class="text-xs font-bold text-slate-700">{{ $modalBreakdown['quiz']['score'] ?? 0 }}%</span>
+                            </div>
+                            <div class="p-2 rounded-lg bg-white border border-slate-200 shadow-2xs">
+                                <span class="text-[10px] text-slate-500 uppercase font-medium block">Desvio Pares</span>
+                                <span class="text-xs font-bold text-slate-700">{{ $modalBreakdown['peer_deviation']['score'] ?? 0 }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="flex flex-col gap-1.5">
-                    <label class="block font-label-md text-xs font-semibold text-on-surface">Mensagem de Apoio / Incentivo Pedagógico</label>
-                    <textarea wire:model="manualMessage" rows="5"
+                    <div class="flex items-center justify-between">
+                        <label class="block font-label-md text-xs font-semibold text-on-surface">Mensagem de Intervenção Pedagógica (Alvora Copilot IA)</label>
+                        <span class="text-[10px] text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">Gerada pela IA</span>
+                    </div>
+                    <textarea wire:model="manualMessage" rows="4"
                               placeholder="Digite a mensagem de apoio para incentivar o colaborador..."
-                              class="w-full p-3 font-body-md text-body-md rounded-xl bg-surface-container-low border border-slate-200 text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary-container"></textarea>
+                              class="w-full p-3 font-body-md text-xs rounded-xl bg-surface-container-low border border-slate-200 text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary-container leading-relaxed"></textarea>
                     @error('manualMessage')
                         <span class="font-label-sm text-xs text-error mt-1">{{ $message }}</span>
                     @enderror
